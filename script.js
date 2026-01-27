@@ -15,11 +15,26 @@ const totalDiv = document.getElementById("total");
 const whatsappLink = document.getElementById("whatsapp-link");
 
 let currentProductIndex = 0;
-const productsPerView = 3;
-const productWidth = 367.73;
+let productsPerView = 3;
+let productWidth = 367.73;
+
+// Update carousel dimensions based on screen size
+function updateCarouselDimensions() {
+  if (window.innerWidth <= 480) {
+    productWidth = 280;
+    productsPerView = 1;
+  } else if (window.innerWidth <= 768) {
+    productWidth = 250;
+    productsPerView = 2;
+  } else {
+    productWidth = 367.73;
+    productsPerView = 3;
+  }
+}
 
 // Display all products in carousel
 function initializeProducts() {
+  updateCarouselDimensions();
   productsCarousel.innerHTML = "";
   products.forEach(product => {
     const div = document.createElement("div");
@@ -40,6 +55,7 @@ function initializeProducts() {
 
 // Display products filtered by category
 function initializeCategory(categoryName) {
+  updateCarouselDimensions();
   const categoryProducts = products.filter(p => p.category === categoryName);
   
   productsCarousel.innerHTML = "";
@@ -76,6 +92,12 @@ function slideProducts(direction) {
   currentProductIndex = Math.max(0, Math.min(currentProductIndex, maxScroll));
   updateCarouselPosition();
 }
+
+// Add event listener for window resize to update carousel on orientation change
+window.addEventListener('resize', () => {
+  updateCarouselDimensions();
+  updateCarouselPosition();
+});
 
 function addToCart(id) {
   const product = products.find(p => p.id === id);
