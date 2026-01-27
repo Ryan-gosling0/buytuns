@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BuyTun - Jewelry</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <div class="logo">
+      <img src="assets/img/logo.png" alt="BuyTun Logo" />
+      <h1>BuyTun</h1>
+    </div>
+    <div class="cart" id="cart-count">Cart: 0</div>
+  </header>
+
+  <nav>
+    <ul>
+      <li><a href="index.html">Home</a></li>
+      <li><a href="watches.html">Watches</a></li>
+      <li><a href="jewelry.html">Jewelry</a></li>
+      <li><a href="electronics.html">Electronics</a></li>
+      <li><a href="games.html">Games</a></li>
+      <li><a href="hotstuff.html">Hot Stuff</a></li>
+      <li><a href="lacation.html">Location</a></li>
+    </ul>
+  </nav>
+
+  <main>
+    
+     
+    <section class="products-section">
+      <h2>Jewelry Collection</h2>
+      <div class="products-carousel-container">
+        <div class="products-carousel-inner" id="products-carousel">
+          <!-- Products will be inserted here -->
+        </div>
+        <button class="carousel-btn prev-btn" onclick="slideProducts(-1)">&#10094;</button>
+        <button class="carousel-btn next-btn" onclick="slideProducts(1)">&#10095;</button>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p>© 2026 BuyTun. All Rights Reserved.</p>
+    contacts: Email Us :contact@buytun.com | Call Us : +216 58885966
+  </footer>
+
+  <!-- Floating Cart Button -->
+  <button class="floating-cart-btn" id="floating-cart-btn" onclick="toggleCart()">
+    🛒 <span id="cart-badge">0</span>
+  </button>
+
+  <!-- Cart Modal -->
+  <div class="cart-modal" id="cart-modal">
+    <div class="cart-modal-content">
+      <button class="close-btn" onclick="toggleCart()">✕</button>
+      <h2>Your Cart</h2>
+      <div id="cart-items"></div>
+      <h3 id="total">Total: 0 dt</h3>
+      <a id="whatsapp-link" href="#" target="_blank">
+        <button class="whatsapp-btn">Order via WhatsApp</button>
+      </a>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+  <script>
+    initializeCategory('Jewelry');
+  </script>
+</body>
+</html>
