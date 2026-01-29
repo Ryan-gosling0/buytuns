@@ -19,24 +19,32 @@
     <ul>
       <li><a href="index.html">Home</a></li>
       <li><a href="watches.html">Watches</a></li>
-      <li><a href="jewelry.html">Jewelry</a></li>
+      <li><a href="accesoires.html">Accessories</a></li>
       <li><a href="electronics.html">Electronics</a></li>
       <li><a href="games.html">Games</a></li>
       <li><a href="hotstuff.html">Hot Stuff</a></li>
+      <li><a href="makeup.html">Makeup</a></li>
       <li><a href="lacation.html">Location</a></li>
     </ul>
   </nav>
 
+  <div class="search-bar-container">
+    <input 
+      type="text" 
+      id="search-input" 
+      class="search-bar" 
+      placeholder="Search products..." 
+      onkeyup="searchCategoryProducts('Games', this.value)"
+    >
+  </div>
+
   <main>
-    
     <section class="products-section">
       <h2>Games Collection</h2>
-      <div class="products-carousel-container">
-        <div class="products-carousel-inner" id="products-carousel">
+      <div class="products-grid-container">
+        <div class="products-grid" id="products-carousel">
           <!-- Products will be inserted here -->
         </div>
-        <button class="carousel-btn prev-btn" onclick="slideProducts(-1)">&#10094;</button>
-        <button class="carousel-btn next-btn" onclick="slideProducts(1)">&#10095;</button>
       </div>
     </section>
   </main>
