@@ -26,12 +26,13 @@ header {
 header .logo {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 70px;
 }
 
 header .logo img {
-  width: 50px;
-  height: 50px;
+  width: 200px;
+  height: 60px;
+   border-radius: 15px;
 }
 
 header .logo h1 {
@@ -98,6 +99,35 @@ nav ul li a:hover {
   nav ul li a {
     font-size: 14px;
   }
+  header h1 {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 2px;
+    position: relative;
+    left : 80px;
+    bottom: 50px;
+  }
+
+  header h3 {
+    display: none;
+  }
+  header p {
+    position: relative;
+    left : 80px;
+    bottom: 50px;
+  }
+  header .cart {
+    display: none;
+  }
+   header .logo img {
+    position: relative;
+    right: 100px;
+    float: left;
+    width: 100%; 
+   
+  }
+
+  
 }
 
 @media (max-width: 480px) {
@@ -109,7 +139,42 @@ nav ul li a:hover {
   nav ul li a {
     font-size: 12px;
   }
+   header {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  header .logo {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  header .logo img {
+    width: 140px;
+    height: auto;
+  }
+
+  
+
+  header .cart {
+    margin-top: 10px;
+  }
+.brand-text h1 {
+    font-size: 19px;
+    font-weight: 600;
+  }
+
+  .brand-text p {
+    font-size: 12.5px;
+    line-height: 1.4;
+  }
+
+  .brand-text .phone {
+    font-size: 12.5px;
+  }
 }
+
 
 /* Search Bar */
 .search-bar-container {
