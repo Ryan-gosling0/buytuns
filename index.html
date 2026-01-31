@@ -3,24 +3,25 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>BuyTun - Professional E-commerce</title>
+  <title>Smart Protect</title>
   <link rel="stylesheet" href="style.css">
+  <link rel="icon" type="image/x-icon" href="assets/logobadi/icon.png">
 </head>
 <body>
   <header>
     <div class="logo">
-      <img src="assets/logobadi/try1.png"  id="logo" alt="BuyTun Logo" />
-      
-      <h1><strong>Smart Protect</strong></h1>
-
-<h3>
-  Spécialisée dans la vente, l’installation et la maintenance de systèmes de sécurité <br>
-  et de vidéosurveillance pour particuliers et professionnels.</h3><p>📞29 556 997</p> 
-
-
-
+       <img src="assets/logobadi/yes.png"  id="logo" alt="BuyTun Logo" />
     </div>
-    <div class="cart" id="cart-count">Cart: 0</div>
+  <div class="search-bar-container">
+    <input 
+      type="text" 
+      id="search-input" 
+      class="search-bar" 
+      placeholder="Search products by name, category, or price..." 
+      onkeyup="searchProducts(this.value)"
+    >
+  </div>
+  <p id="num" >📞29556997</p> 
   </header>
 
   <nav>
@@ -36,21 +37,13 @@
     </ul>
   </nav>
 
-  <div class="search-bar-container">
-    <input 
-      type="text" 
-      id="search-input" 
-      class="search-bar" 
-      placeholder="Search products by name, category, or price..." 
-      onkeyup="searchProducts(this.value)"
-    >
-  </div>
+  <br>
 
   <main>
     <div class="content">
       <div class="slider-container">
         <div class="slider">
-          <img id="slider-image" src="assets/img/offre.jpg" alt="">
+          <img id="slider-image" src="assets/logobadi/def.png" style="object-fit: fill" alt="">
           <button class="slider-btn prev" onclick="changeSlide(-1)">&#10094;</button>
           <button class="slider-btn next" onclick="changeSlide(1)">&#10095;</button>
         </div>
@@ -62,7 +55,7 @@
       </div>
 
       <script>
-        const sliderImages = ["assets/img/offre.jpg", "assets/img/kit.jpg", "assets/img/install.jpg"];
+        const sliderImages = ["assets/logobadi/def.png","assets/img/offre.jpg",  "assets/img/install.jpg"];
         let currentIndex = 0;
         let autoSlideInterval;
 
