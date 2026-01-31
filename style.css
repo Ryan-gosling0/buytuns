@@ -22,7 +22,8 @@ header {
  
   gap: 10px;
 }
-
+header .cart {
+    display: none;}
 header .logo {
   display: flex;
   align-items: center;
