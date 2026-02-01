@@ -1,11 +1,12 @@
 const products = [
   // WATCHES - Add new watches here
-  { id: 1, name: "Luxury Watch", price: 250, category: "Watches", img: "assets/watches/rose.jpg", link: "#" },
+{ id: "IPC-B7ED-5M0TEA-EU/FSP14", name: "Luxury Watch", price: 250, category: "Watches", img: "assets/watches/rose.jpg", link: "#" },
   { id: 101, name: "Classic Silver Watch", price: 180, category: "Watches", img: "assets/watches/rose.jpg", link: "#" },
+  { id: 102, name: "testtets", price: 10, category: "Watches", img: "assets/logobadi/know.jpg", link: "#" },
   
   // JEWELRY - Add new jewelry here
   { id: 2, name: "Gold Ring", price: 500, category: "Jewelry", img: "assets/img/detecteur.jpg", link: "#" },
-  { id: 102, name: "Classy Jewelry Set", price: 300, category: "Jewelry", img: "assets/img/detecteur.jpg", link: "#" },
+  { id: 103, name: "Classy Jewelry Set", price: 300, category: "Jewelry", img: "assets/img/detecteur.jpg", link: "#" },
   
   // ELECTRONICS - Add new electronics here
   { id: 3, name: "Smartphone", price: 800, category: "Electronics", img: "assets/img/art.jpg", link: "#" },
@@ -22,11 +23,11 @@ const products = [
   // MAKEUP - Add new makeup products here
   { id: 6, name: "Elegant Makeup Set", price: 120, category: "Makeup", img: "assets/makeup/creme.jpg", link: "#" },
   { id: 7, name: "Professional Makeup Kit", price: 95, category: "Makeup", img: "assets/makeup/pack.jpg", link: "#" },
-  { id: 103, name: "Luxury Foundation", price: 65, category: "Makeup", img: "assets/makeup/creme2.jpg", link: "#" },
-  { id: 104, name: "Matte Lipstick Palette", price: 45, category: "Makeup", img: "assets/makeup/gloss.jpg", link: "#" },
-  { id: 105, name: "HD Powder Compact", price: 35, category: "Makeup", img: "assets/makeup/eye20.jpg", link: "#" },
-  { id: 106, name: "Eyeshadow Brush Set", price: 28, category: "Makeup", img: "assets/makeup/gloss1.jpg", link: "#" },
-  { id: 107, name: "Face Mask Sheet", price: 18, category: "Makeup", img: "assets/makeup/mask9.jpg", link: "#" }
+  { id: 104, name: "Luxury Foundation", price: 65, category: "Makeup", img: "assets/makeup/creme2.jpg", link: "#" },
+  { id: 105, name: "Matte Lipstick Palette", price: 45, category: "Makeup", img: "assets/makeup/gloss.jpg", link: "#" },
+  { id: 106, name: "HD Powder Compact", price: 35, category: "Makeup", img: "assets/makeup/eye20.jpg", link: "#" },
+  { id: 107, name: "Eyeshadow Brush Set", price: 28, category: "Makeup", img: "assets/makeup/gloss1.jpg", link: "#" },
+  { id: 108, name: "Face Mask Sheet", price: 18, category: "Makeup", img: "assets/makeup/mask9.jpg", link: "#" }
 ];
 
 let cart = [];
