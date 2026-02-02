@@ -5,158 +5,178 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Admin Stock & Invoice Management</title>
 <style>
-body { font-family: Arial, sans-serif; margin: 20px; background-color: lightslategray; }
-h1, h2 { margin-bottom: 10px; }
-button { padding: 6px 12px; margin-right: 6px; cursor: pointer; }
-#top-buttons { margin-bottom: 12px; }
-#search-bar { padding: 6px; width: 300px; }
-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-th, td { border: 1px solid #333; padding: 8px; text-align: center; }
-th { background-color: #4CAF50; color: white; }
-input[type="number"], select { width: 60px; text-align: center; font-weight:bold; }
-img { max-width: 60px; max-height: 60px; }
-.delete-btn { background: #dc3545; color: white; border: none; }
-#invoice-editor { margin-top: 20px; display:none; background:#fff;padding:15px;border:1px solid #333; box-shadow:0 0 10px rgba(0,0,0,0.2);}
-.invoice-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; }
-#logo-preview { max-height:50px; max-width:120px; }
-.signature-box { width:180px; height:60px; border:1px solid #333; display:inline-block; margin:5px; vertical-align:top; }
-.invoice-table th, .invoice-table td { padding:6px; border:1px solid #333; }
-.invoice-table tbody tr:nth-child(even){ background:#f9f9f9; }
-.invoice-table tfoot td { font-weight:bold; }
-button{
-font-family: Verdana, Geneva, Tahoma, sans-serif;
-text-align: center;
-font-size: 12px;
-margin: 0 15px;
-cursor: pointer;
-transition: all 0.3s ease;
+*{box-sizing:border-box;}
+body{margin:0;font-family:Arial,sans-serif;background:#f1f3f6;color:#000;}
+h1,h2{margin:0 0 10px 0;}
+button{padding:6px 12px;border:none;border-radius:4px;cursor:pointer;transition:0.3s;font-size:12px;}
+/* ================== BUTTONS ================== */
+button {
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
+  text-align: center;
+  font-size: 13px;
+  margin: 0 5px 5px 0;
+  padding: 8px 14px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background-color: #4CAF50;
+  color: white;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
 }
-.Button:hover{
-background-color: gray;
-color: white;
-box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24), 0 17px 50px 0 rgba(0,0,0,0.19);
+
+button:hover {
+  background-color: #43a047;
+  color: white;
+  box-shadow: 0 6px 12px rgba(0,0,0,0.2);
+  transform: translateY(-2px);
 }
-.Button:active{
-transform: translateY(4px);
+
+button:active {
+  transform: translateY(2px);
+  box-shadow: 0 3px 6px rgba(0,0,0,0.2);
 }
-@media print {
-  body { margin: 0; }
-  #top-buttons, #tab-stock, #tab-invoices, #invoice-editor button { display:none; }
-  #invoice-editor { border:none; }
+
+/* DELETE BUTTON */
+.delete-btn {
+  background-color: #dc3545;
+  color: white;
+}
+
+.delete-btn:hover {
+  background-color: #c82333;
+}
+
+/* CANCEL BUTTON */
+.cancel-btn {
+  background-color: #ff9800;
+  color: white;
+}
+
+.cancel-btn:hover {
+  background-color: #e68900;
+}
+
+/* Add small consistent spacing for top buttons */
+#top-buttons button {
+  margin-bottom: 6px;
+  
+}
+
+#search-bar{width:250px;padding:5px;}
+.admin-layout{display:grid;grid-template-columns:1fr 1fr;gap:15px;padding:15px;height:calc(100vh - 70px);}
+.stock-panel,#tab-stock,.invoice-panel,#invoice-editor,#tab-invoices{background:white;border:1px solid #333;padding:10px;display:flex;flex-direction:column;}
+.stock-panel h2,#tab-stock h2,.invoice-panel h2,#invoice-editor h2{padding:10px;background:#4CAF50;color:white;}
+table{width:100%;border-collapse:collapse;margin-top:10px;}
+th,td{border:1px solid #333;padding:6px;text-align:center;font-size:13px;}
+thead th{position:sticky;top:0;background:#4CAF50;color:white;z-index:2;}
+img{max-width:60px;max-height:60px;}
+.invoice-header{display:flex;justify-content:space-between;align-items:flex-start;gap:15px;margin-bottom:15px;}
+#logo-preview{max-height:70px;max-width:150px;border:1px solid #ccc;padding:3px;background:#fff;}
+.signature-box{width:180px;height:60px;border:1px solid #333;display:inline-block;margin:5px;text-align:center;line-height:60px;font-weight:bold;}
+.invoice-table th,.invoice-table td{padding:6px;border:1px solid #333;}
+.invoice-table tbody tr:nth-child(even){background:#f9f9f9;}
+.invoice-table tfoot td{font-weight:bold;}
+.total-box{border:2px solid #000;padding:10px;width:250px;margin-top:15px;text-align:right;font-weight:bold;}
+.total-box span{display:block;margin-top:5px;}
+@page{size:A4;margin:15mm;}
+@media print{
+  body{background:white;font-size:11px;margin:0;}
+  #top-buttons,.stock-panel,#tab-invoices,button{display:none !important;}
+  .admin-layout{display:block;height:auto;}
+  .invoice-panel,#invoice-editor{border:none;padding:0;}
 }
 </style>
 </head>
 <body>
 
-<h1>Admin Stock & Invoice Management</h1>
-
+<h1 style="padding:10px;">Admin Stock & Invoice Management</h1>
 <div id="top-buttons">
   <button onclick="saveAllStocks()">Save Stocks</button>
-  <button onclick="exportCSV()">Export Products CSV</button>
-  <button onclick="switchTab('stock')">Stock Management</button>
+  <button onclick="exportCSV()">Export CSV</button>
+  <button onclick="switchTab('stock')">Stock</button>
   <button onclick="switchTab('invoices')">Invoice History</button>
   <input type="file" id="import-file" accept=".csv">
-  <input type="text" id="search-bar" placeholder="Search by ID, Name, Category, Price, Color">
+  <input type="text" id="search-bar" placeholder="Search products">
   <button onclick="startInvoice()">Add Selected Items</button>
+  <input type="text" id="invoice-search-bar" placeholder="Search invoices by #, client, company">
+
 </div>
 
-<div id="tab-stock">
-<table>
-<thead>
-<tr>
-<th>Select</th>
-<th>ID</th>
-<th>Image</th>
-<th>Name</th>
-<th>Category</th>
-<th>Price</th>
-<th>Colors</th>
-<th>Stock</th>
-<th>Delete</th>
-</tr>
-</thead>
-<tbody id="admin-body"></tbody>
-</table>
-</div>
-
-<div id="invoice-editor">
-<h2>Invoice Editor</h2>
-<div class="invoice-header">
-  <div>
-    Company Name: <input type="text" id="company-name" placeholder="Your Company">
+<div class="admin-layout">
+  <!-- STOCK -->
+  <div class="stock-panel" id="tab-stock">
+    <h2>Stock Management</h2>
+    <div style="overflow:auto;">
+      <table>
+        <thead>
+          <tr><th>Select</th><th>ID</th><th>Image</th><th>Name</th><th>Category</th><th>Price</th><th>Colors</th><th>Stock</th><th>Delete</th></tr>
+        </thead>
+        <tbody id="admin-body"></tbody>
+      </table>
+    </div>
   </div>
-  <div>
-    Logo URL: <input type="text" id="company-logo" placeholder="Logo URL">
-  </div>
-</div>
-<table id="invoice-table" class="invoice-table">
-<thead>
-<tr>
-<th>ID</th>
-<th>Name</th>
-<th>Price</th>
-<th>Color</th>
-<th>Qty</th>
-<th>Total</th>
-<th>Remove</th>
-</tr>
-</thead>
-<tbody></tbody>
-<tfoot>
-<tr>
-<td colspan="6">Subtotal</td><td id="subtotal">0</td>
-</tr>
-<tr>
-<td colspan="6">VAT (20%)</td><td id="tva">0</td>
-</tr>
-<tr>
-<td colspan="6">Total</td><td id="total">0</td>
-</tr>
-<tr>
-<td colspan="7" style="padding-top:20px;">
-<div style="display:flex; justify-content:space-between; margin-top:10px;">
-<div>
-<p>Client Signature:</p>
-<div class="signature-box"></div>
-</div>
-<div>
-<p>Company Signature:</p>
-<div class="signature-box"></div>
-</div>
-</div>
-</td>
-</tr>
-</tfoot>
-</table>
-<button onclick="validateInvoice()">Validate Invoice</button>
-<button onclick="cancelInvoiceEditor()">Cancel</button>
-</div>
 
-<div id="tab-invoices" style="display:none;">
-<h2>Invoice History</h2>
-<table>
-<thead>
-<tr>
-<th>Invoice #</th>
-<th>Date</th>
-<th>Client</th>
-<th>Items</th>
-<th>Total</th>
-<th>TVA (20%)</th>
-<th>Actions</th>
-</tr>
-</thead>
-<tbody id="invoice-body"></tbody>
-</table>
+  <!-- INVOICE EDITOR -->
+  <div class="invoice-panel" id="invoice-editor" style="display:none;">
+    <h2>Invoice Editor</h2>
+    <div class="invoice-header">
+      <div style="flex:1;">
+        <label>Invoice ID:</label><input type="text" id="invoice-id" readonly>
+        <label>Client Name:</label><input type="text" id="client-name" placeholder="Client Name">
+        <label>Client Address:</label><textarea id="client-address" placeholder="Client Address"></textarea>
+        <label>
+    Client Phone:
+    <input type="text" id="client-phone" placeholder="Client Phone">
+  </label>
+        <label>Company Name:</label><input type="text" id="company-name" placeholder="Company Name">
+        <label>Company Phone:</label><input type="text" id="company-phone" placeholder="+216...">
+      </div>
+      <div style="width:160px;">
+        <label>Logo URL:</label><input type="text" id="company-logo" placeholder="Logo URL">
+        <img id="logo-preview" alt="Company Logo">
+      </div>
+    </div>
+
+    <table id="invoice-table" class="invoice-table">
+      <thead><tr><th>ID</th><th>Name</th><th>Price</th><th>Color</th><th>Qty</th><th>Total</th><th>Remove</th></tr></thead>
+      <tbody></tbody>
+    </table>
+
+    <div class="total-box">
+      <span>Subtotal: <span id="subtotal">0</span></span>
+      <span>VAT (19%): <span id="tva">0</span></span>
+      <span>Total: <span id="total">0</span></span>
+    </div>
+
+    <div style="margin-top:15px; display:flex; justify-content:space-between;">
+      <div>Client Signature<div class="signature-box">Sign</div></div>
+      <div>Company Signature<div class="signature-box">Sign</div></div>
+    </div>
+
+    <div style="margin-top:10px;">
+      <button onclick="validateInvoice()">Validate Invoice</button>
+      <button onclick="cancelInvoiceEditor()">Cancel</button>
+    </div>
+  </div>
+
+  <!-- INVOICE HISTORY -->
+  <div id="tab-invoices" style="display:none;">
+    <h2>Invoice History</h2>
+    <table>
+      <thead>
+        <tr><th>Invoice #</th><th>Date</th><th>Client / Company</th><th>Items</th><th>Total</th><th>TVA</th><th>Actions</th></tr>
+      </thead>
+      <tbody id="invoice-body"></tbody>
+    </table>
+  </div>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 <script>
 const ADMIN_PASSWORD="1234";
 const TVA_RATE=0.2;
-let products=[];
-let invoices=[];
-let currentInvoice=[];
+let products=[], invoices=[], currentInvoice=[];
 
 function loadProducts(){ const s=localStorage.getItem("admin-products"); if(s) products=JSON.parse(s);}
 function saveProducts(){ localStorage.setItem("admin-products",JSON.stringify(products));}
@@ -169,14 +189,11 @@ function renderAdmin(filter=""){
   filter=filter.toLowerCase();
   products.filter(p=>p.id.toLowerCase().includes(filter)||
                      p.name.toLowerCase().includes(filter)||
-                     p.category.toLowerCase().includes(filter)||
-                     p.price.toString().includes(filter)||
-                     p.colors.join(", ").toLowerCase().includes(filter)
+                     p.category.toLowerCase().includes(filter)
   ).forEach(p=>{
     const tr=document.createElement("tr");
     tr.style.background=p.stock===0?"#f8d7da":(p.stock<5?"#fff3cd":"#d4edda");
-    tr.innerHTML=`
-      <td><input type="checkbox" class="select-item" value="${p.id}"></td>
+    tr.innerHTML=`<td><input type="checkbox" class="select-item" value="${p.id}"></td>
       <td>${p.id}</td>
       <td>${p.image?`<img src="${p.image}">`:''}</td>
       <td>${p.name}</td>
@@ -184,8 +201,7 @@ function renderAdmin(filter=""){
       <td>${p.price}</td>
       <td>${p.colors.join(", ")}</td>
       <td><input type="number" min="0" value="${p.stock}" id="stock-${p.id}"></td>
-      <td><button class="delete-btn" onclick="deleteItem('${p.id}')">Delete</button></td>
-    `;
+      <td><button class="delete-btn" onclick="deleteItem('${p.id}')">Delete</button></td>`;
     tbody.appendChild(tr);
   });
 }
@@ -206,6 +222,9 @@ function deleteItem(id){
   renderAdmin(document.getElementById("search-bar").value);
 }
 
+document.getElementById("search-bar").addEventListener("input",()=>renderAdmin(document.getElementById("search-bar").value));
+document.getElementById("company-logo").addEventListener("input",e=>{ document.getElementById("logo-preview").src=e.target.value; });
+
 function startInvoice(){
   const selected=[...document.querySelectorAll(".select-item:checked")].map(cb=>products.find(p=>p.id===cb.value));
   if(selected.length===0){ alert("Select items"); return; }
@@ -213,11 +232,10 @@ function startInvoice(){
     const color=p.colors[0]||"";
     currentInvoice.push({...p, quantity:1, selectedColor:color});
   });
-  showInvoiceEditor();
+  document.getElementById("invoice-editor").style.display="flex";
+  document.getElementById("invoice-id").value="INV-"+Date.now();
+  renderInvoiceTable();
 }
-
-function showInvoiceEditor(){ document.getElementById("invoice-editor").style.display="block"; renderInvoiceTable();}
-function cancelInvoiceEditor(){ if(confirm("Cancel invoice?")) document.getElementById("invoice-editor").style.display="none"; }
 
 function renderInvoiceTable(){
   const tbody=document.querySelector("#invoice-table tbody");
@@ -228,15 +246,11 @@ function renderInvoiceTable(){
     const total=i.price*i.quantity;
     subtotal+=total;
     const colorOptions=i.colors.map(c=>`<option value="${c}" ${c===i.selectedColor?'selected':''}>${c}</option>`).join('');
-    tr.innerHTML=`
-      <td>${i.id}</td>
-      <td>${i.name}</td>
-      <td>${i.price}</td>
+    tr.innerHTML=`<td>${i.id}</td><td>${i.name}</td><td>${i.price}</td>
       <td><select onchange="updateInvoiceColor(${index},this.value)">${colorOptions}</select></td>
       <td><input type="number" min="1" value="${i.quantity}" onchange="updateInvoiceQty(${index},this.value)"></td>
       <td>${total.toFixed(2)}</td>
-      <td><button onclick="removeInvoiceItem(${index})" class="delete-btn">Remove</button></td>
-    `;
+      <td><button class="delete-btn" onclick="removeInvoiceItem(${index})">Remove</button></td>`;
     tbody.appendChild(tr);
   });
   document.getElementById("subtotal").textContent=subtotal.toFixed(2);
@@ -245,174 +259,249 @@ function renderInvoiceTable(){
 }
 
 function updateInvoiceQty(index,val){
-  val=parseInt(val);
-  if(val<1) val=1;
-  if(val>currentInvoice[index].stock){ alert("Not enough stock!"); val=currentInvoice[index].stock; }
-  currentInvoice[index].quantity=val;
-  renderInvoiceTable();
+  val=parseInt(val); if(val<1) val=1; if(val>currentInvoice[index].stock){ alert("Not enough stock!"); val=currentInvoice[index].stock;}
+  currentInvoice[index].quantity=val; renderInvoiceTable();
 }
 
-function updateInvoiceColor(index,color){
-  currentInvoice[index].selectedColor=color;
-}
+function updateInvoiceColor(index,color){ currentInvoice[index].selectedColor=color; }
 
-function removeInvoiceItem(index){
-  currentInvoice.splice(index,1);
-  renderInvoiceTable();
-}
+function removeInvoiceItem(index){ currentInvoice.splice(index,1); renderInvoiceTable(); }
 
-// ===== VALIDATE INVOICE =====
 function validateInvoice(){
   if(currentInvoice.length===0){ alert("Invoice empty!"); return; }
-  const invNumber=prompt("Invoice number:","INV-"+Date.now());
-  const client=prompt("Client name:","Client");
+  const invNumber=document.getElementById("invoice-id").value;
+  const client=document.getElementById("client-name").value||"Client";
+  const address=document.getElementById("client-address").value||"";
   const company=document.getElementById("company-name").value||"Company";
+  const phone=document.getElementById("company-phone").value||"";
   const logo=document.getElementById("company-logo").value||"";
-  currentInvoice.forEach(i=>{
-    const p=products.find(p=>p.id===i.id);
-    if(p) p.stock-=i.quantity;
-  });
+  const clientPhone = document.getElementById("client-phone").value || "N/A";
+
+  currentInvoice.forEach(i=>{ const p=products.find(p=>p.id===i.id); if(p) p.stock-=i.quantity; });
   saveProducts();
   const subtotal=currentInvoice.reduce((s,i)=>s+i.price*i.quantity,0);
   const tva=subtotal*TVA_RATE;
-  const invoice={number:invNumber,date:new Date().toLocaleString(),client,items:currentInvoice,subtotal,tva,total:subtotal+tva,company,logo};
+ const invoice = {
+  number: invNumber,
+  date: new Date().toLocaleString(),
+  client,
+  clientPhone,         // <- new
+  address: document.getElementById("client-address").value || "N/A",
+  items: currentInvoice,
+  subtotal,
+  tva,
+  total: subtotal + tva,
+  company,
+  phone: document.getElementById("company-phone").value || "N/A", // your company phone
+  logo
+};
+
   invoices.push(invoice);
   saveInvoices();
   currentInvoice=[];
-  renderInvoices();
-  renderAdmin(document.getElementById("search-bar").value);
   document.getElementById("invoice-editor").style.display="none";
+  renderAdmin(); renderInvoices();
   alert("Invoice saved!");
 }
 
-// ===== INVOICE HISTORY =====
-const invBody=document.getElementById("invoice-body");
 function renderInvoices(){
+  const invBody=document.getElementById("invoice-body");
   invBody.innerHTML="";
   invoices.forEach(inv=>{
     const tr=document.createElement("tr");
-    tr.innerHTML=`
+    tr.innerHTML=`<td>${inv.number}</td>
+      <td>${inv.date}</td>
+      <td>${inv.client}<br>${inv.company}</td>
+      <td>${inv.items.map(i=>i.name+" x"+i.quantity+" ("+i.selectedColor+")").join("<br>")}</td>
+      <td>${inv.total.toFixed(2)}</td>
+      <td>${inv.tva.toFixed(2)}</td>
+      <td>
+  <button onclick="printInvoice('${inv.number}')">Print</button>
+  <button class="cancel-btn" onclick="cancelInvoiceHistory('${inv.number}')">Cancel</button>
+  <button onclick="editInvoice('${inv.number}')">Edit</button>
+</td>`;
+    invBody.appendChild(tr);
+  });
+}
+
+function editInvoice(number){
+  const inv = invoices.find(i => i.number === number);
+  if(!inv) return alert("Invoice not found!");
+  
+  currentInvoice = inv.items.map(item => ({...item})); // clone items
+  document.getElementById("invoice-editor").style.display = "flex";
+  document.getElementById("invoice-id").value = inv.number;
+  document.getElementById("client-name").value = inv.client;
+  document.getElementById("client-address").value = inv.address;
+  document.getElementById("company-name").value = inv.company;
+  document.getElementById("company-phone").value = inv.phone;
+  document.getElementById("company-logo").value = inv.logo;
+  document.getElementById("logo-preview").src = inv.logo;
+ document.getElementById("client-phone").value = inv.clientPhone || "";
+
+
+  renderInvoiceTable();
+}
+
+document.getElementById("invoice-search-bar").addEventListener("input", ()=>{
+  const filter = document.getElementById("invoice-search-bar").value.toLowerCase();
+  const invBody = document.getElementById("invoice-body");
+  invBody.innerHTML = "";
+  invoices.filter(inv =>
+    inv.number.toLowerCase().includes(filter) ||
+    inv.client.toLowerCase().includes(filter) ||
+    inv.company.toLowerCase().includes(filter) ||
+    inv.date.toLowerCase().includes(filter)
+  ).forEach(inv => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
       <td>${inv.number}</td>
       <td>${inv.date}</td>
-      <td>${inv.client}</td>
+      <td>${inv.client}<br>${inv.company}</td>
       <td>${inv.items.map(i=>i.name+" x"+i.quantity+" ("+i.selectedColor+")").join("<br>")}</td>
       <td>${inv.total.toFixed(2)}</td>
       <td>${inv.tva.toFixed(2)}</td>
       <td>
         <button onclick="printInvoice('${inv.number}')">Print</button>
-        <button onclick="cancelInvoiceHistory('${inv.number}')">Cancel</button>
-        <button onclick="deleteInvoiceWithoutStock('${inv.number}')">Delete w/o Stock</button>
-      </td>
-    `;
+        <button class="cancel-btn" onclick="cancelInvoiceHistory('${inv.number}')">Cancel</button>
+        <button onclick="editInvoice('${inv.number}')">Edit</button>
+      </td>`;
     invBody.appendChild(tr);
   });
-}
+});
 
-function cancelInvoiceHistory(number){
-  const pass=prompt("Password:");
-  if(pass!==ADMIN_PASSWORD) return alert("Wrong password");
-  const inv=invoices.find(i=>i.number===number);
-  if(!inv) return;
-  if(!confirm("Cancel invoice? Stock will be restored.")) return;
-  inv.items.forEach(i=>{
-    const p=products.find(p=>p.id===i.id);
-    if(p) p.stock+=i.quantity;
-  });
-  invoices=invoices.filter(i=>i.number!==number);
-  saveInvoices();
-  saveProducts();
-  renderInvoices();
-  renderAdmin();
-}
-
-function deleteInvoiceWithoutStock(number){
-  const pass=prompt("Password:");
-  if(pass!==ADMIN_PASSWORD) return alert("Wrong password");
-  if(!confirm("Delete invoice permanently? Stock will NOT be restored.")) return;
-  invoices=invoices.filter(i=>i.number!==number);
-  saveInvoices();
-  renderInvoices();
-}
 
 function printInvoice(number){
-  const inv=invoices.find(i=>i.number===number);
+  const inv = invoices.find(i => i.number === number);
   if(!inv) return;
-  let html=`<div style="border-bottom:2px solid #333;margin-bottom:10px;padding:10px;">
-    <div style="display:flex; justify-content:space-between; align-items:center;">
-      <h2>${inv.company}</h2>
-      <img src="${inv.logo}" style="max-height:50px; max-width:120px;">
-    </div>
-    <p>Invoice #: ${inv.number}<br>Client: ${inv.client}<br>Date: ${inv.date}</p>
-  </div>`;
-  html+=`<table border="1" width="100%" cellpadding="5" class="invoice-table">
-    <tr><th>ID</th><th>Name</th><th>Color</th><th>Qty</th><th>Price</th><th>Total</th></tr>`;
-  inv.items.forEach(i=>{
-    html+=`<tr>
-      <td>${i.id}</td><td>${i.name}</td><td>${i.selectedColor}</td><td>${i.quantity}</td><td>${i.price}</td><td>${(i.price*i.quantity).toFixed(2)}</td>
-    </tr>`;
-  });
-  html+=`<tfoot>
-    <tr><td colspan="5">Subtotal</td><td>${inv.subtotal.toFixed(2)}</td></tr>
-    <tr><td colspan="5">VAT (20%)</td><td>${inv.tva.toFixed(2)}</td></tr>
-    <tr><td colspan="5">Total</td><td>${inv.total.toFixed(2)}</td></tr>
-    <tr><td colspan="6" style="padding-top:20px;">
-      <div style="display:flex; justify-content:space-between;">
-        <div>
-          <p>Client Signature:</p>
-          <div class="signature-box"></div>
-        </div>
-        <div>
-          <p>Company Signature:</p>
-          <div class="signature-box"></div>
-        </div>
+
+  let html = `
+  <div style="padding:20px;font-family:Arial,sans-serif; width:210mm;">
+
+    <!-- Header: Company Name & Logo -->
+    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:20px;">
+      <div>
+        <h2 style="margin:0;">${inv.company}</h2>
       </div>
-    </td></tr>
-  </tfoot>`;
-  html+=`</table><button onclick="window.print()">Print</button>`;
-  const win=window.open("","_blank");
+      <div>
+        <img src="${inv.logo}" style="max-height:70px; max-width:150px; display:block;">
+      </div>
+    </div>
+
+    <!-- Client Info Box (Right-aligned, no overlap) -->
+    <div style="display:flex; justify-content:flex-end; margin-bottom:20px;">
+      <div style="
+        border:1px solid #333;
+        padding:10px;
+        width:220px;
+        font-size:12px;
+        background:#f9f9f9;
+      ">
+        <p style="margin:2px;"><strong>Client:</strong> ${inv.client}</p>
+        <p style="margin:2px;"><strong>Address:</strong> ${inv.address || 'N/A'}</p>
+        <p style="margin:2px;"><strong>Phone:</strong> ${inv.clientPhone || 'N/A'}</p>
+        <p style="margin:2px;"><strong>Date:</strong> ${inv.date}</p>
+      </div>
+    </div>
+
+    <!-- Invoice Table -->
+    <table border="1" width="100%" cellpadding="5" cellspacing="0" style="border-collapse:collapse;">
+      <thead>
+        <tr style="background:#eee;">
+          <th>ID</th><th>Name</th><th>Color</th><th>Qty</th><th>Price</th><th>Total</th>
+        </tr>
+      </thead>
+      <tbody>
+  `;
+
+  inv.items.forEach(i => {
+    html += `
+      <tr>
+        <td>${i.id}</td>
+        <td>${i.name}</td>
+        <td>${i.selectedColor}</td>
+        <td>${i.quantity}</td>
+        <td>${i.price}</td>
+        <td>${(i.price*i.quantity).toFixed(2)}</td>
+      </tr>
+    `;
+  });
+
+  html += `</tbody></table>`;
+
+  // TVA & Total Box on the bottom-right
+  html += `
+    <div style="display:flex; justify-content:flex-end; margin-top:15px;">
+      <div style="border:2px solid #000; padding:15px; width:250px; text-align:right;">
+        <p>Subtotal: ${inv.subtotal.toFixed(2)}</p>
+        <p>VAT (19%): ${inv.tva.toFixed(2)}</p>
+        <p><strong>Total: ${inv.total.toFixed(2)}</strong></p>
+      </div>
+    </div>
+  `;
+
+  // Signatures
+  html += `
+    <div style="margin-top:30px; display:flex; justify-content:space-between;">
+      <div>Client Signature<div style="width:180px;height:60px;border:1px solid #333;"></div></div>
+      <div>Company Signature<div style="width:180px;height:60px;border:1px solid #333;"></div></div>
+    </div>
+  `;
+
+  // Company phone at very bottom
+  html += `
+    <div style="text-align:center; margin-top:30px; font-weight:bold;">
+      Company Phone: ${inv.phone}
+    </div>
+  `;
+
+  const win = window.open("", "_blank");
   win.document.write(html);
   win.document.close();
+  win.print();
+}
+
+
+
+
+
+function cancelInvoiceEditor(){ if(confirm("Cancel invoice?")){currentInvoice=[]; document.getElementById("invoice-editor").style.display="none";} }
+
+function cancelInvoiceHistory(number){
+  const pass=prompt("Enter password:");
+  if(pass!==ADMIN_PASSWORD) return alert("Wrong password!");
+  const inv=invoices.find(i=>i.number===number); if(!inv)return;
+  if(!confirm("Cancel invoice? Stock will be restored.")) return;
+  inv.items.forEach(i=>{ const p=products.find(p=>p.id===i.id); if(p)p.stock+=i.quantity; });
+  invoices=invoices.filter(i=>i.number!==number); saveInvoices(); saveProducts(); renderInvoices(); renderAdmin();
 }
 
 function switchTab(tab){
-  document.getElementById("tab-stock").style.display=tab==="stock"?"block":"none";
-  document.getElementById("tab-invoices").style.display=tab==="invoices"?"block":"none";
+  document.getElementById("tab-stock").style.display=tab==="stock"?"flex":"none";
+  document.getElementById("tab-invoices").style.display=tab==="invoices"?"flex":"none";
 }
 
 function exportCSV(){
   let csv="ID,Name,Category,Price,Stock,Colors,Image\n";
   products.forEach(p=>csv+=`"${p.id}","${p.name}","${p.category}",${p.price},${p.stock},"${p.colors.join("|")}","${p.image}"\n`);
-  const a=document.createElement("a");
-  a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv"}));
-  a.download="products.csv"; a.click();
+  const a=document.createElement("a"); a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv"})); a.download="products.csv"; a.click();
 }
 
 document.getElementById("import-file").addEventListener("change",e=>{
-  const file=e.target.files[0]; if(!file) return;
+  const file=e.target.files[0]; if(!file)return;
   Papa.parse(file,{header:true,skipEmptyLines:true,
     complete:res=>{
       res.data.forEach(row=>{
-        if(!row.ID) return;
+        if(!row.ID)return;
         const colors=row.Colors?row.Colors.split("|").map(c=>c.trim()):[];
-        const item={
-          id:row.ID.trim(),
-          name:row.Name||"Unnamed",
-          category:row.Category||"Uncategorized",
-          price:Number(row.Price)||0,
-          stock:Number(row.Stock)||0,
-          colors,
-          image:row.Image||""
-        };
+        const item={id:row.ID.trim(),name:row.Name||"Unnamed",category:row.Category||"Uncategorized",price:Number(row.Price)||0,stock:Number(row.Stock)||0,colors,image:row.Image||""};
         const existing=products.find(p=>p.id===item.id);
-        if(existing) Object.assign(existing,item);
-        else products.push(item);
+        if(existing) Object.assign(existing,item); else products.push(item);
       });
       saveProducts(); renderAdmin(); alert("CSV imported");
     }
   });
 });
-
-document.getElementById("search-bar").addEventListener("input",()=>renderAdmin(document.getElementById("search-bar").value));
 
 loadProducts(); loadInvoices(); renderAdmin(); renderInvoices();
 </script>
