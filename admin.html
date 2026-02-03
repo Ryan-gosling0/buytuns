@@ -177,6 +177,9 @@ img{max-width:60px;max-height:60px;}
 const ADMIN_PASSWORD="1234";
 const TVA_RATE=0.2;
 let products=[], invoices=[], currentInvoice=[];
+let editMode = false; // track if editing an invoice
+let editingInvoiceIndex = -1; // index of the invoice being edited
+
 
 function loadProducts(){ const s=localStorage.getItem("admin-products"); if(s) products=JSON.parse(s);}
 function saveProducts(){ localStorage.setItem("admin-products",JSON.stringify(products));}
@@ -269,6 +272,7 @@ function removeInvoiceItem(index){ currentInvoice.splice(index,1); renderInvoice
 
 function validateInvoice(){
   if(currentInvoice.length===0){ alert("Invoice empty!"); return; }
+
   const invNumber=document.getElementById("invoice-id").value;
   const client=document.getElementById("client-name").value||"Client";
   const address=document.getElementById("client-address").value||"";
@@ -277,32 +281,51 @@ function validateInvoice(){
   const logo=document.getElementById("company-logo").value||"";
   const clientPhone = document.getElementById("client-phone").value || "N/A";
 
+  // Restore stock if editing an existing invoice
+  if(editMode && editingInvoiceIndex !== -1){
+    const oldInvoice = invoices[editingInvoiceIndex];
+    oldInvoice.items.forEach(i => {
+      const p = products.find(p => p.id === i.id);
+      if(p) p.stock += i.quantity; // restore old quantities
+    });
+  }
+
+  // Subtract stock for current invoice
   currentInvoice.forEach(i=>{ const p=products.find(p=>p.id===i.id); if(p) p.stock-=i.quantity; });
   saveProducts();
   const subtotal=currentInvoice.reduce((s,i)=>s+i.price*i.quantity,0);
   const tva=subtotal*TVA_RATE;
- const invoice = {
-  number: invNumber,
-  date: new Date().toLocaleString(),
-  client,
-  clientPhone,         // <- new
-  address: document.getElementById("client-address").value || "N/A",
-  items: currentInvoice,
-  subtotal,
-  tva,
-  total: subtotal + tva,
-  company,
-  phone: document.getElementById("company-phone").value || "N/A", // your company phone
-  logo
-};
 
-  invoices.push(invoice);
+  const invoice = {
+    number: invNumber,
+    date: new Date().toLocaleString(),
+    client,
+    clientPhone,
+    address,
+    items: currentInvoice,
+    subtotal,
+    tva,
+    total: subtotal + tva,
+    company,
+    phone,
+    logo
+  };
+
+  if(editMode && editingInvoiceIndex !== -1){
+    invoices[editingInvoiceIndex] = invoice; // UPDATE existing
+    editMode = false;
+    editingInvoiceIndex = -1;
+  } else {
+    invoices.push(invoice); // NEW invoice
+  }
+
   saveInvoices();
   currentInvoice=[];
   document.getElementById("invoice-editor").style.display="none";
   renderAdmin(); renderInvoices();
   alert("Invoice saved!");
 }
+
 
 function renderInvoices(){
   const invBody=document.getElementById("invoice-body");
@@ -325,9 +348,13 @@ function renderInvoices(){
 }
 
 function editInvoice(number){
-  const inv = invoices.find(i => i.number === number);
-  if(!inv) return alert("Invoice not found!");
+  const invIndex = invoices.findIndex(i => i.number === number);
+  if(invIndex === -1) return alert("Invoice not found!");
   
+  editMode = true; // mark that we are editing
+  editingInvoiceIndex = invIndex;
+  
+  const inv = invoices[invIndex];
   currentInvoice = inv.items.map(item => ({...item})); // clone items
   document.getElementById("invoice-editor").style.display = "flex";
   document.getElementById("invoice-id").value = inv.number;
@@ -337,22 +364,31 @@ function editInvoice(number){
   document.getElementById("company-phone").value = inv.phone;
   document.getElementById("company-logo").value = inv.logo;
   document.getElementById("logo-preview").src = inv.logo;
- document.getElementById("client-phone").value = inv.clientPhone || "";
-
+  document.getElementById("client-phone").value = inv.clientPhone || "";
 
   renderInvoiceTable();
 }
 
+
 document.getElementById("invoice-search-bar").addEventListener("input", ()=>{
-  const filter = document.getElementById("invoice-search-bar").value.toLowerCase();
+  const filter = document.getElementById("invoice-search-bar").value.toLowerCase().trim();
+  const keywords = filter.split(/\s+/); // split by spaces
   const invBody = document.getElementById("invoice-body");
   invBody.innerHTML = "";
-  invoices.filter(inv =>
-    inv.number.toLowerCase().includes(filter) ||
-    inv.client.toLowerCase().includes(filter) ||
-    inv.company.toLowerCase().includes(filter) ||
-    inv.date.toLowerCase().includes(filter)
-  ).forEach(inv => {
+
+  invoices.filter(inv => {
+    // combine searchable text
+    const searchable = [
+      inv.number,
+      inv.client,
+      inv.company,
+      inv.date,
+      inv.items.map(i => i.name).join(" ")
+    ].join(" ").toLowerCase();
+
+    // all keywords must match somewhere
+    return keywords.every(kw => searchable.includes(kw));
+  }).forEach(inv => {
     const tr = document.createElement("tr");
     tr.innerHTML = `
       <td>${inv.number}</td>
