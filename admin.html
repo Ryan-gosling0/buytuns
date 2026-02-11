@@ -1,545 +1,1170 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Admin Stock & Invoice Management</title>
-<style>
-*{box-sizing:border-box;}
-body{margin:0;font-family:Arial,sans-serif;background:#f1f3f6;color:#000;}
-h1,h2{margin:0 0 10px 0;}
-button{padding:6px 12px;border:none;border-radius:4px;cursor:pointer;transition:0.3s;font-size:12px;}
-/* ================== BUTTONS ================== */
-button {
-  font-family: Verdana, Geneva, Tahoma, sans-serif;
-  text-align: center;
-  font-size: 13px;
-  margin: 0 5px 5px 0;
-  padding: 8px 14px;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  background-color: #4CAF50;
-  color: white;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-}
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Stock & Invoice Management</title>
+  <style>
+    /* GLOBAL STYLES */
+    * {
+      box-sizing: border-box;
+    }
 
-button:hover {
-  background-color: #43a047;
-  color: white;
-  box-shadow: 0 6px 12px rgba(0,0,0,0.2);
-  transform: translateY(-2px);
-}
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f1f3f6;
+      color: #000;
+    }
 
-button:active {
-  transform: translateY(2px);
-  box-shadow: 0 3px 6px rgba(0,0,0,0.2);
-}
+    h1,
+    h2 {
+      margin: 0 0 10px 0;
+    }
 
-/* DELETE BUTTON */
-.delete-btn {
-  background-color: #dc3545;
-  color: white;
-}
+    button {
+      padding: 6px 12px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: 0.3s;
+      font-size: 12px;
+      font-family: Verdana, sans-serif;
+    }
 
-.delete-btn:hover {
-  background-color: #c82333;
-}
+    /* BUTTONS */
+    button {
+      text-align: center;
+      font-size: 13px;
+      margin: 0 5px 5px 0;
+      padding: 8px 14px;
+      border-radius: 6px;
+      background-color: #4CAF50;
+      color: white;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
 
-/* CANCEL BUTTON */
-.cancel-btn {
-  background-color: #ff9800;
-  color: white;
-}
+    button:hover {
+      background-color: #43a047;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+    }
 
-.cancel-btn:hover {
-  background-color: #e68900;
-}
+    button:active {
+      transform: translateY(2px);
+      box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+    }
 
-/* Add small consistent spacing for top buttons */
-#top-buttons button {
-  margin-bottom: 6px;
-  
-}
+    .delete-btn {
+      background-color: #dc3545;
+    }
 
-#search-bar{width:250px;padding:5px;}
-.admin-layout{display:grid;grid-template-columns:1fr 1fr;gap:15px;padding:15px;height:calc(100vh - 70px);}
-.stock-panel,#tab-stock,.invoice-panel,#invoice-editor,#tab-invoices{background:white;border:1px solid #333;padding:10px;display:flex;flex-direction:column;}
-.stock-panel h2,#tab-stock h2,.invoice-panel h2,#invoice-editor h2{padding:10px;background:#4CAF50;color:white;}
-table{width:100%;border-collapse:collapse;margin-top:10px;}
-th,td{border:1px solid #333;padding:6px;text-align:center;font-size:13px;}
-thead th{position:sticky;top:0;background:#4CAF50;color:white;z-index:2;}
-img{max-width:60px;max-height:60px;}
-.invoice-header{display:flex;justify-content:space-between;align-items:flex-start;gap:15px;margin-bottom:15px;}
-#logo-preview{max-height:70px;max-width:150px;border:1px solid #ccc;padding:3px;background:#fff;}
-.signature-box{width:180px;height:60px;border:1px solid #333;display:inline-block;margin:5px;text-align:center;line-height:60px;font-weight:bold;}
-.invoice-table th,.invoice-table td{padding:6px;border:1px solid #333;}
-.invoice-table tbody tr:nth-child(even){background:#f9f9f9;}
-.invoice-table tfoot td{font-weight:bold;}
-.total-box{border:2px solid #000;padding:10px;width:250px;margin-top:15px;text-align:right;font-weight:bold;}
-.total-box span{display:block;margin-top:5px;}
-@page{size:A4;margin:15mm;}
-@media print{
-  body{background:white;font-size:11px;margin:0;}
-  #top-buttons,.stock-panel,#tab-invoices,button{display:none !important;}
-  .admin-layout{display:block;height:auto;}
-  .invoice-panel,#invoice-editor{border:none;padding:0;}
-}
-</style>
+    .delete-btn:hover {
+      background-color: #c82333;
+    }
+
+    .cancel-btn {
+      background-color: #ff9800;
+    }
+
+    .cancel-btn:hover {
+      background-color: #e68900;
+    }
+
+    #top-buttons button {
+      margin-bottom: 6px;
+    }
+
+    /* LAYOUT */
+    #search-bar,
+    #invoice-search-bar {
+      width: 250px;
+      padding: 6px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+
+    .admin-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+      padding: 15px;
+      height: calc(100vh - 80px);
+    }
+
+    .stock-panel,
+    #tab-stock,
+    .invoice-panel,
+    #invoice-editor,
+    #tab-invoices {
+      background: white;
+      border: 1px solid #ddd;
+      padding: 15px;
+      display: flex;
+      flex-direction: column;
+      border-radius: 4px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    }
+
+    .stock-panel h2,
+    #tab-stock h2,
+    .invoice-panel h2,
+    #invoice-editor h2 {
+      padding: 10px;
+      background: #4CAF50;
+      color: white;
+      border-radius: 4px 4px 0 0;
+      margin: -15px -15px 15px -15px;
+    }
+
+    /* TABLES */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+
+    th,
+    td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: center;
+      font-size: 13px;
+    }
+
+    thead th {
+      position: sticky;
+      top: 0;
+      background: #f8f9fa;
+      color: #333;
+      z-index: 2;
+      border-bottom: 2px solid #ddd;
+    }
+
+    img {
+      max-width: 50px;
+      max-height: 50px;
+      object-fit: contain;
+    }
+
+    /* INVOICE EDITOR SPECIFIC */
+    .invoice-panel {
+      overflow-y: auto;
+    }
+
+    .editor-fields {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .editor-fields label {
+      display: flex;
+      flex-direction: column;
+      font-size: 12px;
+      font-weight: bold;
+      color: #555;
+    }
+
+    .editor-fields input,
+    .editor-fields textarea,
+    .editor-fields select {
+      padding: 6px;
+      border: 1px solid #ccc;
+      border-radius: 3px;
+      font-size: 12px;
+      margin-top: 4px;
+    }
+
+    .editor-fields textarea {
+      resize: vertical;
+      min-height: 40px;
+      font-family: inherit;
+    }
+
+    .field-group {
+      border: 1px solid #eee;
+      padding: 10px;
+      border-radius: 6px;
+      background: #fafafa;
+    }
+
+    .field-group h3 {
+      margin: 0 0 10px 0;
+      font-size: 14px;
+      color: #4CAF50;
+      border-bottom: 1px solid #eee;
+      padding-bottom: 5px;
+    }
+
+    #logo-preview {
+      max-height: 60px;
+      max-width: 150px;
+      border: 1px solid #eee;
+      padding: 2px;
+      background: #fff;
+      margin-top: 5px;
+      display: block;
+    }
+
+    .signature-box {
+      width: 100%;
+      height: 60px;
+      border: 1px dashed #ccc;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 5px;
+      color: #999;
+      font-size: 11px;
+    }
+
+    /* INVOICE TABLE IN EDITOR */
+    .invoice-table th {
+      background: #eee;
+      font-size: 12px;
+    }
+
+    .invoice-table td {
+      padding: 4px;
+      font-size: 12px;
+    }
+
+    .invoice-table input,
+    .invoice-table select {
+      width: 100%;
+      padding: 4px;
+      box-sizing: border-box;
+      border: 1px solid #ccc;
+      border-radius: 3px;
+    }
+
+    /* TOTALS BOX */
+    .total-box {
+      border: 2px solid #333;
+      padding: 15px;
+      width: 300px;
+      margin-top: 15px;
+      text-align: right;
+      font-weight: bold;
+      background: #fff;
+      margin-left: auto;
+    }
+
+    .total-box span {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 5px;
+    }
+
+    .total-separator {
+      border-top: 2px solid #333;
+      margin: 5px 0;
+      padding-top: 5px;
+      font-size: 16px;
+    }
+
+    /* PRINT STYLES */
+    @page {
+      size: A4;
+      margin: 10mm;
+    }
+
+    @media print {
+      body {
+        background: white;
+        font-size: 11px;
+        margin: 0;
+        print-color-adjust: exact;
+        -webkit-print-color-adjust: exact;
+      }
+
+      #top-buttons,
+      .stock-panel,
+      #tab-invoices,
+      button,
+      h1 {
+        display: none !important;
+      }
+
+      .admin-layout {
+        display: block;
+        height: auto;
+        padding: 0;
+      }
+
+      .invoice-panel,
+      #invoice-editor {
+        border: none;
+        padding: 0;
+        box-shadow: none;
+        overflow: visible;
+        display: block !important;
+      }
+
+      /* Hide editor UI controls when printing directly if ever needed, but we use a separate print window */
+    }
+  </style>
 </head>
+
 <body>
 
-<h1 style="padding:10px;">Admin Stock & Invoice Management</h1>
-<div id="top-buttons">
-  <button onclick="saveAllStocks()">Save Stocks</button>
-  <button onclick="exportCSV()">Export CSV</button>
-  <button onclick="switchTab('stock')">Stock</button>
-  <button onclick="switchTab('invoices')">Invoice History</button>
-  <input type="file" id="import-file" accept=".csv">
-  <input type="text" id="search-bar" placeholder="Search products">
-  <button onclick="startInvoice()">Add Selected Items</button>
-  <input type="text" id="invoice-search-bar" placeholder="Search invoices by #, client, company">
-
-</div>
-
-<div class="admin-layout">
-  <!-- STOCK -->
-  <div class="stock-panel" id="tab-stock">
-    <h2>Stock Management</h2>
-    <div style="overflow:auto;">
-      <table>
-        <thead>
-          <tr><th>Select</th><th>ID</th><th>Image</th><th>Name</th><th>Category</th><th>Price</th><th>Colors</th><th>Stock</th><th>Delete</th></tr>
-        </thead>
-        <tbody id="admin-body"></tbody>
-      </table>
-    </div>
+  <h1 style="padding:10px 15px; background:#fff; border-bottom:1px solid #ddd; margin:0;">Admin Stock & Invoice
+    Management</h1>
+  <div id="top-buttons" style="padding:15px; background:#fff; border-bottom:1px solid #eee;">
+    <button onclick="saveAllStocks()">Save Stocks</button>
+    <button onclick="exportCSV()">Export CSV</button>
+    <button onclick="switchTab('stock')">Stock</button>
+    <button onclick="switchTab('invoices')">Invoice History</button>
+    <input type="file" id="import-file" accept=".csv" style="font-size:12px;">
+    <span
+      style="margin:0 10px; border-left:1px solid #ccc; height:20px; display:inline-block; vertical-align:middle;"></span>
+    <input type="text" id="search-bar" placeholder="Search products...">
+    <button onclick="startInvoice()" style="background:#2196F3;">Add to / Create Invoice</button>
+    <input type="text" id="invoice-search-bar" placeholder="Search invoices...">
   </div>
 
-  <!-- INVOICE EDITOR -->
-  <div class="invoice-panel" id="invoice-editor" style="display:none;">
-    <h2>Invoice Editor</h2>
-    <div class="invoice-header">
-      <div style="flex:1;">
-        <label>Invoice ID:</label><input type="text" id="invoice-id" readonly>
-        <label>Client Name:</label><input type="text" id="client-name" placeholder="Client Name">
-        <label>Client Address:</label><textarea id="client-address" placeholder="Client Address"></textarea>
-        <label>
-    Client Phone:
-    <input type="text" id="client-phone" placeholder="Client Phone">
-  </label>
-        <label>Company Name:</label><input type="text" id="company-name" placeholder="Company Name">
-        <label>Company Phone:</label><input type="text" id="company-phone" placeholder="+216...">
-      </div>
-      <div style="width:160px;">
-        <label>Logo URL:</label><input type="text" id="company-logo" placeholder="Logo URL">
-        <img id="logo-preview" alt="Company Logo">
+  <div class="admin-layout">
+    <!-- STOCK TAB -->
+    <div class="stock-panel" id="tab-stock">
+      <h2>Stock Management</h2>
+      <div style="overflow:auto; flex:1;">
+        <table>
+          <thead>
+            <tr>
+              <th width="40">Select</th>
+              <th width="80">ID</th>
+              <th width="60">Image</th>
+              <th>Name</th>
+              <th>Category</th>
+              <th>Price</th>
+              <th>Colors</th>
+              <th width="60">Stock</th>
+              <th width="60">Action</th>
+            </tr>
+          </thead>
+          <tbody id="admin-body"></tbody>
+        </table>
       </div>
     </div>
 
-    <table id="invoice-table" class="invoice-table">
-      <thead><tr><th>ID</th><th>Name</th><th>Price</th><th>Color</th><th>Qty</th><th>Total</th><th>Remove</th></tr></thead>
-      <tbody></tbody>
-    </table>
+    <!-- INVOICE EDITOR -->
+    <div class="invoice-panel" id="invoice-editor" style="display:none;">
+      <h2>Invoice Editor</h2>
 
-    <div class="total-box">
-      <span>Subtotal: <span id="subtotal">0</span></span>
-      <span>VAT (19%): <span id="tva">0</span></span>
-      <span>Total: <span id="total">0</span></span>
+      <!-- Top Meta -->
+      <div
+        style="display:flex; justify-content:space-between; margin-bottom:15px; background:#f9f9f9; padding:10px; border-radius:4px;">
+        <div>
+          <label style="font-weight:bold; font-size:12px;">Invoice ID:</label>
+          <input type="text" id="invoice-id" readonly
+            style="border:none; background:transparent; font-weight:bold; color:#4CAF50;">
+        </div>
+        <div style="text-align:right;">
+          <button class="delete-btn" onclick="cancelInvoiceEditor()" style="padding:4px 8px; font-size:11px;">Close
+            Editor</button>
+        </div>
+      </div>
+
+      <div style="display:flex; gap:15px; margin-bottom:15px;">
+        <!-- Company Info -->
+        <div class="field-group" style="flex:1;">
+          <h3>Company Details</h3>
+          <div class="editor-fields">
+            <label>Name<input type="text" id="company-name" placeholder="Company Name"></label>
+            <label>Phone<input type="text" id="company-phone" placeholder="Phone"></label>
+            <label>Address<input type="text" id="company-address" placeholder="Address"></label>
+            <label>Fax<input type="text" id="company-fax" placeholder="Fax"></label>
+            <label>Email<input type="text" id="company-email" placeholder="Email"></label>
+            <label>Website<input type="text" id="company-website" placeholder="Website"></label>
+            <label>Tax ID (MF)<input type="text" id="company-mf" placeholder="MF"></label>
+            <label>RC<input type="text" id="company-rc" placeholder="RC"></label>
+            <label>RIB<input type="text" id="company-rib" placeholder="RIB"></label>
+            <label>Logo URL<input type="text" id="company-logo" placeholder="http://..."></label>
+          </div>
+          <img id="logo-preview" alt="Logo Preview">
+        </div>
+
+        <!-- Client Info -->
+        <div class="field-group" style="flex:1;">
+          <h3>Client Details</h3>
+          <div class="editor-fields">
+            <label>Client Name<input type="text" id="client-name" placeholder="Client Name"></label>
+            <label>Phone<input type="text" id="client-phone" placeholder="Phone"></label>
+            <label>Address<textarea id="client-address" placeholder="Address"></textarea></label>
+            <label>Client Code<input type="text" id="client-code" placeholder="Code"></label>
+            <label>MF / CIN<input type="text" id="client-mfcin" placeholder="MF or CIN"></label>
+            <label>Ref. Invoice<input type="text" id="client-ref" placeholder="Reference"></label>
+          </div>
+          <div style="margin-top:10px; border-top:1px solid #eee; pt-2">
+            <label style="font-size:12px; font-weight:bold;">Payment Mode</label>
+            <select id="payment-mode"
+              style="width:100%; padding:6px; margin-top:4px; border:1px solid #ccc; border-radius:3px;">
+              <option value="CAISSE">CAISSE</option>
+              <option value="CHÈQUE">CHÈQUE</option>
+              <option value="VIREMENT">VIREMENT</option>
+              <option value="ESPÈCES">ESPÈCES</option>
+              <option value="A TERME">A TERME</option>
+            </select>
+          </div>
+          <div style="margin-top:10px;">
+            <label style="font-size:12px; font-weight:bold;">Chargé(e)</label>
+            <input type="text" id="charged-to" placeholder="Name"
+              style="width:100%; padding:6px; margin-top:4px; border:1px solid #ccc; border-radius:3px;">
+          </div>
+        </div>
+      </div>
+
+      <!-- Items Table -->
+      <div style="overflow:auto; border:1px solid #ccc; border-radius:4px; margin-bottom:15px;">
+        <table class="invoice-table" id="invoice-table">
+          <thead>
+            <tr>
+              <th width="15%">Ref</th>
+              <th width="25%">Item</th>
+              <th width="10%">Color</th>
+              <th width="8%">Qty</th>
+              <th width="10%">Price TTC</th>
+              <th width="8%">Disc %</th>
+              <th width="10%">Total</th>
+              <th width="8%">TVA %</th>
+              <th width="5%">X</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+
+      <div style="display:flex; gap:15px;">
+        <!-- Fees -->
+        <div class="field-group" style="flex:1;">
+          <h3>Fees & Adjustments</h3>
+          <div class="editor-fields" style="grid-template-columns:1fr 1fr 1fr;">
+            <label>Transport<input type="number" step="0.001" id="fee-transport" value="0"></label>
+            <label>Installation<input type="number" step="0.001" id="fee-installation" value="0"></label>
+            <label>Frais<input type="number" step="0.001" id="fee-frais" value="0"></label>
+            <label>Retenue<input type="number" step="0.001" id="fee-retenue" value="0"></label>
+            <label>Garantie<input type="number" step="0.001" id="fee-garantie" value="0"></label>
+            <label>Timbre Fiscal<input type="number" step="0.001" id="timbre-fiscal" value="1.000"></label>
+          </div>
+        </div>
+
+        <!-- Totals -->
+        <div class="total-box">
+          <span>Subtotal HT: <b id="subtotal">0.000</b></span>
+          <span>Total TVA: <b id="tva">0.000</b></span>
+          <span>Fees: <b id="fees-total">0.000</b></span>
+          <span>Timbre: <b id="timbre-display">1.000</b></span>
+          <div class="total-separator">
+            <span>Net To Pay (TTC): <b id="total" style="font-size:18px;">0.000 DNT</b></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div
+        style="margin-top:20px; display:flex; gap:10px; justify-content:flex-end; border-top:1px solid #eee; padding-top:15px;">
+        <button onclick="cancelInvoiceEditor()" class="cancel-btn">Cancel</button>
+        <button onclick="validateInvoice()" style="padding:10px 25px; font-size:14px;">Validate & Save Invoice</button>
+      </div>
     </div>
 
-    <div style="margin-top:15px; display:flex; justify-content:space-between;">
-      <div>Client Signature<div class="signature-box">Sign</div></div>
-      <div>Company Signature<div class="signature-box">Sign</div></div>
-    </div>
-
-    <div style="margin-top:10px;">
-      <button onclick="validateInvoice()">Validate Invoice</button>
-      <button onclick="cancelInvoiceEditor()">Cancel</button>
+    <!-- INVOICE HISTORY TAB -->
+    <div id="tab-invoices" style="display:none;">
+      <h2>Invoice History</h2>
+      <div style="overflow:auto; flex:1;">
+        <table>
+          <thead>
+            <tr>
+              <th>Invoice #</th>
+              <th>Date</th>
+              <th>Client</th>
+              <th>Items</th>
+              <th>Amount TTC</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="invoice-body"></tbody>
+        </table>
+      </div>
     </div>
   </div>
 
-  <!-- INVOICE HISTORY -->
-  <div id="tab-invoices" style="display:none;">
-    <h2>Invoice History</h2>
-    <table>
-      <thead>
-        <tr><th>Invoice #</th><th>Date</th><th>Client / Company</th><th>Items</th><th>Total</th><th>TVA</th><th>Actions</th></tr>
-      </thead>
-      <tbody id="invoice-body"></tbody>
-    </table>
-  </div>
-</div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+  <script>
+    // --- CONFIG & STATE ---
+    const ADMIN_PASSWORD = "1234";
+    let products = [], invoices = [], currentInvoice = [];
+    let editMode = false;
+    let editingInvoiceIndex = -1;
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
-<script>
-const ADMIN_PASSWORD="1234";
-const TVA_RATE=0.2;
-let products=[], invoices=[], currentInvoice=[];
-let editMode = false; // track if editing an invoice
-let editingInvoiceIndex = -1; // index of the invoice being edited
+    // --- INITIALIZATION ---
+    function init() {
+      const p = localStorage.getItem("admin-products");
+      if (p) products = JSON.parse(p);
 
+      const i = localStorage.getItem("admin-invoices");
+      if (i) invoices = JSON.parse(i);
 
-function loadProducts(){ const s=localStorage.getItem("admin-products"); if(s) products=JSON.parse(s);}
-function saveProducts(){ localStorage.setItem("admin-products",JSON.stringify(products));}
-function loadInvoices(){ const s=localStorage.getItem("admin-invoices"); if(s) invoices=JSON.parse(s);}
-function saveInvoices(){ localStorage.setItem("admin-invoices",JSON.stringify(invoices));}
+      renderStockTable();
+      renderInvoiceHistory();
 
-const tbody=document.getElementById("admin-body");
-function renderAdmin(filter=""){
-  tbody.innerHTML="";
-  filter=filter.toLowerCase();
-  products.filter(p=>p.id.toLowerCase().includes(filter)||
-                     p.name.toLowerCase().includes(filter)||
-                     p.category.toLowerCase().includes(filter)
-  ).forEach(p=>{
-    const tr=document.createElement("tr");
-    tr.style.background=p.stock===0?"#f8d7da":(p.stock<5?"#fff3cd":"#d4edda");
-    tr.innerHTML=`<td><input type="checkbox" class="select-item" value="${p.id}"></td>
+      // Logos
+      document.getElementById("company-logo").addEventListener("input", e => {
+        document.getElementById("logo-preview").src = e.target.value;
+      });
+
+      // Search
+      document.getElementById("search-bar").addEventListener("input", () => {
+        renderStockTable(document.getElementById("search-bar").value);
+      });
+      document.getElementById("invoice-search-bar").addEventListener("input", renderInvoiceHistory);
+
+      // Fee Listeners for live update
+      ["fee-transport", "fee-installation", "fee-frais", "fee-retenue", "fee-garantie", "timbre-fiscal"].forEach(id => {
+        document.getElementById(id).addEventListener("input", renderInvoiceEditorTable);
+      });
+    }
+
+    // --- STOCK MANAGEMENT ---
+    function saveProducts() { localStorage.setItem("admin-products", JSON.stringify(products)); }
+    function saveInvoices() { localStorage.setItem("admin-invoices", JSON.stringify(invoices)); }
+
+    function renderStockTable(filter = "") {
+      const tbody = document.getElementById("admin-body");
+      tbody.innerHTML = "";
+      filter = filter.toLowerCase();
+
+      products.filter(p =>
+        p.id.toLowerCase().includes(filter) ||
+        p.name.toLowerCase().includes(filter) ||
+        p.category.toLowerCase().includes(filter)
+      ).forEach(p => {
+        const tr = document.createElement("tr");
+        tr.style.background = p.stock === 0 ? "#fff0f0" : (p.stock < 5 ? "#fffbef" : "#f0fff4");
+
+        // Safety for fields
+        const img = p.image ? `<img src="${p.image}">` : '';
+        const colors = Array.isArray(p.colors) ? p.colors.join(", ") : p.colors;
+
+        tr.innerHTML = `
+      <td><input type="checkbox" class="select-item" value="${p.id}"></td>
       <td>${p.id}</td>
-      <td>${p.image?`<img src="${p.image}">`:''}</td>
+      <td>${img}</td>
       <td>${p.name}</td>
       <td>${p.category}</td>
-      <td>${p.price}</td>
-      <td>${p.colors.join(", ")}</td>
-      <td><input type="number" min="0" value="${p.stock}" id="stock-${p.id}"></td>
-      <td><button class="delete-btn" onclick="deleteItem('${p.id}')">Delete</button></td>`;
-    tbody.appendChild(tr);
-  });
-}
+      <td>${Number(p.price).toFixed(3)}</td>
+      <td>${colors}</td>
+      <td><input type="number" id="stock-${p.id}" value="${p.stock}" style="width:60px;"></td>
+      <td><button class="delete-btn" onclick="deleteProduct('${p.id}')">Del</button></td>
+    `;
+        tbody.appendChild(tr);
+      });
+    }
 
-function saveAllStocks(){
-  products.forEach(p=>{ const i=document.getElementById(`stock-${p.id}`); if(i) p.stock=parseInt(i.value)||0; });
-  saveProducts();
-  renderAdmin(document.getElementById("search-bar").value);
-  alert("Stocks saved!");
-}
+    function saveAllStocks() {
+      products.forEach(p => {
+        const el = document.getElementById(`stock-${p.id}`);
+        if (el) p.stock = parseInt(el.value) || 0;
+      });
+      saveProducts();
+      alert("Stocks updated!");
+    }
 
-function deleteItem(id){
-  const pass=prompt("Enter password:");
-  if(pass!==ADMIN_PASSWORD) return alert("Wrong password!");
-  if(!confirm("Delete this product?")) return;
-  products=products.filter(p=>p.id!==id);
-  saveProducts();
-  renderAdmin(document.getElementById("search-bar").value);
-}
+    function deleteProduct(id) {
+      if (prompt("Password:") !== ADMIN_PASSWORD) return alert("Wrong password");
+      if (!confirm("Delete this product?")) return;
+      products = products.filter(p => p.id !== id);
+      saveProducts();
+      renderStockTable();
+    }
 
-document.getElementById("search-bar").addEventListener("input",()=>renderAdmin(document.getElementById("search-bar").value));
-document.getElementById("company-logo").addEventListener("input",e=>{ document.getElementById("logo-preview").src=e.target.value; });
+    // --- CSV IMPORT/EXPORT ---
+    function exportCSV() {
+      let csv = "ID,Name,Category,Price,Stock,Colors,Image\n";
+      products.forEach(p => {
+        const cols = Array.isArray(p.colors) ? p.colors.join("|") : p.colors;
+        csv += `"${p.id}","${p.name}","${p.category}",${p.price},${p.stock},"${cols}","${p.image}"\n`;
+      });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(new Blob([csv], { type: "text/csv" }));
+      a.download = "products_export.csv";
+      a.click();
+    }
 
-function startInvoice(){
-  const selected=[...document.querySelectorAll(".select-item:checked")].map(cb=>products.find(p=>p.id===cb.value));
-  if(selected.length===0){ alert("Select items"); return; }
-  selected.forEach(p=>{
-    const color=p.colors[0]||"";
-    currentInvoice.push({...p, quantity:1, selectedColor:color});
-  });
-  document.getElementById("invoice-editor").style.display="flex";
-  document.getElementById("invoice-id").value="INV-"+Date.now();
-  renderInvoiceTable();
-}
-
-function renderInvoiceTable(){
-  const tbody=document.querySelector("#invoice-table tbody");
-  tbody.innerHTML="";
-  let subtotal=0;
-  currentInvoice.forEach((i,index)=>{
-    const tr=document.createElement("tr");
-    const total=i.price*i.quantity;
-    subtotal+=total;
-    const colorOptions=i.colors.map(c=>`<option value="${c}" ${c===i.selectedColor?'selected':''}>${c}</option>`).join('');
-    tr.innerHTML=`<td>${i.id}</td><td>${i.name}</td><td>${i.price}</td>
-      <td><select onchange="updateInvoiceColor(${index},this.value)">${colorOptions}</select></td>
-      <td><input type="number" min="1" value="${i.quantity}" onchange="updateInvoiceQty(${index},this.value)"></td>
-      <td>${total.toFixed(2)}</td>
-      <td><button class="delete-btn" onclick="removeInvoiceItem(${index})">Remove</button></td>`;
-    tbody.appendChild(tr);
-  });
-  document.getElementById("subtotal").textContent=subtotal.toFixed(2);
-  document.getElementById("tva").textContent=(subtotal*TVA_RATE).toFixed(2);
-  document.getElementById("total").textContent=(subtotal*(1+TVA_RATE)).toFixed(2);
-}
-
-function updateInvoiceQty(index,val){
-  val=parseInt(val); if(val<1) val=1; if(val>currentInvoice[index].stock){ alert("Not enough stock!"); val=currentInvoice[index].stock;}
-  currentInvoice[index].quantity=val; renderInvoiceTable();
-}
-
-function updateInvoiceColor(index,color){ currentInvoice[index].selectedColor=color; }
-
-function removeInvoiceItem(index){ currentInvoice.splice(index,1); renderInvoiceTable(); }
-
-function validateInvoice(){
-  if(currentInvoice.length===0){ alert("Invoice empty!"); return; }
-
-  const invNumber=document.getElementById("invoice-id").value;
-  const client=document.getElementById("client-name").value||"Client";
-  const address=document.getElementById("client-address").value||"";
-  const company=document.getElementById("company-name").value||"Company";
-  const phone=document.getElementById("company-phone").value||"";
-  const logo=document.getElementById("company-logo").value||"";
-  const clientPhone = document.getElementById("client-phone").value || "N/A";
-
-  // Restore stock if editing an existing invoice
-  if(editMode && editingInvoiceIndex !== -1){
-    const oldInvoice = invoices[editingInvoiceIndex];
-    oldInvoice.items.forEach(i => {
-      const p = products.find(p => p.id === i.id);
-      if(p) p.stock += i.quantity; // restore old quantities
+    document.getElementById("import-file").addEventListener("change", e => {
+      const file = e.target.files[0];
+      if (!file) return;
+      Papa.parse(file, {
+        header: true, skipEmptyLines: true,
+        complete: res => {
+          res.data.forEach(row => {
+            if (!row.ID) return;
+            const existing = products.find(p => p.id === row.ID.trim());
+            const item = {
+              id: row.ID.trim(),
+              name: row.Name || "Item",
+              category: row.Category || "General",
+              price: parseFloat(row.Price) || 0,
+              stock: parseInt(row.Stock) || 0,
+              colors: row.Colors ? row.Colors.split("|") : [],
+              image: row.Image || ""
+            };
+            if (existing) Object.assign(existing, item);
+            else products.push(item);
+          });
+          saveProducts();
+          renderStockTable();
+          alert("Import successful!");
+        }
+      });
     });
-  }
 
-  // Subtract stock for current invoice
-  currentInvoice.forEach(i=>{ const p=products.find(p=>p.id===i.id); if(p) p.stock-=i.quantity; });
-  saveProducts();
-  const subtotal=currentInvoice.reduce((s,i)=>s+i.price*i.quantity,0);
-  const tva=subtotal*TVA_RATE;
+    // --- INVOICE EDITOR LOGIC ---
+    function switchTab(tab) {
+      if (tab === "stock") {
+        document.getElementById("tab-stock").style.display = "flex";
+        document.getElementById("tab-invoices").style.display = "none";
+        // If invoice editor was open, keep it open (side-by-side)
+        // If not, it stays hidden
+      } else if (tab === "invoices") {
+        document.getElementById("tab-stock").style.display = "none";
+        document.getElementById("invoice-editor").style.display = "none";
+        document.getElementById("tab-invoices").style.display = "flex";
+      }
+    }
 
-  const invoice = {
-    number: invNumber,
-    date: new Date().toLocaleString(),
-    client,
-    clientPhone,
-    address,
-    items: currentInvoice,
-    subtotal,
-    tva,
-    total: subtotal + tva,
-    company,
-    phone,
-    logo
-  };
+    function startInvoice() {
+      const checks = document.querySelectorAll(".select-item:checked");
+      if (checks.length === 0) return alert("Select items first!");
 
-  if(editMode && editingInvoiceIndex !== -1){
-    invoices[editingInvoiceIndex] = invoice; // UPDATE existing
-    editMode = false;
-    editingInvoiceIndex = -1;
-  } else {
-    invoices.push(invoice); // NEW invoice
-  }
+      let addedCount = 0;
+      checks.forEach(c => {
+        const p = products.find(prod => prod.id === c.value);
+        if (p) {
+          // Check if item already in invoice to update quantity or add new line?
+          // Simple behavior: Add as new line
+          currentInvoice.push({
+            ...p,
+            quantity: 1,
+            selectedColor: p.colors[0] || "",
+            tvaRate: 19,
+            discount: 0
+          });
+          addedCount++;
+          // Uncheck
 
-  saveInvoices();
-  currentInvoice=[];
-  document.getElementById("invoice-editor").style.display="none";
-  renderAdmin(); renderInvoices();
-  alert("Invoice saved!");
-}
+        }
+      });
 
+      if (addedCount > 0) {
+        // Ensure editor is visible
+        document.getElementById("tab-stock").style.display = "flex"; // Keep stock visible
+        document.getElementById("tab-invoices").style.display = "none";
+        document.getElementById("invoice-editor").style.display = "flex";
 
-function renderInvoices(){
-  const invBody=document.getElementById("invoice-body");
-  invBody.innerHTML="";
-  invoices.forEach(inv=>{
-    const tr=document.createElement("tr");
-    tr.innerHTML=`<td>${inv.number}</td>
-      <td>${inv.date}</td>
-      <td>${inv.client}<br>${inv.company}</td>
-      <td>${inv.items.map(i=>i.name+" x"+i.quantity+" ("+i.selectedColor+")").join("<br>")}</td>
-      <td>${inv.total.toFixed(2)}</td>
-      <td>${inv.tva.toFixed(2)}</td>
-      <td>
-  <button onclick="printInvoice('${inv.number}')">Print</button>
-  <button class="cancel-btn" onclick="cancelInvoiceHistory('${inv.number}')">Cancel</button>
-  <button onclick="editInvoice('${inv.number}')">Edit</button>
-</td>`;
-    invBody.appendChild(tr);
-  });
-}
+        // If it was a new invoice (empty ID), set ID. But startInvoice previously reset ID.
+        // We should only set ID if it's empty
+        if (!document.getElementById("invoice-id").value) {
+          document.getElementById("invoice-id").value = "INV-" + Date.now();
+        }
 
-function editInvoice(number){
-  const invIndex = invoices.findIndex(i => i.number === number);
-  if(invIndex === -1) return alert("Invoice not found!");
-  
-  editMode = true; // mark that we are editing
-  editingInvoiceIndex = invIndex;
-  
-  const inv = invoices[invIndex];
-  currentInvoice = inv.items.map(item => ({...item})); // clone items
-  document.getElementById("invoice-editor").style.display = "flex";
-  document.getElementById("invoice-id").value = inv.number;
-  document.getElementById("client-name").value = inv.client;
-  document.getElementById("client-address").value = inv.address;
-  document.getElementById("company-name").value = inv.company;
-  document.getElementById("company-phone").value = inv.phone;
-  document.getElementById("company-logo").value = inv.logo;
-  document.getElementById("logo-preview").src = inv.logo;
-  document.getElementById("client-phone").value = inv.clientPhone || "";
+        renderInvoiceEditorTable();
+      }
+    }
 
-  renderInvoiceTable();
-}
+    function renderInvoiceEditorTable() {
+      const tbody = document.querySelector("#invoice-table tbody");
+      tbody.innerHTML = "";
 
+      let totalHT = 0;
+      let totalTVA = 0;
 
-document.getElementById("invoice-search-bar").addEventListener("input", ()=>{
-  const filter = document.getElementById("invoice-search-bar").value.toLowerCase().trim();
-  const keywords = filter.split(/\s+/); // split by spaces
-  const invBody = document.getElementById("invoice-body");
-  invBody.innerHTML = "";
+      currentInvoice.forEach((item, idx) => {
+        // Math: 
+        // Price is assumed TTC (based on prompt "PU TTC").
+        // Amount (Montant) = Price * Qty * (1 - Disc/100).
+        // Base HT = Amount / (1 + TVA/100).
+        // TVA Val = Amount - Base HT.
 
-  invoices.filter(inv => {
-    // combine searchable text
-    const searchable = [
-      inv.number,
-      inv.client,
-      inv.company,
-      inv.date,
-      inv.items.map(i => i.name).join(" ")
-    ].join(" ").toLowerCase();
+        // HOWEVER, typical B2B invoices often work with HT price. 
+        // Reference image has columns: PU TTC, Montant (TTC by implication if PU is TTC? Or HT?).
+        // Usually "Montant" column is the row total. 
+        // If PU is TTC, then Montant is TTC.
+        // Then the tax summary breaks it down.
 
-    // all keywords must match somewhere
-    return keywords.every(kw => searchable.includes(kw));
-  }).forEach(inv => {
-    const tr = document.createElement("tr");
-    tr.innerHTML = `
+        const qty = parseInt(item.quantity) || 1;
+        const price = parseFloat(item.price) || 0; // TTC
+        const disc = parseFloat(item.discount) || 0;
+        const tvaRate = parseFloat(item.tvaRate) || 19;
+
+        const rowTotal = price * qty * (1 - disc / 100);
+
+        const baseHT = rowTotal / (1 + tvaRate / 100);
+        const tvaVal = rowTotal - baseHT;
+
+        totalHT += baseHT;
+        totalTVA += tvaVal;
+
+        const tr = document.createElement("tr");
+
+        const colorOpts = (Array.isArray(item.colors) ? item.colors : []).map(c =>
+          `<option value="${c}" ${c === item.selectedColor ? "selected" : ""}>${c}</option>`
+        ).join("");
+
+        tr.innerHTML = `
+      <td>${item.id}</td>
+      <td>${item.name}</td>
+      <td><select onchange="updateInvItem(${idx}, 'color', this.value)">${colorOpts}</select></td>
+      <td><input type="number" min="1" value="${qty}" onchange="updateInvItem(${idx}, 'qty', this.value)"></td>
+      <td>${price.toFixed(3)}</td>
+      <td><input type="number" min="0" max="100" value="${disc}" onchange="updateInvItem(${idx}, 'disc', this.value)"></td>
+      <td><b>${rowTotal.toFixed(3)}</b></td>
+      <td><input type="number" value="${tvaRate}" onchange="updateInvItem(${idx}, 'tva', this.value)"></td>
+      <td><button class="delete-btn" onclick="removeInvItem(${idx})" style="padding:2px 6px;">x</button></td>
+    `;
+        tbody.appendChild(tr);
+      });
+
+      // Fees
+      const transport = parseFloat(document.getElementById("fee-transport").value) || 0;
+      const installation = parseFloat(document.getElementById("fee-installation").value) || 0;
+      const frais = parseFloat(document.getElementById("fee-frais").value) || 0;
+      const retenue = parseFloat(document.getElementById("fee-retenue").value) || 0;
+      const garantie = parseFloat(document.getElementById("fee-garantie").value) || 0;
+      const timbre = parseFloat(document.getElementById("timbre-fiscal").value) || 0;
+
+      const feesTotal = transport + installation + frais + garantie; // Positive fees
+
+      // Grand Totals
+      // totalHT and totalTVA are calculated from lines.
+      // We need to present them clearly.
+      // Mytek invoice structure usually: 
+      // Subtotal (Total HT presumably? or Total TTC lines?). 
+      // Let's assume standard Tunisian invoice:
+      // Subtotal usually means Total HT.
+      // But our inputs are TTC. 
+      // Let's display "Total HT" correctly calculated from back-calc.
+
+      document.getElementById("subtotal").textContent = totalHT.toFixed(3);
+      document.getElementById("tva").textContent = totalTVA.toFixed(3);
+      document.getElementById("fees-total").textContent = feesTotal.toFixed(3);
+      document.getElementById("timbre-display").textContent = timbre.toFixed(3);
+
+      // TTC = (Total HT + Total TVA) + Fees + Timbre - Retenue
+      // Note: (Total HT + Total TVA) is essentialy sum of row totals (which are TTC).
+      const totalTTC = (totalHT + totalTVA) + feesTotal + timbre - retenue;
+
+      document.getElementById("total").textContent = totalTTC.toFixed(3) + " DNT";
+    }
+
+    function updateInvItem(idx, field, val) {
+      if (field === "qty") {
+        let v = parseInt(val) || 1;
+        if (v < 1) v = 1;
+        // Check stock
+        const available = currentInvoice[idx].stock;
+        // Note: If editing, stock might be complicated. For now simple check.
+        if (v > available) { alert("Max stock request exceeded (" + available + ")"); v = available; }
+        currentInvoice[idx].quantity = v;
+      }
+      if (field === "color") currentInvoice[idx].selectedColor = val;
+      if (field === "disc") currentInvoice[idx].discount = parseFloat(val) || 0;
+      if (field === "tva") currentInvoice[idx].tvaRate = parseFloat(val) || 0;
+
+      renderInvoiceEditorTable();
+    }
+
+    function removeInvItem(idx) {
+      currentInvoice.splice(idx, 1);
+      renderInvoiceEditorTable();
+    }
+
+    function cancelInvoiceEditor() {
+      if (confirm("Discard unsaved changes?")) {
+        currentInvoice = [];
+        editMode = false;
+        editingInvoiceIndex = -1;
+        document.getElementById("invoice-editor").style.display = "none";
+        document.getElementById("tab-stock").style.display = "flex"; // Ensure stock comes back
+      }
+    }
+
+    // --- VALIDATION & SAVING ---
+    function validateInvoice() {
+      if (currentInvoice.length === 0) return alert("Invoice is empty!");
+
+      // Capture Data
+      const invData = {
+        number: document.getElementById("invoice-id").value,
+        date: new Date().toLocaleString(),
+        company: {
+          name: document.getElementById("company-name").value,
+          phone: document.getElementById("company-phone").value,
+          address: document.getElementById("company-address").value,
+          fax: document.getElementById("company-fax").value,
+          email: document.getElementById("company-email").value,
+          website: document.getElementById("company-website").value,
+          mf: document.getElementById("company-mf").value,
+          rc: document.getElementById("company-rc").value,
+          rib: document.getElementById("company-rib").value,
+          logo: document.getElementById("company-logo").value
+        },
+        client: {
+          name: document.getElementById("client-name").value,
+          phone: document.getElementById("client-phone").value,
+          address: document.getElementById("client-address").value,
+          code: document.getElementById("client-code").value,
+          mfcin: document.getElementById("client-mfcin").value,
+          ref: document.getElementById("client-ref").value
+        },
+        meta: {
+          payment: document.getElementById("payment-mode").value,
+          chargedTo: document.getElementById("charged-to").value
+        },
+        fees: {
+          transport: parseFloat(document.getElementById("fee-transport").value) || 0,
+          installation: parseFloat(document.getElementById("fee-installation").value) || 0,
+          frais: parseFloat(document.getElementById("fee-frais").value) || 0,
+          retenue: parseFloat(document.getElementById("fee-retenue").value) || 0,
+          garantie: parseFloat(document.getElementById("fee-garantie").value) || 0,
+          timbre: parseFloat(document.getElementById("timbre-fiscal").value) || 0
+        },
+        items: JSON.parse(JSON.stringify(currentInvoice))
+      };
+
+      // Calculate final totals for generic view
+      let rawTotal = 0;
+      invData.items.forEach(i => {
+        rawTotal += (i.price * i.quantity * (1 - (i.discount || 0) / 100));
+      });
+      const feesSum = invData.fees.transport + invData.fees.installation + invData.fees.frais + invData.fees.garantie;
+      const grandTotal = rawTotal + feesSum + invData.fees.timbre - invData.fees.retenue;
+      invData.totalTTC = grandTotal;
+
+      // Stock Handling
+      // 1. If editing, restore old stock
+      if (editMode && editingInvoiceIndex !== -1) {
+        const old = invoices[editingInvoiceIndex];
+        old.items.forEach(oldItem => {
+          const p = products.find(x => x.id === oldItem.id);
+          if (p) p.stock += oldItem.quantity;
+        });
+      }
+      // 2. Deduct new stock
+      invData.items.forEach(newItem => {
+        const p = products.find(x => x.id === newItem.id);
+        if (p) p.stock -= newItem.quantity;
+      });
+      saveProducts();
+      renderStockTable();
+
+      // Save Invoice
+      if (editMode && editingInvoiceIndex !== -1) {
+        // Keep original date or number? Usually keep number, maybe update date? Let's update Date as modified date.
+        invoices[editingInvoiceIndex] = invData;
+      } else {
+        invoices.push(invData);
+      }
+      saveInvoices();
+
+      // Cleanup
+      editMode = false;
+      editingInvoiceIndex = -1;
+      currentInvoice = [];
+      document.getElementById("invoice-editor").style.display = "none";
+      switchTab("invoices");
+      renderInvoiceHistory();
+      alert("Invoice Saved Successfully!");
+    }
+
+    // --- HISTORY & PRINTING ---
+    function renderInvoiceHistory() {
+      const tbody = document.getElementById("invoice-body");
+      tbody.innerHTML = "";
+      const term = document.getElementById("invoice-search-bar").value.toLowerCase();
+
+      invoices.forEach(inv => {
+        // Search filter
+        const searchStr = (inv.number + inv.client.name + inv.date).toLowerCase();
+        if (term && !searchStr.includes(term)) return;
+
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
       <td>${inv.number}</td>
       <td>${inv.date}</td>
-      <td>${inv.client}<br>${inv.company}</td>
-      <td>${inv.items.map(i=>i.name+" x"+i.quantity+" ("+i.selectedColor+")").join("<br>")}</td>
-      <td>${inv.total.toFixed(2)}</td>
-      <td>${inv.tva.toFixed(2)}</td>
+      <td>${inv.client.name}</td>
+      <td>${inv.items.length}</td>
+      <td><b>${(inv.totalTTC || 0).toFixed(3)}</b></td>
       <td>
         <button onclick="printInvoice('${inv.number}')">Print</button>
-        <button class="cancel-btn" onclick="cancelInvoiceHistory('${inv.number}')">Cancel</button>
-        <button onclick="editInvoice('${inv.number}')">Edit</button>
-      </td>`;
-    invBody.appendChild(tr);
-  });
-});
+        <button onclick="editInvoice('${inv.number}')" style="background:#2196F3;">Edit</button>
+        <button onclick="cancelInvoice('${inv.number}')" class="cancel-btn">Cancel</button>
+      </td>
+    `;
+        tbody.appendChild(tr);
+      });
+    }
 
+    function cancelInvoice(num) {
+      if (prompt("Admin Password:") !== ADMIN_PASSWORD) return;
+      const idx = invoices.findIndex(i => i.number === num);
+      if (idx === -1) return;
 
-function printInvoice(number){
-  const inv = invoices.find(i => i.number === number);
-  if(!inv) return;
+      if (confirm("Cancel this invoice? Stock will be restored.")) {
+        const inv = invoices[idx];
+        // Restore stock
+        inv.items.forEach(item => {
+          const p = products.find(x => x.id === item.id);
+          if (p) p.stock += item.quantity;
+        });
+        saveProducts();
+        // Remove invoice
+        invoices.splice(idx, 1);
+        saveInvoices();
+        renderStockTable();
+        renderInvoiceHistory();
+      }
+    }
 
-  let html = `
-  <div style="padding:20px;font-family:Arial,sans-serif; width:210mm;">
+    function editInvoice(num) {
+      const inv = invoices.find(i => i.number === num);
+      if (!inv) return;
 
-    <!-- Header: Company Name & Logo -->
-    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:20px;">
-      <div>
-        <h2 style="margin:0;">${inv.company}</h2>
-      </div>
-      <div>
-        <img src="${inv.logo}" style="max-height:70px; max-width:150px; display:block;">
-      </div>
-    </div>
+      editMode = true;
+      editingInvoiceIndex = invoices.findIndex(i => i.number === num);
 
-    <!-- Client Info Box (Right-aligned, no overlap) -->
-    <div style="display:flex; justify-content:flex-end; margin-bottom:20px;">
-      <div style="
-        border:1px solid #333;
-        padding:10px;
-        width:220px;
-        font-size:12px;
-        background:#f9f9f9;
-      ">
-        <p style="margin:2px;"><strong>Client:</strong> ${inv.client}</p>
-        <p style="margin:2px;"><strong>Address:</strong> ${inv.address || 'N/A'}</p>
-        <p style="margin:2px;"><strong>Phone:</strong> ${inv.clientPhone || 'N/A'}</p>
-        <p style="margin:2px;"><strong>Date:</strong> ${inv.date}</p>
-      </div>
-    </div>
+      // Load data
+      currentInvoice = JSON.parse(JSON.stringify(inv.items));
+      document.getElementById("invoice-id").value = inv.number;
 
-    <!-- Invoice Table -->
-    <table border="1" width="100%" cellpadding="5" cellspacing="0" style="border-collapse:collapse;">
-      <thead>
-        <tr style="background:#eee;">
-          <th>ID</th><th>Name</th><th>Color</th><th>Qty</th><th>Price</th><th>Total</th>
-        </tr>
-      </thead>
-      <tbody>
-  `;
+      // Map fields
+      if (inv.company) {
+        document.getElementById("company-name").value = inv.company.name || "";
+        document.getElementById("company-phone").value = inv.company.phone || "";
+        document.getElementById("company-address").value = inv.company.address || "";
+        document.getElementById("company-fax").value = inv.company.fax || "";
+        document.getElementById("company-email").value = inv.company.email || "";
+        document.getElementById("company-website").value = inv.company.website || "";
+        document.getElementById("company-mf").value = inv.company.mf || "";
+        document.getElementById("company-rc").value = inv.company.rc || "";
+        document.getElementById("company-rib").value = inv.company.rib || "";
+        document.getElementById("company-logo").value = inv.company.logo || "";
+        document.getElementById("logo-preview").src = inv.company.logo || "";
+      }
 
-  inv.items.forEach(i => {
-    html += `
+      if (inv.client) {
+        document.getElementById("client-name").value = inv.client.name || "";
+        document.getElementById("client-phone").value = inv.client.phone || "";
+        document.getElementById("client-address").value = inv.client.address || "";
+        document.getElementById("client-code").value = inv.client.code || "";
+        document.getElementById("client-mfcin").value = inv.client.mfcin || "";
+        document.getElementById("client-ref").value = inv.client.ref || "";
+      }
+
+      if (inv.meta) {
+        document.getElementById("payment-mode").value = inv.meta.payment || "CAISSE";
+        document.getElementById("charged-to").value = inv.meta.chargedTo || "";
+      }
+
+      if (inv.fees) {
+        document.getElementById("fee-transport").value = inv.fees.transport || 0;
+        document.getElementById("fee-installation").value = inv.fees.installation || 0;
+        document.getElementById("fee-frais").value = inv.fees.frais || 0;
+        document.getElementById("fee-retenue").value = inv.fees.retenue || 0;
+        document.getElementById("fee-garantie").value = inv.fees.garantie || 0;
+        document.getElementById("timbre-fiscal").value = inv.fees.timbre || 1.000;
+      }
+
+      document.getElementById("tab-stock").style.display = "flex"; // Side by side editing
+      document.getElementById("tab-invoices").style.display = "none";
+      document.getElementById("invoice-editor").style.display = "flex";
+
+      renderInvoiceEditorTable();
+    }
+
+    function printInvoice(num) {
+      const inv = invoices.find(i => i.number === num);
+      if (!inv) return;
+
+      // Safe helpers
+      const fmt = (n) => (n || 0).toFixed(3);
+      const cmp = inv.company || {};
+      const cli = inv.client || {};
+      const meta = inv.meta || {};
+      const fees = inv.fees || {};
+
+      // Calculate Totals for Print
+      let totalHT = 0;
+      let totalTVA = 0;
+
+      const taxStats = {}; // { 19: {base: x, tva: x}, 7: ... }
+
+      const itemsHtml = inv.items.map(item => {
+        const qty = item.quantity;
+        const price = item.price;
+        const disc = item.discount || 0;
+        const rate = item.tvaRate || 19;
+
+        // Line Calcs
+        const rowTotal = price * qty * (1 - disc / 100);
+        const baseHT = rowTotal / (1 + rate / 100);
+        const tvaVal = rowTotal - baseHT;
+
+        totalHT += baseHT;
+        totalTVA += tvaVal;
+
+        if (!taxStats[rate]) taxStats[rate] = { base: 0, tva: 0 };
+        taxStats[rate].base += baseHT;
+        taxStats[rate].tva += tvaVal;
+
+        return `
       <tr>
-        <td>${i.id}</td>
-        <td>${i.name}</td>
-        <td>${i.selectedColor}</td>
-        <td>${i.quantity}</td>
-        <td>${i.price}</td>
-        <td>${(i.price*i.quantity).toFixed(2)}</td>
+        <td>${item.name}</td>
+        <td>${item.id}</td>
+        <td>${item.name} ${item.selectedColor ? "(" + item.selectedColor + ")" : ""}</td>
+        <td style="text-align:center">${qty}</td>
+        <td style="text-align:right">${price.toFixed(3)}</td>
+        <td style="text-align:center">${disc}%</td>
+        <td style="text-align:right">${rowTotal.toFixed(3)}</td>
+        <td style="text-align:center">${rate}%</td>
       </tr>
     `;
-  });
+      }).join("");
 
-  html += `</tbody></table>`;
+      const feesSum = (fees.transport || 0) + (fees.installation || 0) + (fees.frais || 0) + (fees.garantie || 0);
+      const grandTotal = totalHT + totalTVA + feesSum + (fees.timbre || 0) - (fees.retenue || 0);
 
-  // TVA & Total Box on the bottom-right
-  html += `
-    <div style="display:flex; justify-content:flex-end; margin-top:15px;">
-      <div style="border:2px solid #000; padding:15px; width:250px; text-align:right;">
-        <p>Subtotal: ${inv.subtotal.toFixed(2)}</p>
-        <p>VAT (19%): ${inv.tva.toFixed(2)}</p>
-        <p><strong>Total: ${inv.total.toFixed(2)}</strong></p>
+      // Integer / Decimal for Words
+      const intPart = Math.floor(grandTotal);
+      const decPart = Math.round((grandTotal - intPart) * 1000);
+
+      const taxTableHtml = Object.keys(taxStats).map(k => `
+    <tr>
+      <td>${(taxStats[k].base + taxStats[k].tva).toFixed(3)} (TTC incl.)</td> <!-- Actually classic view might differ -->
+      <td>${taxStats[k].base.toFixed(3)}</td>
+      <td>${k}%</td>
+      <td>${taxStats[k].tva.toFixed(3)}</td>
+    </tr>
+  `).join("");
+
+      // Print Window
+      const w = window.open("", "PrintInvoice", "width=800,height=900");
+      w.document.write(`
+    <html><head><title>${inv.number}</title>
+    <style>
+      body { font-family:'Arial Narrow', sans-serif; font-size:12px; margin:20px; }
+      table { width:100%; border-collapse:collapse; }
+      td, th { border:1px solid #000; padding:4px; }
+      .no-border td { border:none; }
+      .header-box { display:flex; justify-content:space-between; margin-bottom:20px; }
+      .title-box { border:1px solid #000; padding:5px; background:#ddd; font-weight:bold; margin:10px 0; display:flex; justify-content:space-between; }
+      .footer { margin-top:30px; font-size:10px; }
+    </style>
+    </head><body>
+      
+      <!-- HEADER -->
+      <div class="header-box">
+        <div style="width:55%">
+          ${cmp.logo ? `<img src="${cmp.logo}" style="max-height:60px; margin-bottom:10px;">` : ''}
+          <div style="font-size:16px; font-weight:bold; text-transform:uppercase;">${cmp.name}</div>
+          <div>${cmp.address}</div>
+          <div>Tel: ${cmp.phone} Fax: ${cmp.fax}</div>
+          <div>${cmp.email}</div>
+          <div style="margin-top:5px; font-size:11px;">Ref: ${inv.number} / Date: ${inv.date.split(',')[0]}</div>
+        </div>
+        <div style="width:40%; border:1px solid #000; padding:10px; border-radius:4px;">
+          <div style="border-bottom:1px solid #000; font-weight:bold; margin-bottom:5px;">LIVRÉ À:</div>
+          <div style="font-weight:bold; font-size:14px;">${cli.name}</div>
+          <div>${cli.address}</div>
+          <div>Code: ${cli.code}</div>
+          <div>MF/CIN: ${cli.mfcin}</div>
+          <div style="margin-top:10px;">Mode: <b>${meta.payment}</b></div>
+        </div>
       </div>
-    </div>
-  `;
 
-  // Signatures
-  html += `
-    <div style="margin-top:30px; display:flex; justify-content:space-between;">
-      <div>Client Signature<div style="width:180px;height:60px;border:1px solid #333;"></div></div>
-      <div>Company Signature<div style="width:180px;height:60px;border:1px solid #333;"></div></div>
-    </div>
-  `;
+      <div class="title-box">
+        <span>BON DE LIVRAISON / FACTURE</span>
+        <span>${inv.number}</span>
+      </div>
+      
+      <table style="margin-bottom:15px; text-align:center;">
+        <tr style="background:#eee;">
+          <td>Date</td><td>Numéro</td><td>Client Ref</td><td>Chargé(e)</td>
+        </tr>
+        <tr>
+          <td>${inv.date}</td>
+          <td>${inv.number}</td>
+          <td>${cli.ref}</td>
+          <td>${meta.chargedTo}</td>
+        </tr>
+      </table>
 
-  // Company phone at very bottom
-  html += `
-    <div style="text-align:center; margin-top:30px; font-weight:bold;">
-      Company Phone: ${inv.phone}
-    </div>
-  `;
+      <table>
+        <thead style="background:#eee;">
+          <tr>
+            <th>Ref</th><th>Code</th><th>Désignation</th><th>Qté</th><th>PU TTC</th><th>Remise</th><th>Montant</th><th>TVA</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${itemsHtml}
+        </tbody>
+      </table>
+      
+      <!-- FEES ROW -->
+      <div style="border:1px solid #000; border-top:none; padding:5px; display:flex; justify-content:space-around; font-size:11px;">
+        <span>Transport: ${fmt(fees.transport)}</span>
+        <span>Installation: ${fmt(fees.installation)}</span>
+        <span>Frais: ${fmt(fees.frais)}</span>
+        <span>Retenue: ${fmt(fees.retenue)}</span>
+        <span>Garantie: ${fmt(fees.garantie)}</span>
+      </div>
 
-  const win = window.open("", "_blank");
-  win.document.write(html);
-  win.document.close();
-  win.print();
-}
+      <div style="display:flex; justify-content:space-between; margin-top:20px;">
+        <div style="width:55%">
+          <table style="font-size:11px;">
+            <tr style="background:#eee;"><th>Total HT</th><th>Base TVA</th><th>Taux</th><th>Mont TVA</th></tr>
+            ${taxTableHtml}
+          </table>
+          <div style="margin-top:15px; font-style:italic;">
+            Arrêtée la présente facture à la somme de:<br>
+            <b>${intPart} Dinars et ${decPart} Millimes.</b>
+          </div>
+        </div>
+        
+        <div style="width:40%">
+           <table style="font-weight:bold;">
+             <tr><td>Total HT</td><td style="text-align:right;">${totalHT.toFixed(3)}</td></tr>
+             <tr><td>Total TVA</td><td style="text-align:right;">${totalTVA.toFixed(3)}</td></tr>
+             <tr><td>Timbre Fiscal</td><td style="text-align:right;">${fmt(fees.timbre)}</td></tr>
+             <tr style="background:#ddd; font-size:14px;"><td>NET À PAYER TTC</td><td style="text-align:right;">${grandTotal.toFixed(3)}</td></tr>
+           </table>
+        </div>
+      </div>
 
+      <div class="footer">
+        <div style="border-top:1px solid #000; padding-top:5px; display:flex; justify-content:space-between;">
+          <div style="width:60%">
+            <b>Infos Légales:</b><br>
+            MF: ${cmp.mf} | RC: ${cmp.rc} | RIB: ${cmp.rib}<br>
+            IMPORTANT: Marchandise reçue conforme...
+          </div>
+          <div style="text-align:right;">
+            Signature & Cachet
+            <div style="border:1px solid #ccc; height:60px; width:150px; margin-top:5px;"></div>
+          </div>
+        </div>
+      </div>
 
-
-
-
-function cancelInvoiceEditor(){ if(confirm("Cancel invoice?")){currentInvoice=[]; document.getElementById("invoice-editor").style.display="none";} }
-
-function cancelInvoiceHistory(number){
-  const pass=prompt("Enter password:");
-  if(pass!==ADMIN_PASSWORD) return alert("Wrong password!");
-  const inv=invoices.find(i=>i.number===number); if(!inv)return;
-  if(!confirm("Cancel invoice? Stock will be restored.")) return;
-  inv.items.forEach(i=>{ const p=products.find(p=>p.id===i.id); if(p)p.stock+=i.quantity; });
-  invoices=invoices.filter(i=>i.number!==number); saveInvoices(); saveProducts(); renderInvoices(); renderAdmin();
-}
-
-function switchTab(tab){
-  document.getElementById("tab-stock").style.display=tab==="stock"?"flex":"none";
-  document.getElementById("tab-invoices").style.display=tab==="invoices"?"flex":"none";
-}
-
-function exportCSV(){
-  let csv="ID,Name,Category,Price,Stock,Colors,Image\n";
-  products.forEach(p=>csv+=`"${p.id}","${p.name}","${p.category}",${p.price},${p.stock},"${p.colors.join("|")}","${p.image}"\n`);
-  const a=document.createElement("a"); a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv"})); a.download="products.csv"; a.click();
-}
-
-document.getElementById("import-file").addEventListener("change",e=>{
-  const file=e.target.files[0]; if(!file)return;
-  Papa.parse(file,{header:true,skipEmptyLines:true,
-    complete:res=>{
-      res.data.forEach(row=>{
-        if(!row.ID)return;
-        const colors=row.Colors?row.Colors.split("|").map(c=>c.trim()):[];
-        const item={id:row.ID.trim(),name:row.Name||"Unnamed",category:row.Category||"Uncategorized",price:Number(row.Price)||0,stock:Number(row.Stock)||0,colors,image:row.Image||""};
-        const existing=products.find(p=>p.id===item.id);
-        if(existing) Object.assign(existing,item); else products.push(item);
-      });
-      saveProducts(); renderAdmin(); alert("CSV imported");
+    </body></html>
+  `);
+      w.document.close();
+      w.print();
     }
-  });
-});
 
-loadProducts(); loadInvoices(); renderAdmin(); renderInvoices();
-</script>
+    init();
+  </script>
 </body>
+
 </html>
