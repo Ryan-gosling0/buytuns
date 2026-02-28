@@ -1,10 +1,10 @@
-Ôªø<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="fr">
 
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>NaggyStore Admin ‚Äì Stock & Factures</title>
+  <title>NaggyStore Admin ñ Stock & Factures</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     /* GLOBAL STYLES */
@@ -315,7 +315,7 @@
     Factures</h1>
   <div id="top-buttons"
     style="padding:15px; background:#fff; border-bottom:1px solid #eee; display:flex; flex-wrap:wrap; align-items:center; gap:6px;">
-    <span id="firebase-status" style="font-size:12px; color:#4CAF50; font-weight:600; margin-right:6px;">‚òÅÔ∏è Cloud</span>
+    <span id="firebase-status" style="font-size:12px; color:#4CAF50; font-weight:600; margin-right:6px;">?? Cloud</span>
     <button onclick="saveAllStocks()">Enregistrer les stocks</button>
     <button onclick="exportCSV()">Exporter (CSV)</button>
     <button onclick="switchTab('stock')">Stock</button>
@@ -327,8 +327,8 @@
     <button onclick="startInvoice()" style="background:#2196F3;">Ajouter une facture</button>
     <input type="text" id="invoice-search-bar" placeholder="Rechercher des factures...">
     <span style="flex:1;"></span>
-    <button onclick="window.location.href='admin-users.html'" style="background:#9c27b0;">üë• Manage Users</button>
-    <button onclick="doLogout()" style="background:#f44336;">üö™ Logout</button>
+    <button onclick="window.location.href='admin-users.html'" style="background:#9c27b0;">?? Manage Users</button>
+    <button onclick="doLogout()" style="background:#f44336;">?? Logout</button>
   </div>
 
   <div class="admin-layout">
@@ -339,11 +339,11 @@
         <table>
           <thead>
             <tr>
-              <th width="40">S√©lectionner</th>
+              <th width="40">SÈlectionner</th>
               <th width="80">ID</th>
               <th width="60">Image</th>
               <th>Nom</th>
-              <th>Cat√©gorie</th>
+              <th>CatÈgorie</th>
               <th>Prix</th>
               <th>Couleurs</th>
               <th width="60">Stock</th>
@@ -357,7 +357,7 @@
 
     <!-- INVOICE EDITOR -->
     <div class="invoice-panel" id="invoice-editor" style="display:none;">
-      <h2>√âditeur de facture</h2>
+      <h2>…diteur de facture</h2>
 
       <!-- Top Meta -->
       <div
@@ -376,10 +376,10 @@
       <div style="display:flex; gap:15px; margin-bottom:15px;">
         <!-- Company Info -->
         <div class="field-group" style="flex:1;">
-          <h3>D√©tails de l'entreprise</h3>
+          <h3>DÈtails de l'entreprise</h3>
           <div class="editor-fields">
             <label>Nom<input type="text" id="company-name" placeholder="Nom de l'entreprise"></label>
-            <label>T√©l√©phone<input type="text" id="company-phone" placeholder="T√©l√©phone"></label>
+            <label>TÈlÈphone<input type="text" id="company-phone" placeholder="TÈlÈphone"></label>
             <label>Adresse<input type="text" id="company-address" placeholder="Adresse"></label>
             <label>Fax<input type="text" id="company-fax" placeholder="Fax"></label>
             <label>Email<input type="text" id="company-email" placeholder="Email"></label>
@@ -389,33 +389,33 @@
             <label>RIB<input type="text" id="company-rib" placeholder="RIB"></label>
             <label>URL du logo<input type="text" id="company-logo" placeholder="http://..."></label>
           </div>
-          <img id="logo-preview" alt="Aper√ßu du logo">
+          <img id="logo-preview" alt="AperÁu du logo">
         </div>
 
         <!-- Client Info -->
         <div class="field-group" style="flex:1;">
-          <h3>D√©tails du client</h3>
+          <h3>DÈtails du client</h3>
           <div class="editor-fields">
             <label>Nom du client<input type="text" id="client-name" placeholder="Nom du client"></label>
-            <label>T√©l√©phone<input type="text" id="client-phone" placeholder="T√©l√©phone"></label>
+            <label>TÈlÈphone<input type="text" id="client-phone" placeholder="TÈlÈphone"></label>
             <label>Adresse<textarea id="client-address" placeholder="Adresse"></textarea></label>
             <label>Code client<input type="text" id="client-code" placeholder="Code"></label>
             <label>MF / CIN<input type="text" id="client-mfcin" placeholder="MF ou CIN"></label>
-            <label>R√©f. facture<input type="text" id="client-ref" placeholder="R√©f√©rence"></label>
+            <label>RÈf. facture<input type="text" id="client-ref" placeholder="RÈfÈrence"></label>
           </div>
           <div style="margin-top:10px; border-top:1px solid #eee; padding-top: -2px;">
             <label style="font-size:12px; font-weight:bold;">Mode de paiement</label>
             <select id="payment-mode"
               style="width:100%; padding:6px; margin-top:4px; border:1px solid #ccc; border-radius:3px;">
               <option value="CAISSE">CAISSE</option>
-              <option value="CH√àQUE">CH√àQUE</option>
+              <option value="CH»QUE">CH»QUE</option>
               <option value="VIREMENT">VIREMENT</option>
-              <option value="ESP√àCES">ESP√àCES</option>
+              <option value="ESP»CES">ESP»CES</option>
               <option value="A TERME">A TERME</option>
             </select>
           </div>
           <div style="margin-top:10px;">
-            <label style="font-size:12px; font-weight:bold;">Charg√©(e)</label>
+            <label style="font-size:12px; font-weight:bold;">ChargÈ(e)</label>
             <input type="text" id="charged-to" placeholder="Nom"
               style="width:100%; padding:6px; margin-top:4px; border:1px solid #ccc; border-radius:3px;">
           </div>
@@ -427,10 +427,10 @@
         <table class="invoice-table" id="invoice-table">
           <thead>
             <tr>
-              <th width="15%">R√©f</th>
+              <th width="15%">RÈf</th>
               <th width="25%">Article</th>
               <th width="10%">Couleur</th>
-              <th width="8%">Qt√©</th>
+              <th width="8%">QtÈ</th>
               <th width="10%">PU TTC</th>
               <th width="8%">Remise %</th>
               <th width="10%">Montant</th>
@@ -463,7 +463,7 @@
           <span>Frais: <b id="fees-total">0.000</b></span>
           <span>Timbre: <b id="timbre-display">1.000</b></span>
           <div class="total-separator">
-            <span>Net √† payer (TTC): <b id="total" style="font-size:18px;">0.000 DNT</b></span>
+            <span>Net ‡ payer (TTC): <b id="total" style="font-size:18px;">0.000 DNT</b></span>
           </div>
         </div>
       </div>
@@ -583,23 +583,35 @@
       // --- FIRESTORE DATA LAYER ---
       async function loadFromFirestore() {
         try {
-          // Load products
-          const prodSnap = await getDocs(collection(db, "products"));
-          products = [];
-          prodSnap.forEach(d => products.push({ ...d.data(), _docId: d.id }));
-          products.forEach(p => { if (p.id) p.id = String(p.id); });
-
-          // Load invoices
-          const invSnap = await getDocs(collection(db, "invoices"));
-          invoices = [];
-          invSnap.forEach(d => invoices.push({ ...d.data(), _docId: d.id }));
-
-          renderStockTable();
-          renderInvoiceHistory();
-          document.getElementById('firebase-status').textContent = '‚òÅÔ∏è Synced';
+          onSnapshot(collection(db, "products"), (snap) => {
+            products = [];
+            snap.forEach(d => {
+              const data = d.data();
+              data._docId = d.id;
+              if (data.id) data.id = String(data.id);
+              products.push(data);
+            });
+            renderStockTable();
+            document.getElementById('firebase-status').textContent = '?? Synced';
+          }, (err) => {
+            console.error('Products Snapshot error:', err);
+            document.getElementById('firebase-status').textContent = '?? Error';
+            document.getElementById('firebase-status').style.color = '#f44336';
+          });
+          onSnapshot(collection(db, "invoices"), (snap) => {
+            invoices = [];
+            snap.forEach(d => {
+              const data = d.data();
+              data._docId = d.id;
+              invoices.push(data);
+            });
+            renderInvoiceHistory();
+          }, (err) => {
+            console.error('Invoices Snapshot error:', err);
+          });
         } catch (e) {
           console.error('Firestore load error:', e);
-          document.getElementById('firebase-status').textContent = '‚ö†Ô∏è Offline';
+          document.getElementById('firebase-status').textContent = '?? Offline';
           document.getElementById('firebase-status').style.color = '#f44336';
         }
       }
@@ -615,7 +627,7 @@
             });
             p._docId = String(docId);
           }
-          document.getElementById('firebase-status').textContent = '‚òÅÔ∏è Saved';
+          document.getElementById('firebase-status').textContent = '?? Saved';
         } catch (e) {
           alert('Cloud save error: ' + e.message);
         }
@@ -661,7 +673,7 @@
       <td>${colors}</td>
       <td><input type="number" id="stock-${p.id}" value="${p.stock}" style="width:60px;"></td>
       <td>
-        <button onclick="addToInvoice('${p.id}')" title="Ajouter √† la facture" style="background:#2196F3; padding:4px 8px; margin-right:5px;">+</button>
+        <button onclick="addToInvoice('${p.id}')" title="Ajouter ‡ la facture" style="background:#2196F3; padding:4px 8px; margin-right:5px;">+</button>
         <button class="delete-btn" onclick="deleteProduct('${p.id}')">Suppr</button>
       </td>
     `;
@@ -675,7 +687,7 @@
           if (el) p.stock = parseInt(el.value) || 0;
         });
         await saveProducts();
-        alert("Stocks mis √† jour et sauvegard√©s dans le cloud!");
+        alert("Stocks mis ‡ jour et sauvegardÈs dans le cloud!");
       }
 
       async function deleteProduct(id) {
@@ -720,7 +732,7 @@
         try {
           if (filename.endsWith('.xlsx') || filename.endsWith('.xls')) {
             // Excel Logic
-            if (typeof XLSX === 'undefined') throw new Error("Erreur: Librairie Excel non charg√©e.");
+            if (typeof XLSX === 'undefined') throw new Error("Erreur: Librairie Excel non chargÈe.");
             const data = await file.arrayBuffer();
             const workbook = XLSX.read(data);
             const sheet = workbook.Sheets[workbook.SheetNames[0]];
@@ -817,16 +829,16 @@
           await saveProducts();
           renderStockTable();
 
-          let msg = "Import r√©ussi: " + successCount + " produits sauvegard√©s dans le cloud ‚òÅÔ∏è.";
-          if (failCount > 0) msg += "\n(" + failCount + " lignes ignor√©es sans ID)";
+          let msg = "Import rÈussi: " + successCount + " produits sauvegardÈs dans le cloud ??.";
+          if (failCount > 0) msg += "\n(" + failCount + " lignes ignorÈes sans ID)";
           if (successCount === 0) {
-            msg += "\n\nColonnes trouv√©es: " + debugKeys.join(", ");
-            msg += "\n(V√©rifiez que la colonne ID/Identifiant existe)";
+            msg += "\n\nColonnes trouvÈes: " + debugKeys.join(", ");
+            msg += "\n(VÈrifiez que la colonne ID/Identifiant existe)";
           }
           alert(msg);
 
         } catch (e) {
-          alert("Erreur traitement donn√©es: " + e.message);
+          alert("Erreur traitement donnÈes: " + e.message);
         }
       });
 
@@ -877,42 +889,28 @@
 
       function startInvoice() {
         const checks = document.querySelectorAll(".select-item:checked");
-        // Constraint removed
-        // if (checks.length === 0) return alert("Select items first!");
-
         let addedCount = 0;
         checks.forEach(c => {
-          const p = products.find(prod => prod.id === c.value);
+          const p = products.find(prod => String(prod.id) === String(c.value));
           if (p) {
-            // Check if item already in invoice to update quantity or add new line?
-            // Simple behavior: Add as new line
             currentInvoice.push({
               ...p,
               quantity: 1,
-              selectedColor: p.colors[0] || "",
+              selectedColor: (p.colors && p.colors[0]) ? p.colors[0] : "",
               tvaRate: 19,
               discount: 0
             });
             addedCount++;
-            // Uncheck
-
+            c.checked = false;
           }
         });
-
-        if (true) {
-          // Ensure editor is visible
-          document.getElementById("tab-stock").style.display = "flex"; // Keep stock visible
-          document.getElementById("tab-invoices").style.display = "none";
-          document.getElementById("invoice-editor").style.display = "flex";
-
-          // If it was a new invoice (empty ID), set ID. But startInvoice previously reset ID.
-          // We should only set ID if it's empty
-          if (!document.getElementById("invoice-id").value) {
-            document.getElementById("invoice-id").value = "INV-" + Date.now();
-          }
-
-          renderInvoiceEditorTable();
+        document.getElementById("tab-stock").style.display = "flex";
+        document.getElementById("tab-invoices").style.display = "none";
+        document.getElementById("invoice-editor").style.display = "flex";
+        if (!document.getElementById("invoice-id").value) {
+          document.getElementById("invoice-id").value = "INV-" + Date.now();
         }
+        renderInvoiceEditorTable();
       }
 
       function renderInvoiceEditorTable() {
@@ -1119,7 +1117,7 @@
         document.getElementById("invoice-editor").style.display = "none";
         switchTab("invoices");
         renderInvoiceHistory();
-        alert("Invoice Saved to Cloud Successfully! \u2601Ô∏è");
+        alert("Invoice Saved to Cloud Successfully! \u2601?");
       }
 
       // --- HISTORY & PRINTING ---
@@ -1322,7 +1320,7 @@
         html += "<div style='margin-top:5px; font-size:11px;'>Ref: " + inv.number + " / Date: " + inv.date.split(',')[0] + "</div>";
         html += "</div>";
         html += "<div style='width:40%; border:1px solid #000; padding:10px; border-radius:4px;'>";
-        html += "<div style='border-bottom:1px solid #000; font-weight:bold; margin-bottom:5px;'>LIVR√â √Ä:</div>";
+        html += "<div style='border-bottom:1px solid #000; font-weight:bold; margin-bottom:5px;'>LIVR… ¿:</div>";
         html += "<div style='font-weight:bold; font-size:14px;'>" + (cli.name || "") + "</div>";
         html += "<div>" + (cli.address || "") + "</div>";
         html += "<div>Code: " + (cli.code || "") + "</div>";
@@ -1336,7 +1334,7 @@
         html += "</div>";
 
         html += "<table style='margin-bottom:15px; text-align:center;'>";
-        html += "<tr style='background:#eee;'><td>Date</td><td>Num√©ro</td><td>Client Ref</td><td>Charg√©(e)</td></tr>";
+        html += "<tr style='background:#eee;'><td>Date</td><td>NumÈro</td><td>Client Ref</td><td>ChargÈ(e)</td></tr>";
         html += "<tr>";
         html += "<td>" + inv.date + "</td>";
         html += "<td>" + inv.number + "</td>";
@@ -1345,7 +1343,7 @@
         html += "</tr></table>";
 
         html += "<table>";
-        html += "<thead style='background:#eee;'><tr><th>Ref</th><th>Code</th><th>D√©signation</th><th>Qt√©</th><th>PU TTC</th><th>Remise</th><th>Montant</th><th>TVA</th></tr></thead>";
+        html += "<thead style='background:#eee;'><tr><th>Ref</th><th>Code</th><th>DÈsignation</th><th>QtÈ</th><th>PU TTC</th><th>Remise</th><th>Montant</th><th>TVA</th></tr></thead>";
         html += "<tbody>" + itemsHtml + "</tbody>";
         html += "</table>";
 
@@ -1365,7 +1363,7 @@
         html += taxTableHtml;
         html += "</table>";
         html += "<div style='margin-top:15px; font-style:italic;'>";
-        html += "Arr√™t√©e la pr√©sente facture √† la somme de:<br>";
+        html += "ArrÍtÈe la prÈsente facture ‡ la somme de:<br>";
         html += "<b>" + intPart + " Dinars et " + decPart + " Millimes.</b>";
         html += "</div></div>";
 
@@ -1374,16 +1372,16 @@
         html += "<tr><td>Total HT</td><td style='text-align:right;'>" + totalHT.toFixed(3) + "</td></tr>";
         html += "<tr><td>Total TVA</td><td style='text-align:right;'>" + totalTVA.toFixed(3) + "</td></tr>";
         html += "<tr><td>Timbre Fiscal</td><td style='text-align:right;'>" + fmt(fees.timbre) + "</td></tr>";
-        html += "<tr style='background:#ddd; font-size:14px;'><td>NET √Ä PAYER TTC</td><td style='text-align:right;'>" + grandTotal.toFixed(3) + "</td></tr>";
+        html += "<tr style='background:#ddd; font-size:14px;'><td>NET ¿ PAYER TTC</td><td style='text-align:right;'>" + grandTotal.toFixed(3) + "</td></tr>";
         html += "</table></div></div>";
 
         // Footer
         html += "<div class='footer'>";
         html += "<div style='border-top:1px solid #000; padding-top:5px; display:flex; justify-content:space-between;'>";
         html += "<div style='width:60%'>";
-        html += "<b>Infos L√©gales:</b><br>";
+        html += "<b>Infos LÈgales:</b><br>";
         html += "MF: " + (cmp.mf || "") + " | RC: " + (cmp.rc || "") + " | RIB: " + (cmp.rib || "") + "<br>";
-        html += "IMPORTANT: Marchandise re√ßue conforme...";
+        html += "IMPORTANT: Marchandise reÁue conforme...";
         html += "</div>";
         html += "<div style='text-align:right;'>Signature & Cachet<div style='border:1px solid #ccc; height:60px; width:150px; margin-top:5px;'></div></div>";
         html += "</div></div>";

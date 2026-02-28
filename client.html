@@ -1,10 +1,10 @@
-Ôªø<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NaggyStore ‚Äì My Account</title>
+    <title>NaggyStore ñ My Account</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         *,
@@ -273,7 +273,7 @@
 
     <div class="topbar">
         <div class="topbar-brand">
-            <div class="icon">üè™</div>
+            <div class="icon">??</div>
             NaggyStore
         </div>
         <div class="topbar-right">
@@ -287,26 +287,26 @@
 
     <div class="main">
         <div class="welcome-card">
-            <h2 id="welcome-heading">Welcome back! üëã</h2>
+            <h2 id="welcome-heading">Welcome back! ??</h2>
             <p id="welcome-sub">Here's your account overview and invoice history.</p>
         </div>
 
         <div class="stats-row">
             <div class="stat-card">
-                <div class="value" id="stat-total-invoices">‚Äî</div>
+                <div class="value" id="stat-total-invoices">ó</div>
                 <div class="label">Total Invoices</div>
             </div>
             <div class="stat-card">
-                <div class="value" id="stat-total-spent">‚Äî</div>
+                <div class="value" id="stat-total-spent">ó</div>
                 <div class="label">Total Spent (DNT)</div>
             </div>
             <div class="stat-card">
-                <div class="value" id="stat-last-invoice">‚Äî</div>
+                <div class="value" id="stat-last-invoice">ó</div>
                 <div class="label">Last Invoice</div>
             </div>
         </div>
 
-        <div class="section-title">üìÑ My Invoices</div>
+        <div class="section-title">?? My Invoices</div>
 
         <div class="invoices-panel">
             <div id="invoices-content">
@@ -320,7 +320,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { getFirestore, collection, query, where, getDocs, doc, getDoc, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, collection, query, where, getDocs, doc, getDoc, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBHN_I3NsFfw3xryVH1SImTjfMayYCm7hA",
@@ -346,7 +346,7 @@
             if (userData.status === 'suspended') {
                 document.body.innerHTML = `<div style="display:flex;align-items:center;justify-content:center;min-height:100vh;font-family:Inter,sans-serif;background:#fff">
           <div style="text-align:center;padding:40px;">
-            <div style="font-size:64px;margin-bottom:16px;">üö´</div>
+            <div style="font-size:64px;margin-bottom:16px;">??</div>
             <h2 style="color:#e53935;margin-bottom:8px;">Account Suspended</h2>
             <p style="color:#666;">Please contact the admin at <a href="mailto:ahmedmidonajjar@gmail.com">ahmedmidonajjar@gmail.com</a></p>
           </div>
@@ -361,26 +361,24 @@
             const name = userData.name || user.email;
             document.getElementById('user-name-display').textContent = name;
             document.getElementById('avatar-initial').textContent = name.charAt(0).toUpperCase();
-            document.getElementById('welcome-heading').textContent = `Welcome back, ${name.split(' ')[0]}! üëã`;
+            document.getElementById('welcome-heading').textContent = `Welcome back, ${name.split(' ')[0]}! ??`;
 
             // Load invoices
             await loadInvoices(user.uid);
         });
 
-        async function loadInvoices(uid) {
+        function loadInvoices(uid) {
             const container = document.getElementById('invoices-content');
-            try {
-                const q = query(collection(db, "invoices"), where("clientUid", "==", uid));
-                const snap = await getDocs(q);
-
+            
+            const q = query(collection(db, "invoices"), where("clientUid", "==", uid));
+            onSnapshot(q, (snap) => {
                 if (snap.empty) {
                     container.innerHTML = `<div class="empty-state">
-            <div class="emoji">üì≠</div>
-            <p>No invoices yet. Your invoices will appear here once created by the store.</p>
-          </div>`;
+            <div class="emoji">??</div>
+            <p>No invoices yet. Your invoices will appear here once created by the store.</p></div>;
                     document.getElementById('stat-total-invoices').textContent = '0';
                     document.getElementById('stat-total-spent').textContent = '0.000';
-                    document.getElementById('stat-last-invoice').textContent = '‚Äî';
+                    document.getElementById('stat-last-invoice').textContent = 'ó';
                     return;
                 }
 
@@ -391,28 +389,27 @@
                 const totalSpent = invoices.reduce((s, i) => s + (i.totalTTC || 0), 0);
                 document.getElementById('stat-total-invoices').textContent = invoices.length;
                 document.getElementById('stat-total-spent').textContent = totalSpent.toFixed(3);
-                document.getElementById('stat-last-invoice').textContent = invoices[0] ? (invoices[0].date || '‚Äî').split(',')[0] : '‚Äî';
+                document.getElementById('stat-last-invoice').textContent = invoices[0] ? (invoices[0].date || 'ó').split(',')[0] : 'ó';
 
-                let rows = invoices.map(inv => `
+                let rows = invoices.map(inv => 
           <tr>
             <td><b>${inv.number || inv.id}</b></td>
-            <td>${inv.date || '‚Äî'}</td>
+            <td>${inv.date || 'ó'}</td>
             <td>${inv.items ? inv.items.length : 0} item(s)</td>
             <td class="amount">${(inv.totalTTC || 0).toFixed(3)} DNT</td>
             <td><span class="status-badge badge-paid">Issued</span></td>
           </tr>
-        `).join('');
+        ).join('');
 
-                container.innerHTML = `<table>
+                container.innerHTML = <table>
           <thead><tr>
             <th>Invoice #</th><th>Date</th><th>Items</th><th>Amount</th><th>Status</th>
           </tr></thead>
           <tbody>${rows}</tbody>
-        </table>`;
-
-            } catch (e) {
-                container.innerHTML = `<div class="empty-state"><p>Error loading invoices: ${e.message}</p></div>`;
-            }
+        </table>;
+            }, (err) => {
+                container.innerHTML = `<div class="empty-state"><p>Error loading invoices: ${err.message}</p></div>;
+            });
         }
 
         window.doLogout = async function () {
@@ -423,3 +420,5 @@
 </body>
 
 </html>
+
+
