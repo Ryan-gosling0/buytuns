@@ -580,6 +580,23 @@
                 ["fee-transport", "fee-installation", "fee-frais", "fee-retenue", "fee-garantie", "timbre-fiscal"].forEach(id => {
                     document.getElementById(id).addEventListener("input", renderInvoiceEditorTable);
                 });
+
+                // Connection monitoring
+                window.addEventListener('online', updateConnectionStatus);
+                window.addEventListener('offline', updateConnectionStatus);
+                updateConnectionStatus();
+            }
+
+            function updateConnectionStatus() {
+                const status = document.getElementById('firebase-status');
+                if (!status) return;
+                if (navigator.onLine) {
+                    status.textContent = '?? Online';
+                    status.style.color = '#4CAF50';
+                } else {
+                    status.textContent = '?? Offline (Local Cache)';
+                    status.style.color = '#ff9800';
+                }
             }
 
             // --- STOCK MANAGEMENT ---

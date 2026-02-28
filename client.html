@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NaggyStore Â– My Account</title>
+    <title>NaggyStore – My Account</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         *,
@@ -277,6 +277,8 @@
             NaggyStore
         </div>
         <div class="topbar-right">
+            <div id="connection-status" style="font-size: 11px; margin-right: 8px; font-weight: 500; color: #4CAF50;">
+            </div>
             <div class="user-chip">
                 <div class="avatar" id="avatar-initial">?</div>
                 <span id="user-name-display">Loading...</span>
@@ -363,9 +365,27 @@
             document.getElementById('avatar-initial').textContent = name.charAt(0).toUpperCase();
             document.getElementById('welcome-heading').textContent = `Welcome back, ${name.split(' ')[0]}! ??`;
 
+
             // Load invoices
             await loadInvoices(user.uid);
+
+            // Connection monitoring
+            window.addEventListener('online', updateConnectionStatus);
+            window.addEventListener('offline', updateConnectionStatus);
+            updateConnectionStatus();
         });
+
+        function updateConnectionStatus() {
+            const status = document.getElementById('connection-status');
+            if (!status) return;
+            if (navigator.onLine) {
+                status.textContent = '?? Online';
+                status.style.color = '#4CAF50';
+            } else {
+                status.textContent = '?? Offline (Using Cache)';
+                status.style.color = '#ff9800';
+            }
+        }
 
         function loadInvoices(uid) {
             const container = document.getElementById('invoices-content');
