@@ -367,23 +367,21 @@
     </div>
 
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { getFirestore, doc, setDoc, getDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { auth, db, ADMIN_EMAIL } from "./firebase-config.js";
+        import { signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { doc, setDoc, getDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyBHN_I3NsFfw3xryVH1SImTjfMayYCm7hA",
-      authDomain: "naggystore-d3697.firebaseapp.com",
-      projectId: "naggystore-d3697",
-      storageBucket: "naggystore-d3697.firebasestorage.app",
-      messagingSenderId: "1083270919985",
-      appId: "1:1083270919985:web:83a9d2db42ad2458eae210"
-        };
-
-        const ADMIN_EMAIL = "ahmedmidonajjar@gmail.com";
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
+        // Monitoring connectivity
+        window.addEventListener('online', updateConnectivityUI);
+        window.addEventListener('offline', updateConnectivityUI);
+        function updateConnectivityUI() {
+            if (!navigator.onLine) {
+                showAlert('suspended', '⚠️ You are currently offline. Logging in is only possible if you have accessed this device before. New accounts cannot be created while offline.');
+            } else {
+                hideAlert();
+            }
+        }
+        updateConnectivityUI();
 
         // Check if already logged in
         onAuthStateChanged(auth, async (user) => {

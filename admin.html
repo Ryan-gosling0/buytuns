@@ -505,27 +505,14 @@
             // =============================================
             // FIREBASE INTEGRATION
             // =============================================
-            import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-            import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+            import { auth, db, ADMIN_EMAIL } from "./firebase-config.js";
+            import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
             import {
-                getFirestore, collection, doc,
+                collection, doc,
                 getDocs, getDoc, setDoc, updateDoc, deleteDoc,
                 onSnapshot, serverTimestamp, query, orderBy
             } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-            const firebaseConfig = {
-                apiKey: "AIzaSyBHN_I3NsFfw3xryVH1SImTjfMayYCm7hA",
-                authDomain: "naggystore-d3697.firebaseapp.com",
-                projectId: "naggystore-d3697",
-                storageBucket: "naggystore-d3697.firebasestorage.app",
-                messagingSenderId: "1083270919985",
-                appId: "1:1083270919985:web:83a9d2db42ad2458eae210"
-            };
-
-            const ADMIN_EMAIL = "ahmedmidonajjar@gmail.com";
-            const app = initializeApp(firebaseConfig);
-            const auth = getAuth(app);
-            const db = getFirestore(app);
 
             // --- CONFIG & STATE ---
             const ADMIN_PASSWORD = "1234";
