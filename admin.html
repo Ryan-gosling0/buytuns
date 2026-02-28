@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin Stock & Invoice Management</title>
+  <title>Gestion Admin - Stock et Factures</title>
   <style>
     /* GLOBAL STYLES */
     * {
@@ -22,7 +22,6 @@
     h2 {
       margin: 0 0 10px 0;
     }
-
     button {
       padding: 6px 12px;
       border: none;
@@ -33,7 +32,7 @@
       font-family: Verdana, sans-serif;
     }
 
-    /* BUTTONS */
+    /* BUTTONSs */
     button {
       text-align: center;
       font-size: 13px;
@@ -240,7 +239,7 @@
       border-radius: 3px;
     }
 
-    /* TOTALS BOX */
+    /* TOTALS BOXss */
     .total-box {
       border: 2px solid #333;
       padding: 15px;
@@ -310,19 +309,19 @@
 
 <body>
 
-  <h1 style="padding:10px 15px; background:#fff; border-bottom:1px solid #ddd; margin:0;">Admin Stock & Invoice
-    Management</h1>
+  <h1 style="padding:10px 15px; background:#fff; border-bottom:1px solid #ddd; margin:0;">Gestion Admin - Stock et
+    Factures</h1>
   <div id="top-buttons" style="padding:15px; background:#fff; border-bottom:1px solid #eee;">
-    <button onclick="saveAllStocks()">Save Stocks</button>
-    <button onclick="exportCSV()">Export CSV</button>
+    <button onclick="saveAllStocks()">Enregistrer les stocks</button>
+    <button onclick="exportCSV()">Exporter (CSV)</button>
     <button onclick="switchTab('stock')">Stock</button>
-    <button onclick="switchTab('invoices')">Invoice History</button>
-    <input type="file" id="import-file" accept=".csv" style="font-size:12px;">
+    <button onclick="switchTab('invoices')">Historique des factures</button>
+    <input type="file" id="import-file" accept=".csv,.txt,.tsv,.xlsx,.xls" style="font-size:12px;">
     <span
       style="margin:0 10px; border-left:1px solid #ccc; height:20px; display:inline-block; vertical-align:middle;"></span>
-    <input type="text" id="search-bar" placeholder="Search products...">
-    <button onclick="startInvoice()" style="background:#2196F3;">Add to / Create Invoice</button>
-    <input type="text" id="invoice-search-bar" placeholder="Search invoices...">
+    <input type="text" id="search-bar" placeholder="Rechercher des produits...">
+    <button onclick="startInvoice()" style="background:#2196F3;">Ajouter une facture</button>
+    <input type="text" id="invoice-search-bar" placeholder="Rechercher des factures...">
   </div>
 
   <div class="admin-layout">
@@ -333,13 +332,13 @@
         <table>
           <thead>
             <tr>
-              <th width="40">Select</th>
+              <th width="40">Sélectionner</th>
               <th width="80">ID</th>
               <th width="60">Image</th>
-              <th>Name</th>
-              <th>Category</th>
-              <th>Price</th>
-              <th>Colors</th>
+              <th>Nom</th>
+              <th>Catégorie</th>
+              <th>Prix</th>
+              <th>Couleurs</th>
               <th width="60">Stock</th>
               <th width="60">Action</th>
             </tr>
@@ -351,18 +350,18 @@
 
     <!-- INVOICE EDITOR -->
     <div class="invoice-panel" id="invoice-editor" style="display:none;">
-      <h2>Invoice Editor</h2>
+      <h2>Éditeur de facture</h2>
 
       <!-- Top Meta -->
       <div
         style="display:flex; justify-content:space-between; margin-bottom:15px; background:#f9f9f9; padding:10px; border-radius:4px;">
         <div>
-          <label style="font-weight:bold; font-size:12px;">Invoice ID:</label>
+          <label style="font-weight:bold; font-size:12px;">ID facture :</label>
           <input type="text" id="invoice-id" readonly
             style="border:none; background:transparent; font-weight:bold; color:#4CAF50;">
         </div>
         <div style="text-align:right;">
-          <button class="delete-btn" onclick="cancelInvoiceEditor()" style="padding:4px 8px; font-size:11px;">Close
+          <button class="delete-btn" onclick="cancelInvoiceEditor()" style="padding:4px 8px; font-size:11px;">Fermer
             Editor</button>
         </div>
       </div>
@@ -370,35 +369,35 @@
       <div style="display:flex; gap:15px; margin-bottom:15px;">
         <!-- Company Info -->
         <div class="field-group" style="flex:1;">
-          <h3>Company Details</h3>
+          <h3>Détails de l'entreprise</h3>
           <div class="editor-fields">
-            <label>Name<input type="text" id="company-name" placeholder="Company Name"></label>
-            <label>Phone<input type="text" id="company-phone" placeholder="Phone"></label>
-            <label>Address<input type="text" id="company-address" placeholder="Address"></label>
+            <label>Nom<input type="text" id="company-name" placeholder="Nom de l'entreprise"></label>
+            <label>Téléphone<input type="text" id="company-phone" placeholder="Téléphone"></label>
+            <label>Adresse<input type="text" id="company-address" placeholder="Adresse"></label>
             <label>Fax<input type="text" id="company-fax" placeholder="Fax"></label>
             <label>Email<input type="text" id="company-email" placeholder="Email"></label>
-            <label>Website<input type="text" id="company-website" placeholder="Website"></label>
-            <label>Tax ID (MF)<input type="text" id="company-mf" placeholder="MF"></label>
+            <label>Site web<input type="text" id="company-website" placeholder="Site web"></label>
+            <label>Identifiant fiscal (MF)<input type="text" id="company-mf" placeholder="MF"></label>
             <label>RC<input type="text" id="company-rc" placeholder="RC"></label>
             <label>RIB<input type="text" id="company-rib" placeholder="RIB"></label>
-            <label>Logo URL<input type="text" id="company-logo" placeholder="http://..."></label>
+            <label>URL du logo<input type="text" id="company-logo" placeholder="http://..."></label>
           </div>
-          <img id="logo-preview" alt="Logo Preview">
+          <img id="logo-preview" alt="Aperçu du logo">
         </div>
 
         <!-- Client Info -->
         <div class="field-group" style="flex:1;">
-          <h3>Client Details</h3>
+          <h3>Détails du client</h3>
           <div class="editor-fields">
-            <label>Client Name<input type="text" id="client-name" placeholder="Client Name"></label>
-            <label>Phone<input type="text" id="client-phone" placeholder="Phone"></label>
-            <label>Address<textarea id="client-address" placeholder="Address"></textarea></label>
-            <label>Client Code<input type="text" id="client-code" placeholder="Code"></label>
-            <label>MF / CIN<input type="text" id="client-mfcin" placeholder="MF or CIN"></label>
-            <label>Ref. Invoice<input type="text" id="client-ref" placeholder="Reference"></label>
+            <label>Nom du client<input type="text" id="client-name" placeholder="Nom du client"></label>
+            <label>Téléphone<input type="text" id="client-phone" placeholder="Téléphone"></label>
+            <label>Adresse<textarea id="client-address" placeholder="Adresse"></textarea></label>
+            <label>Code client<input type="text" id="client-code" placeholder="Code"></label>
+            <label>MF / CIN<input type="text" id="client-mfcin" placeholder="MF ou CIN"></label>
+            <label>Réf. facture<input type="text" id="client-ref" placeholder="Référence"></label>
           </div>
-          <div style="margin-top:10px; border-top:1px solid #eee; pt-2">
-            <label style="font-size:12px; font-weight:bold;">Payment Mode</label>
+          <div style="margin-top:10px; border-top:1px solid #eee; padding-top: -2px;">
+            <label style="font-size:12px; font-weight:bold;">Mode de paiement</label>
             <select id="payment-mode"
               style="width:100%; padding:6px; margin-top:4px; border:1px solid #ccc; border-radius:3px;">
               <option value="CAISSE">CAISSE</option>
@@ -410,7 +409,7 @@
           </div>
           <div style="margin-top:10px;">
             <label style="font-size:12px; font-weight:bold;">Chargé(e)</label>
-            <input type="text" id="charged-to" placeholder="Name"
+            <input type="text" id="charged-to" placeholder="Nom"
               style="width:100%; padding:6px; margin-top:4px; border:1px solid #ccc; border-radius:3px;">
           </div>
         </div>
@@ -421,15 +420,15 @@
         <table class="invoice-table" id="invoice-table">
           <thead>
             <tr>
-              <th width="15%">Ref</th>
-              <th width="25%">Item</th>
-              <th width="10%">Color</th>
-              <th width="8%">Qty</th>
-              <th width="10%">Price TTC</th>
-              <th width="8%">Disc %</th>
-              <th width="10%">Total</th>
+              <th width="15%">Réf</th>
+              <th width="25%">Article</th>
+              <th width="10%">Couleur</th>
+              <th width="8%">Qté</th>
+              <th width="10%">PU TTC</th>
+              <th width="8%">Remise %</th>
+              <th width="10%">Montant</th>
               <th width="8%">TVA %</th>
-              <th width="5%">X</th>
+              <th width="5%">Suppr</th>
             </tr>
           </thead>
           <tbody></tbody>
@@ -439,7 +438,7 @@
       <div style="display:flex; gap:15px;">
         <!-- Fees -->
         <div class="field-group" style="flex:1;">
-          <h3>Fees & Adjustments</h3>
+          <h3>Frais & ajustements</h3>
           <div class="editor-fields" style="grid-template-columns:1fr 1fr 1fr;">
             <label>Transport<input type="number" step="0.001" id="fee-transport" value="0"></label>
             <label>Installation<input type="number" step="0.001" id="fee-installation" value="0"></label>
@@ -452,12 +451,12 @@
 
         <!-- Totals -->
         <div class="total-box">
-          <span>Subtotal HT: <b id="subtotal">0.000</b></span>
+          <span>Sous-total HT: <b id="subtotal">0.000</b></span>
           <span>Total TVA: <b id="tva">0.000</b></span>
-          <span>Fees: <b id="fees-total">0.000</b></span>
+          <span>Frais: <b id="fees-total">0.000</b></span>
           <span>Timbre: <b id="timbre-display">1.000</b></span>
           <div class="total-separator">
-            <span>Net To Pay (TTC): <b id="total" style="font-size:18px;">0.000 DNT</b></span>
+            <span>Net à payer (TTC): <b id="total" style="font-size:18px;">0.000 DNT</b></span>
           </div>
         </div>
       </div>
@@ -472,16 +471,16 @@
 
     <!-- INVOICE HISTORY TAB -->
     <div id="tab-invoices" style="display:none;">
-      <h2>Invoice History</h2>
+      <h2>Historique des Factures</h2>
       <div style="overflow:auto; flex:1;">
         <table>
           <thead>
             <tr>
-              <th>Invoice #</th>
+              <th>Facture #</th>
               <th>Date</th>
               <th>Client</th>
               <th>Items</th>
-              <th>Amount TTC</th>
+              <th>Montant TTC</th>
               <th>Actions</th>
             </tr>
           </thead>
@@ -489,66 +488,87 @@
         </table>
       </div>
     </div>
-  </div>
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
-  <script>
-    // --- CONFIG & STATE ---
-    const ADMIN_PASSWORD = "1234";
-    let products = [], invoices = [], currentInvoice = [];
-    let editMode = false;
-    let editingInvoiceIndex = -1;
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    <!-- Fallback to local if CDN fails, but let's prioritize local to ensure it works now -->
+    <script src="assets/xlsx.full.min.js"></script>
+    <script>
+      // --- CONFIG & STATE ---
+      const ADMIN_PASSWORD = "1234";
+      let products = [], invoices = [], currentInvoice = [];
+      let editMode = false;
+      let editingInvoiceIndex = -1;
 
-    // --- INITIALIZATION ---
-    function init() {
-      const p = localStorage.getItem("admin-products");
-      if (p) products = JSON.parse(p);
+      // --- INITIALIZATION ---
+      function init() {
+        // Library Check
+        const missing = [];
+        if (typeof Papa === 'undefined') missing.push("PapaParse (CSV)");
+        if (typeof XLSX === 'undefined') missing.push("SheetJS (Excel)");
 
-      const i = localStorage.getItem("admin-invoices");
-      if (i) invoices = JSON.parse(i);
+        if (missing.length > 0) {
+          alert("Attention: Certaines librairies sont manquantes (" + missing.join(", ") + ").\nL'import pourrait ne pas fonctionner hors ligne.");
+        }
 
-      renderStockTable();
-      renderInvoiceHistory();
+        const p = localStorage.getItem("admin-products");
+        if (p) {
+          try {
+            products = JSON.parse(p);
+            // Sanitation check
+            products.forEach(prod => {
+              if (prod.id) prod.id = String(prod.id);
+            });
+          } catch (e) {
+            console.error("Error parsing products", e);
+            products = [];
+          }
+        }
 
-      // Logos
-      document.getElementById("company-logo").addEventListener("input", e => {
-        document.getElementById("logo-preview").src = e.target.value;
-      });
+        const i = localStorage.getItem("admin-invoices");
+        if (i) invoices = JSON.parse(i);
 
-      // Search
-      document.getElementById("search-bar").addEventListener("input", () => {
-        renderStockTable(document.getElementById("search-bar").value);
-      });
-      document.getElementById("invoice-search-bar").addEventListener("input", renderInvoiceHistory);
+        renderStockTable();
+        renderInvoiceHistory();
 
-      // Fee Listeners for live update
-      ["fee-transport", "fee-installation", "fee-frais", "fee-retenue", "fee-garantie", "timbre-fiscal"].forEach(id => {
-        document.getElementById(id).addEventListener("input", renderInvoiceEditorTable);
-      });
-    }
+        // Logos
+        document.getElementById("company-logo").addEventListener("input", e => {
+          document.getElementById("logo-preview").src = e.target.value;
+        });
 
-    // --- STOCK MANAGEMENT ---
-    function saveProducts() { localStorage.setItem("admin-products", JSON.stringify(products)); }
-    function saveInvoices() { localStorage.setItem("admin-invoices", JSON.stringify(invoices)); }
+        // Search
+        document.getElementById("search-bar").addEventListener("input", () => {
+          renderStockTable(document.getElementById("search-bar").value);
+        });
+        document.getElementById("invoice-search-bar").addEventListener("input", renderInvoiceHistory);
 
-    function renderStockTable(filter = "") {
-      const tbody = document.getElementById("admin-body");
-      tbody.innerHTML = "";
-      filter = filter.toLowerCase();
+        // Fee Listeners for live update
+        ["fee-transport", "fee-installation", "fee-frais", "fee-retenue", "fee-garantie", "timbre-fiscal"].forEach(id => {
+          document.getElementById(id).addEventListener("input", renderInvoiceEditorTable);
+        });
+      }
 
-      products.filter(p =>
-        p.id.toLowerCase().includes(filter) ||
-        p.name.toLowerCase().includes(filter) ||
-        p.category.toLowerCase().includes(filter)
-      ).forEach(p => {
-        const tr = document.createElement("tr");
-        tr.style.background = p.stock === 0 ? "#fff0f0" : (p.stock < 5 ? "#fffbef" : "#f0fff4");
+      // --- STOCK MANAGEMENT ---
+      function saveProducts() { localStorage.setItem("admin-products", JSON.stringify(products)); }
+      function saveInvoices() { localStorage.setItem("admin-invoices", JSON.stringify(invoices)); }
 
-        // Safety for fields
-        const img = p.image ? `<img src="${p.image}">` : '';
-        const colors = Array.isArray(p.colors) ? p.colors.join(", ") : p.colors;
+      function renderStockTable(filter = "") {
+        const tbody = document.getElementById("admin-body");
+        tbody.innerHTML = "";
+        filter = filter.toLowerCase();
 
-        tr.innerHTML = `
+        products.filter(p =>
+          String(p.id).toLowerCase().includes(filter) ||
+          String(p.name).toLowerCase().includes(filter) ||
+          String(p.category).toLowerCase().includes(filter)
+        ).forEach(p => {
+          const tr = document.createElement("tr");
+          tr.style.background = p.stock === 0 ? "#fff0f0" : (p.stock < 5 ? "#fffbef" : "#f0fff4");
+
+          // Safety for fields
+          const img = p.image ? `<img src="${p.image}">` : '';
+          const colors = Array.isArray(p.colors) ? p.colors.join(", ") : p.colors;
+
+          tr.innerHTML = `
       <td><input type="checkbox" class="select-item" value="${p.id}"></td>
       <td>${p.id}</td>
       <td>${img}</td>
@@ -557,163 +577,295 @@
       <td>${Number(p.price).toFixed(3)}</td>
       <td>${colors}</td>
       <td><input type="number" id="stock-${p.id}" value="${p.stock}" style="width:60px;"></td>
-      <td><button class="delete-btn" onclick="deleteProduct('${p.id}')">Del</button></td>
+      <td>
+        <button onclick="addToInvoice('${p.id}')" title="Ajouter à la facture" style="background:#2196F3; padding:4px 8px; margin-right:5px;">+</button>
+        <button class="delete-btn" onclick="deleteProduct('${p.id}')">Suppr</button>
+      </td>
     `;
-        tbody.appendChild(tr);
-      });
-    }
+          tbody.appendChild(tr);
+        });
+      }
 
-    function saveAllStocks() {
-      products.forEach(p => {
-        const el = document.getElementById(`stock-${p.id}`);
-        if (el) p.stock = parseInt(el.value) || 0;
-      });
-      saveProducts();
-      alert("Stocks updated!");
-    }
+      function saveAllStocks() {
+        products.forEach(p => {
+          const el = document.getElementById(`stock-${p.id}`);
+          if (el) p.stock = parseInt(el.value) || 0;
+        });
+        saveProducts();
+        alert("Stocks mis à jour !");
+      }
 
-    function deleteProduct(id) {
-      if (prompt("Password:") !== ADMIN_PASSWORD) return alert("Wrong password");
-      if (!confirm("Delete this product?")) return;
-      products = products.filter(p => p.id !== id);
-      saveProducts();
-      renderStockTable();
-    }
+      function deleteProduct(id) {
+        if (prompt("Password:") !== ADMIN_PASSWORD) return alert("Wrong password");
+        if (!confirm("Delete this product?")) return;
+        products = products.filter(p => p.id !== id);
+        saveProducts();
+        renderStockTable();
+      }
 
-    // --- CSV IMPORT/EXPORT ---
-    function exportCSV() {
-      let csv = "ID,Name,Category,Price,Stock,Colors,Image\n";
-      products.forEach(p => {
-        const cols = Array.isArray(p.colors) ? p.colors.join("|") : p.colors;
-        csv += `"${p.id}","${p.name}","${p.category}",${p.price},${p.stock},"${cols}","${p.image}"\n`;
-      });
-      const a = document.createElement("a");
-      a.href = URL.createObjectURL(new Blob([csv], { type: "text/csv" }));
-      a.download = "products_export.csv";
-      a.click();
-    }
+      // --- CSV/EXCEL IMPORT/EXPORT ---
+      function exportCSV() {
+        let csv = "ID,Name,Category,Price,Stock,Colors,Image\n";
+        products.forEach(p => {
+          const cols = Array.isArray(p.colors) ? p.colors.join("|") : p.colors;
+          csv += `"${p.id}","${p.name}","${p.category}",${p.price},${p.stock},"${cols}","${p.image}"\n`;
+        });
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(new Blob([csv], { type: "text/csv" }));
+        a.download = "products_export.csv";
+        a.click();
+      }
 
-    document.getElementById("import-file").addEventListener("change", e => {
-      const file = e.target.files[0];
-      if (!file) return;
-      Papa.parse(file, {
-        header: true, skipEmptyLines: true,
-        complete: res => {
-          res.data.forEach(row => {
-            if (!row.ID) return;
-            const existing = products.find(p => p.id === row.ID.trim());
-            const item = {
-              id: row.ID.trim(),
-              name: row.Name || "Item",
-              category: row.Category || "General",
-              price: parseFloat(row.Price) || 0,
-              stock: parseInt(row.Stock) || 0,
-              colors: row.Colors ? row.Colors.split("|") : [],
-              image: row.Image || ""
+      document.getElementById("import-file").addEventListener("change", async e => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        // Reset value so change event fires again if same file selected
+        e.target.value = '';
+
+        const filename = file.name.toLowerCase();
+        let importedData = [];
+        let failureMessage = "";
+
+        // 1. DATA EXTRACTION
+        try {
+          if (filename.endsWith('.xlsx') || filename.endsWith('.xls')) {
+            // Excel Logic
+            if (typeof XLSX === 'undefined') throw new Error("Erreur: Librairie Excel non chargée.");
+            const data = await file.arrayBuffer();
+            const workbook = XLSX.read(data);
+            const sheet = workbook.Sheets[workbook.SheetNames[0]];
+
+            // Simple Header Detection
+            const rawInfo = XLSX.utils.sheet_to_json(sheet, { header: 1 }); // Array of arrays
+            let headerIdx = 0;
+            // Find row with "Identifiant" or "ID"
+            for (let i = 0; i < Math.min(rawInfo.length, 25); i++) {
+              const str = (JSON.stringify(rawInfo[i]) || "").toLowerCase();
+              if (str.includes("identifiant") || str.includes("code") || (str.includes("id") && str.length < 200)) {
+                headerIdx = i;
+                break;
+              }
+            }
+            importedData = XLSX.utils.sheet_to_json(sheet, { range: headerIdx, defval: "" });
+
+          } else {
+            // CSV Logic (Simpler)
+            const text = await new Promise(resolve => {
+              const r = new FileReader();
+              r.onload = evt => resolve(evt.target.result);
+              r.readAsText(file); // Default encoding
+            });
+
+            const parse = (delim) => Papa.parse(text, { header: true, skipEmptyLines: true, delimiter: delim });
+            let res = parse("");
+            if (!res.data || res.data.length === 0 || Object.keys(res.data[0]).length < 2) res = parse(";");
+            if (!res.data || res.data.length === 0 || Object.keys(res.data[0]).length < 2) res = parse("\t");
+
+            importedData = res.data || [];
+          }
+        } catch (err) {
+          console.error(err);
+          return alert("Erreur extraction fichier: " + err.message);
+        }
+
+        if (!importedData.length) return alert("Fichier vide ou format non reconnu.");
+
+        // 2. NORMALIZATION & IMPORT
+        let successCount = 0;
+        let failCount = 0;
+        const debugKeys = Object.keys(importedData[0] || {});
+
+        try {
+          importedData.forEach(raw => {
+            // Normalize Helper
+            const get = (keys) => {
+              for (const k of keys) {
+                if (raw[k] !== undefined) return raw[k];
+                // Try lowercase/normalized keys
+                for (const rawKey in raw) {
+                  const n = rawKey.trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, "");
+                  if (n === k) return raw[rawKey];
+                }
+              }
+              return "";
             };
-            if (existing) Object.assign(existing, item);
-            else products.push(item);
+
+            const id = (get(["id", "identifiant", "code", "ref"]) || "").toString().trim();
+            if (!id) { failCount++; return; }
+
+            const name = (get(["name", "nom", "article", "designation"]) || "Produit").toString().trim();
+            const cat = (get(["category", "categorie", "famille"]) || "General").toString().trim();
+
+            let priceStr = (get(["price", "prix", "montant"]) || "0").toString().replace(",", ".");
+            const price = parseFloat(priceStr) || 0;
+
+            let stockStr = (get(["stock", "quantite", "qte"]) || "0").toString().replace(",", ".");
+            const stock = parseInt(stockStr) || 0;
+
+            // Colors
+            let colorVal = get(["colors", "couleurs", "color", "couleur"]);
+            let colorArr = [];
+            if (Array.isArray(colorVal)) colorArr = colorVal;
+            else if (typeof colorVal === 'string') {
+              if (colorVal.includes("|")) colorArr = colorVal.split("|");
+              else if (colorVal.includes(",")) colorArr = colorVal.split(",");
+              else colorArr = [colorVal];
+            }
+            colorArr = colorArr.map(c => c.trim()).filter(c => c);
+
+            const img = (get(["image", "url", "photo"]) || "").toString().trim();
+
+            // Merge
+            const existing = products.find(p => p.id === id);
+            const pObj = { id, name, category: cat, price, stock, colors: colorArr, image: img };
+
+            if (existing) Object.assign(existing, pObj);
+            else products.push(pObj);
+            successCount++;
           });
+
           saveProducts();
           renderStockTable();
-          alert("Import successful!");
+
+          let msg = "Import réussi: " + successCount + " produits.";
+          if (failCount > 0) msg += "\\n(" + failCount + " lignes ignorées sans ID)";
+          if (successCount === 0) {
+            msg += "\\n\\nColonnes trouvées: " + debugKeys.join(", ");
+            msg += "\\n(Vérifiez que la colonne ID/Identifiant existe)";
+          } 
+          alert(msg);
+
+        } catch (e) {
+          alert("Erreur traitement données: " + e.message);
         }
       });
-    });
 
-    // --- INVOICE EDITOR LOGIC ---
-    function switchTab(tab) {
-      if (tab === "stock") {
-        document.getElementById("tab-stock").style.display = "flex";
-        document.getElementById("tab-invoices").style.display = "none";
-        // If invoice editor was open, keep it open (side-by-side)
-        // If not, it stays hidden
-      } else if (tab === "invoices") {
-        document.getElementById("tab-stock").style.display = "none";
-        document.getElementById("invoice-editor").style.display = "none";
-        document.getElementById("tab-invoices").style.display = "flex";
+      // --- INVOICE EDITOR LOGIC ---
+      function switchTab(tab) {
+        if (tab === "stock") {
+          document.getElementById("tab-stock").style.display = "flex";
+          document.getElementById("tab-invoices").style.display = "none";
+          // If invoice editor was open, keep it open (side-by-side)
+          // If not, it stays hidden
+        } else if (tab === "invoices") {
+          document.getElementById("tab-stock").style.display = "none";
+          document.getElementById("invoice-editor").style.display = "none";
+          document.getElementById("tab-invoices").style.display = "flex";
+        }
       }
-    }
 
-    function startInvoice() {
-      const checks = document.querySelectorAll(".select-item:checked");
-      if (checks.length === 0) return alert("Select items first!");
+      function addToInvoice(id) {
+        const p = products.find(prod => prod.id === id);
+        if (!p) return;
 
-      let addedCount = 0;
-      checks.forEach(c => {
-        const p = products.find(prod => prod.id === c.value);
-        if (p) {
-          // Check if item already in invoice to update quantity or add new line?
-          // Simple behavior: Add as new line
-          currentInvoice.push({
-            ...p,
-            quantity: 1,
-            selectedColor: p.colors[0] || "",
-            tvaRate: 19,
-            discount: 0
-          });
-          addedCount++;
-          // Uncheck
-
+        let pColors = p.colors;
+        if (typeof pColors === 'string') {
+          // Basic split, can be improved
+          pColors = pColors.split(/[,|]/).map(c => c.trim()).filter(c => c);
+        } else if (!Array.isArray(pColors)) {
+          pColors = [];
         }
-      });
 
-      if (addedCount > 0) {
-        // Ensure editor is visible
-        document.getElementById("tab-stock").style.display = "flex"; // Keep stock visible
+        currentInvoice.push({
+          ...p,
+          colors: pColors,
+          quantity: 1,
+          selectedColor: pColors[0] || "",
+          tvaRate: 19,
+          discount: 0
+        });
+
+        document.getElementById("tab-stock").style.display = "flex";
         document.getElementById("tab-invoices").style.display = "none";
         document.getElementById("invoice-editor").style.display = "flex";
 
-        // If it was a new invoice (empty ID), set ID. But startInvoice previously reset ID.
-        // We should only set ID if it's empty
         if (!document.getElementById("invoice-id").value) {
           document.getElementById("invoice-id").value = "INV-" + Date.now();
         }
-
         renderInvoiceEditorTable();
       }
-    }
 
-    function renderInvoiceEditorTable() {
-      const tbody = document.querySelector("#invoice-table tbody");
-      tbody.innerHTML = "";
+      function startInvoice() {
+        const checks = document.querySelectorAll(".select-item:checked");
+        // Constraint removed
+        // if (checks.length === 0) return alert("Select items first!");
 
-      let totalHT = 0;
-      let totalTVA = 0;
+        let addedCount = 0;
+        checks.forEach(c => {
+          const p = products.find(prod => prod.id === c.value);
+          if (p) {
+            // Check if item already in invoice to update quantity or add new line?
+            // Simple behavior: Add as new line
+            currentInvoice.push({
+              ...p,
+              quantity: 1,
+              selectedColor: p.colors[0] || "",
+              tvaRate: 19,
+              discount: 0
+            });
+            addedCount++;
+            // Uncheck
 
-      currentInvoice.forEach((item, idx) => {
-        // Math: 
-        // Price is assumed TTC (based on prompt "PU TTC").
-        // Amount (Montant) = Price * Qty * (1 - Disc/100).
-        // Base HT = Amount / (1 + TVA/100).
-        // TVA Val = Amount - Base HT.
+          }
+        });
 
-        // HOWEVER, typical B2B invoices often work with HT price. 
-        // Reference image has columns: PU TTC, Montant (TTC by implication if PU is TTC? Or HT?).
-        // Usually "Montant" column is the row total. 
-        // If PU is TTC, then Montant is TTC.
-        // Then the tax summary breaks it down.
+        if (true) {
+          // Ensure editor is visible
+          document.getElementById("tab-stock").style.display = "flex"; // Keep stock visible
+          document.getElementById("tab-invoices").style.display = "none";
+          document.getElementById("invoice-editor").style.display = "flex";
 
-        const qty = parseInt(item.quantity) || 1;
-        const price = parseFloat(item.price) || 0; // TTC
-        const disc = parseFloat(item.discount) || 0;
-        const tvaRate = parseFloat(item.tvaRate) || 19;
+          // If it was a new invoice (empty ID), set ID. But startInvoice previously reset ID.
+          // We should only set ID if it's empty
+          if (!document.getElementById("invoice-id").value) {
+            document.getElementById("invoice-id").value = "INV-" + Date.now();
+          }
 
-        const rowTotal = price * qty * (1 - disc / 100);
+          renderInvoiceEditorTable();
+        }
+      }
 
-        const baseHT = rowTotal / (1 + tvaRate / 100);
-        const tvaVal = rowTotal - baseHT;
+      function renderInvoiceEditorTable() {
+        const tbody = document.querySelector("#invoice-table tbody");
+        tbody.innerHTML = "";
 
-        totalHT += baseHT;
-        totalTVA += tvaVal;
+        let totalHT = 0;
+        let totalTVA = 0;
 
-        const tr = document.createElement("tr");
+        currentInvoice.forEach((item, idx) => {
+          // Math: 
+          // Price is assumed TTC (based on prompt "PU TTC").
+          // Amount (Montant) = Price * Qty * (1 - Disc/100).
+          // Base HT = Amount / (1 + TVA/100).
+          // TVA Val = Amount - Base HT.
 
-        const colorOpts = (Array.isArray(item.colors) ? item.colors : []).map(c =>
-          `<option value="${c}" ${c === item.selectedColor ? "selected" : ""}>${c}</option>`
-        ).join("");
+          // HOWEVER, typical B2B invoices often work with HT price. 
+          // Reference image has columns: PU TTC, Montant (TTC by implication if PU is TTC? Or HT?).
+          // Usually "Montant" column is the row total. 
+          // If PU is TTC, then Montant is TTC.
+          // Then the tax summary breaks it down.
 
-        tr.innerHTML = `
+          const qty = parseInt(item.quantity) || 1;
+          const price = parseFloat(item.price) || 0; // TTC
+          const disc = parseFloat(item.discount) || 0;
+          const tvaRate = parseFloat(item.tvaRate) || 19;
+
+          const rowTotal = price * qty * (1 - disc / 100);
+
+          const baseHT = rowTotal / (1 + tvaRate / 100);
+          const tvaVal = rowTotal - baseHT;
+
+          totalHT += baseHT;
+          totalTVA += tvaVal;
+
+          const tr = document.createElement("tr");
+
+          const colorOpts = (Array.isArray(item.colors) ? item.colors : []).map(c =>
+            `<option value="${c}" ${c === item.selectedColor ? "selected" : ""}>${c}</option>`
+          ).join("");
+
+          tr.innerHTML = `
       <td>${item.id}</td>
       <td>${item.name}</td>
       <td><select onchange="updateInvItem(${idx}, 'color', this.value)">${colorOpts}</select></td>
@@ -724,174 +876,174 @@
       <td><input type="number" value="${tvaRate}" onchange="updateInvItem(${idx}, 'tva', this.value)"></td>
       <td><button class="delete-btn" onclick="removeInvItem(${idx})" style="padding:2px 6px;">x</button></td>
     `;
-        tbody.appendChild(tr);
-      });
+          tbody.appendChild(tr);
+        });
 
-      // Fees
-      const transport = parseFloat(document.getElementById("fee-transport").value) || 0;
-      const installation = parseFloat(document.getElementById("fee-installation").value) || 0;
-      const frais = parseFloat(document.getElementById("fee-frais").value) || 0;
-      const retenue = parseFloat(document.getElementById("fee-retenue").value) || 0;
-      const garantie = parseFloat(document.getElementById("fee-garantie").value) || 0;
-      const timbre = parseFloat(document.getElementById("timbre-fiscal").value) || 0;
+        // Fees
+        const transport = parseFloat(document.getElementById("fee-transport").value) || 0;
+        const installation = parseFloat(document.getElementById("fee-installation").value) || 0;
+        const frais = parseFloat(document.getElementById("fee-frais").value) || 0;
+        const retenue = parseFloat(document.getElementById("fee-retenue").value) || 0;
+        const garantie = parseFloat(document.getElementById("fee-garantie").value) || 0;
+        const timbre = parseFloat(document.getElementById("timbre-fiscal").value) || 0;
 
-      const feesTotal = transport + installation + frais + garantie; // Positive fees
+        const feesTotal = transport + installation + frais + garantie; // Positive fees
 
-      // Grand Totals
-      // totalHT and totalTVA are calculated from lines.
-      // We need to present them clearly.
-      // Mytek invoice structure usually: 
-      // Subtotal (Total HT presumably? or Total TTC lines?). 
-      // Let's assume standard Tunisian invoice:
-      // Subtotal usually means Total HT.
-      // But our inputs are TTC. 
-      // Let's display "Total HT" correctly calculated from back-calc.
+        // Grand Totals
+        // totalHT and totalTVA are calculated from lines.
+        // We need to present them clearly.
+        // Mytek invoice structure usually: 
+        // Subtotal (Total HT presumably? or Total TTC lines?). 
+        // Let's assume standard Tunisian invoice:
+        // Subtotal usually means Total HT.
+        // But our inputs are TTC. 
+        // Let's display "Total HT" correctly calculated from back-calc.
 
-      document.getElementById("subtotal").textContent = totalHT.toFixed(3);
-      document.getElementById("tva").textContent = totalTVA.toFixed(3);
-      document.getElementById("fees-total").textContent = feesTotal.toFixed(3);
-      document.getElementById("timbre-display").textContent = timbre.toFixed(3);
+        document.getElementById("subtotal").textContent = totalHT.toFixed(3);
+        document.getElementById("tva").textContent = totalTVA.toFixed(3);
+        document.getElementById("fees-total").textContent = feesTotal.toFixed(3);
+        document.getElementById("timbre-display").textContent = timbre.toFixed(3);
 
-      // TTC = (Total HT + Total TVA) + Fees + Timbre - Retenue
-      // Note: (Total HT + Total TVA) is essentialy sum of row totals (which are TTC).
-      const totalTTC = (totalHT + totalTVA) + feesTotal + timbre - retenue;
+        // TTC = (Total HT + Total TVA) + Fees + Timbre - Retenue
+        // Note: (Total HT + Total TVA) is essentialy sum of row totals (which are TTC).
+        const totalTTC = (totalHT + totalTVA) + feesTotal + timbre - retenue;
 
-      document.getElementById("total").textContent = totalTTC.toFixed(3) + " DNT";
-    }
-
-    function updateInvItem(idx, field, val) {
-      if (field === "qty") {
-        let v = parseInt(val) || 1;
-        if (v < 1) v = 1;
-        // Check stock
-        const available = currentInvoice[idx].stock;
-        // Note: If editing, stock might be complicated. For now simple check.
-        if (v > available) { alert("Max stock request exceeded (" + available + ")"); v = available; }
-        currentInvoice[idx].quantity = v;
+        document.getElementById("total").textContent = totalTTC.toFixed(3) + " DNT";
       }
-      if (field === "color") currentInvoice[idx].selectedColor = val;
-      if (field === "disc") currentInvoice[idx].discount = parseFloat(val) || 0;
-      if (field === "tva") currentInvoice[idx].tvaRate = parseFloat(val) || 0;
 
-      renderInvoiceEditorTable();
-    }
+      function updateInvItem(idx, field, val) {
+        if (field === "qty") {
+          let v = parseInt(val) || 1;
+          if (v < 1) v = 1;
+          // Check stock
+          const available = currentInvoice[idx].stock;
+          // Note: If editing, stock might be complicated. For now simple check.
+          if (v > available) { alert("Max stock request exceeded (" + available + ")"); v = available; }
+          currentInvoice[idx].quantity = v;
+        }
+        if (field === "color") currentInvoice[idx].selectedColor = val;
+        if (field === "disc") currentInvoice[idx].discount = parseFloat(val) || 0;
+        if (field === "tva") currentInvoice[idx].tvaRate = parseFloat(val) || 0;
 
-    function removeInvItem(idx) {
-      currentInvoice.splice(idx, 1);
-      renderInvoiceEditorTable();
-    }
+        renderInvoiceEditorTable();
+      }
 
-    function cancelInvoiceEditor() {
-      if (confirm("Discard unsaved changes?")) {
-        currentInvoice = [];
+      function removeInvItem(idx) {
+        currentInvoice.splice(idx, 1);
+        renderInvoiceEditorTable();
+      }
+
+      function cancelInvoiceEditor() {
+        if (confirm("Discard unsaved changes?")) {
+          currentInvoice = [];
+          editMode = false;
+          editingInvoiceIndex = -1;
+          document.getElementById("invoice-editor").style.display = "none";
+          document.getElementById("tab-stock").style.display = "flex"; // Ensure stock comes back
+        }
+      }
+
+      // --- VALIDATION & SAVING ---
+      function validateInvoice() {
+        if (currentInvoice.length === 0) return alert("Invoice is empty!");
+
+        // Capture Data
+        const invData = {
+          number: document.getElementById("invoice-id").value,
+          date: new Date().toLocaleString(),
+          company: {
+            name: document.getElementById("company-name").value,
+            phone: document.getElementById("company-phone").value,
+            address: document.getElementById("company-address").value,
+            fax: document.getElementById("company-fax").value,
+            email: document.getElementById("company-email").value,
+            website: document.getElementById("company-website").value,
+            mf: document.getElementById("company-mf").value,
+            rc: document.getElementById("company-rc").value,
+            rib: document.getElementById("company-rib").value,
+            logo: document.getElementById("company-logo").value
+          },
+          client: {
+            name: document.getElementById("client-name").value,
+            phone: document.getElementById("client-phone").value,
+            address: document.getElementById("client-address").value,
+            code: document.getElementById("client-code").value,
+            mfcin: document.getElementById("client-mfcin").value,
+            ref: document.getElementById("client-ref").value
+          },
+          meta: {
+            payment: document.getElementById("payment-mode").value,
+            chargedTo: document.getElementById("charged-to").value
+          },
+          fees: {
+            transport: parseFloat(document.getElementById("fee-transport").value) || 0,
+            installation: parseFloat(document.getElementById("fee-installation").value) || 0,
+            frais: parseFloat(document.getElementById("fee-frais").value) || 0,
+            retenue: parseFloat(document.getElementById("fee-retenue").value) || 0,
+            garantie: parseFloat(document.getElementById("fee-garantie").value) || 0,
+            timbre: parseFloat(document.getElementById("timbre-fiscal").value) || 0
+          },
+          items: JSON.parse(JSON.stringify(currentInvoice))
+        };
+
+        // Calculate final totals for generic view
+        let rawTotal = 0;
+        invData.items.forEach(i => {
+          rawTotal += (i.price * i.quantity * (1 - (i.discount || 0) / 100));
+        });
+        const feesSum = invData.fees.transport + invData.fees.installation + invData.fees.frais + invData.fees.garantie;
+        const grandTotal = rawTotal + feesSum + invData.fees.timbre - invData.fees.retenue;
+        invData.totalTTC = grandTotal;
+
+        // Stock Handling
+        // 1. If editing, restore old stock
+        if (editMode && editingInvoiceIndex !== -1) {
+          const old = invoices[editingInvoiceIndex];
+          old.items.forEach(oldItem => {
+            const p = products.find(x => x.id === oldItem.id);
+            if (p) p.stock += oldItem.quantity;
+          });
+        }
+        // 2. Deduct new stock
+        invData.items.forEach(newItem => {
+          const p = products.find(x => x.id === newItem.id);
+          if (p) p.stock -= newItem.quantity;
+        });
+        saveProducts();
+        renderStockTable();
+
+        // Save Invoice
+        if (editMode && editingInvoiceIndex !== -1) {
+          // Keep original date or number? Usually keep number, maybe update date? Let's update Date as modified date.
+          invoices[editingInvoiceIndex] = invData;
+        } else {
+          invoices.push(invData);
+        }
+        saveInvoices();
+
+        // Cleanup
         editMode = false;
         editingInvoiceIndex = -1;
+        currentInvoice = [];
         document.getElementById("invoice-editor").style.display = "none";
-        document.getElementById("tab-stock").style.display = "flex"; // Ensure stock comes back
+        switchTab("invoices");
+        renderInvoiceHistory();
+        alert("Invoice Saved Successfully!");
       }
-    }
 
-    // --- VALIDATION & SAVING ---
-    function validateInvoice() {
-      if (currentInvoice.length === 0) return alert("Invoice is empty!");
+      // --- HISTORY & PRINTING ---
+      function renderInvoiceHistory() {
+        const tbody = document.getElementById("invoice-body");
+        tbody.innerHTML = "";
+        const term = document.getElementById("invoice-search-bar").value.toLowerCase();
 
-      // Capture Data
-      const invData = {
-        number: document.getElementById("invoice-id").value,
-        date: new Date().toLocaleString(),
-        company: {
-          name: document.getElementById("company-name").value,
-          phone: document.getElementById("company-phone").value,
-          address: document.getElementById("company-address").value,
-          fax: document.getElementById("company-fax").value,
-          email: document.getElementById("company-email").value,
-          website: document.getElementById("company-website").value,
-          mf: document.getElementById("company-mf").value,
-          rc: document.getElementById("company-rc").value,
-          rib: document.getElementById("company-rib").value,
-          logo: document.getElementById("company-logo").value
-        },
-        client: {
-          name: document.getElementById("client-name").value,
-          phone: document.getElementById("client-phone").value,
-          address: document.getElementById("client-address").value,
-          code: document.getElementById("client-code").value,
-          mfcin: document.getElementById("client-mfcin").value,
-          ref: document.getElementById("client-ref").value
-        },
-        meta: {
-          payment: document.getElementById("payment-mode").value,
-          chargedTo: document.getElementById("charged-to").value
-        },
-        fees: {
-          transport: parseFloat(document.getElementById("fee-transport").value) || 0,
-          installation: parseFloat(document.getElementById("fee-installation").value) || 0,
-          frais: parseFloat(document.getElementById("fee-frais").value) || 0,
-          retenue: parseFloat(document.getElementById("fee-retenue").value) || 0,
-          garantie: parseFloat(document.getElementById("fee-garantie").value) || 0,
-          timbre: parseFloat(document.getElementById("timbre-fiscal").value) || 0
-        },
-        items: JSON.parse(JSON.stringify(currentInvoice))
-      };
+        invoices.forEach(inv => {
+          // Search filter
+          const searchStr = (inv.number + inv.client.name + inv.date).toLowerCase();
+          if (term && !searchStr.includes(term)) return;
 
-      // Calculate final totals for generic view
-      let rawTotal = 0;
-      invData.items.forEach(i => {
-        rawTotal += (i.price * i.quantity * (1 - (i.discount || 0) / 100));
-      });
-      const feesSum = invData.fees.transport + invData.fees.installation + invData.fees.frais + invData.fees.garantie;
-      const grandTotal = rawTotal + feesSum + invData.fees.timbre - invData.fees.retenue;
-      invData.totalTTC = grandTotal;
-
-      // Stock Handling
-      // 1. If editing, restore old stock
-      if (editMode && editingInvoiceIndex !== -1) {
-        const old = invoices[editingInvoiceIndex];
-        old.items.forEach(oldItem => {
-          const p = products.find(x => x.id === oldItem.id);
-          if (p) p.stock += oldItem.quantity;
-        });
-      }
-      // 2. Deduct new stock
-      invData.items.forEach(newItem => {
-        const p = products.find(x => x.id === newItem.id);
-        if (p) p.stock -= newItem.quantity;
-      });
-      saveProducts();
-      renderStockTable();
-
-      // Save Invoice
-      if (editMode && editingInvoiceIndex !== -1) {
-        // Keep original date or number? Usually keep number, maybe update date? Let's update Date as modified date.
-        invoices[editingInvoiceIndex] = invData;
-      } else {
-        invoices.push(invData);
-      }
-      saveInvoices();
-
-      // Cleanup
-      editMode = false;
-      editingInvoiceIndex = -1;
-      currentInvoice = [];
-      document.getElementById("invoice-editor").style.display = "none";
-      switchTab("invoices");
-      renderInvoiceHistory();
-      alert("Invoice Saved Successfully!");
-    }
-
-    // --- HISTORY & PRINTING ---
-    function renderInvoiceHistory() {
-      const tbody = document.getElementById("invoice-body");
-      tbody.innerHTML = "";
-      const term = document.getElementById("invoice-search-bar").value.toLowerCase();
-
-      invoices.forEach(inv => {
-        // Search filter
-        const searchStr = (inv.number + inv.client.name + inv.date).toLowerCase();
-        if (term && !searchStr.includes(term)) return;
-
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
       <td>${inv.number}</td>
       <td>${inv.date}</td>
       <td>${inv.client.name}</td>
@@ -903,268 +1055,253 @@
         <button onclick="cancelInvoice('${inv.number}')" class="cancel-btn">Cancel</button>
       </td>
     `;
-        tbody.appendChild(tr);
-      });
-    }
-
-    function cancelInvoice(num) {
-      if (prompt("Admin Password:") !== ADMIN_PASSWORD) return;
-      const idx = invoices.findIndex(i => i.number === num);
-      if (idx === -1) return;
-
-      if (confirm("Cancel this invoice? Stock will be restored.")) {
-        const inv = invoices[idx];
-        // Restore stock
-        inv.items.forEach(item => {
-          const p = products.find(x => x.id === item.id);
-          if (p) p.stock += item.quantity;
+          tbody.appendChild(tr);
         });
-        saveProducts();
-        // Remove invoice
-        invoices.splice(idx, 1);
-        saveInvoices();
-        renderStockTable();
-        renderInvoiceHistory();
-      }
-    }
-
-    function editInvoice(num) {
-      const inv = invoices.find(i => i.number === num);
-      if (!inv) return;
-
-      editMode = true;
-      editingInvoiceIndex = invoices.findIndex(i => i.number === num);
-
-      // Load data
-      currentInvoice = JSON.parse(JSON.stringify(inv.items));
-      document.getElementById("invoice-id").value = inv.number;
-
-      // Map fields
-      if (inv.company) {
-        document.getElementById("company-name").value = inv.company.name || "";
-        document.getElementById("company-phone").value = inv.company.phone || "";
-        document.getElementById("company-address").value = inv.company.address || "";
-        document.getElementById("company-fax").value = inv.company.fax || "";
-        document.getElementById("company-email").value = inv.company.email || "";
-        document.getElementById("company-website").value = inv.company.website || "";
-        document.getElementById("company-mf").value = inv.company.mf || "";
-        document.getElementById("company-rc").value = inv.company.rc || "";
-        document.getElementById("company-rib").value = inv.company.rib || "";
-        document.getElementById("company-logo").value = inv.company.logo || "";
-        document.getElementById("logo-preview").src = inv.company.logo || "";
       }
 
-      if (inv.client) {
-        document.getElementById("client-name").value = inv.client.name || "";
-        document.getElementById("client-phone").value = inv.client.phone || "";
-        document.getElementById("client-address").value = inv.client.address || "";
-        document.getElementById("client-code").value = inv.client.code || "";
-        document.getElementById("client-mfcin").value = inv.client.mfcin || "";
-        document.getElementById("client-ref").value = inv.client.ref || "";
+      function cancelInvoice(num) {
+        if (prompt("Admin Password:") !== ADMIN_PASSWORD) return;
+        const idx = invoices.findIndex(i => i.number === num);
+        if (idx === -1) return;
+
+        if (confirm("Cancel this invoice? Stock will be restored.")) {
+          const inv = invoices[idx];
+          // Restore stock
+          inv.items.forEach(item => {
+            const p = products.find(x => x.id === item.id);
+            if (p) p.stock += item.quantity;
+          });
+          saveProducts();
+          // Remove invoice
+          invoices.splice(idx, 1);
+          saveInvoices();
+          renderStockTable();
+          renderInvoiceHistory();
+        }
       }
 
-      if (inv.meta) {
-        document.getElementById("payment-mode").value = inv.meta.payment || "CAISSE";
-        document.getElementById("charged-to").value = inv.meta.chargedTo || "";
+      function editInvoice(num) {
+        const inv = invoices.find(i => i.number === num);
+        if (!inv) return;
+
+        editMode = true;
+        editingInvoiceIndex = invoices.findIndex(i => i.number === num);
+
+        // Load data
+        currentInvoice = JSON.parse(JSON.stringify(inv.items));
+        document.getElementById("invoice-id").value = inv.number;
+
+        // Map fields
+        if (inv.company) {
+          document.getElementById("company-name").value = inv.company.name || "";
+          document.getElementById("company-phone").value = inv.company.phone || "";
+          document.getElementById("company-address").value = inv.company.address || "";
+          document.getElementById("company-fax").value = inv.company.fax || "";
+          document.getElementById("company-email").value = inv.company.email || "";
+          document.getElementById("company-website").value = inv.company.website || "";
+          document.getElementById("company-mf").value = inv.company.mf || "";
+          document.getElementById("company-rc").value = inv.company.rc || "";
+          document.getElementById("company-rib").value = inv.company.rib || "";
+          document.getElementById("company-logo").value = inv.company.logo || "";
+          document.getElementById("logo-preview").src = inv.company.logo || "";
+        }
+
+        if (inv.client) {
+          document.getElementById("client-name").value = inv.client.name || "";
+          document.getElementById("client-phone").value = inv.client.phone || "";
+          document.getElementById("client-address").value = inv.client.address || "";
+          document.getElementById("client-code").value = inv.client.code || "";
+          document.getElementById("client-mfcin").value = inv.client.mfcin || "";
+          document.getElementById("client-ref").value = inv.client.ref || "";
+        }
+
+        if (inv.meta) {
+          document.getElementById("payment-mode").value = inv.meta.payment || "CAISSE";
+          document.getElementById("charged-to").value = inv.meta.chargedTo || "";
+        }
+
+        if (inv.fees) {
+          document.getElementById("fee-transport").value = inv.fees.transport || 0;
+          document.getElementById("fee-installation").value = inv.fees.installation || 0;
+          document.getElementById("fee-frais").value = inv.fees.frais || 0;
+          document.getElementById("fee-retenue").value = inv.fees.retenue || 0;
+          document.getElementById("fee-garantie").value = inv.fees.garantie || 0;
+          document.getElementById("timbre-fiscal").value = inv.fees.timbre || 1.000;
+        }
+
+        document.getElementById("tab-stock").style.display = "flex"; // Side by side editing
+        document.getElementById("tab-invoices").style.display = "none";
+        document.getElementById("invoice-editor").style.display = "flex";
+
+        renderInvoiceEditorTable();
       }
 
-      if (inv.fees) {
-        document.getElementById("fee-transport").value = inv.fees.transport || 0;
-        document.getElementById("fee-installation").value = inv.fees.installation || 0;
-        document.getElementById("fee-frais").value = inv.fees.frais || 0;
-        document.getElementById("fee-retenue").value = inv.fees.retenue || 0;
-        document.getElementById("fee-garantie").value = inv.fees.garantie || 0;
-        document.getElementById("timbre-fiscal").value = inv.fees.timbre || 1.000;
+      function printInvoice(num) {
+        const inv = invoices.find(i => i.number === num);
+        if (!inv) return;
+
+        // Safe helpers
+        const fmt = (n) => (n || 0).toFixed(3);
+        const cmp = inv.company || {};
+        const cli = inv.client || {};
+        const meta = inv.meta || {};
+        const fees = inv.fees || {};
+
+        // Calculate Totals for Print
+        let totalHT = 0;
+        let totalTVA = 0;
+
+        const taxStats = {};
+
+        const itemsHtml = inv.items.map(item => {
+          const qty = item.quantity;
+          const price = item.price;
+          const disc = item.discount || 0;
+          const rate = item.tvaRate || 19;
+
+          // Line Calcs
+          const rowTotal = price * qty * (1 - disc / 100);
+          const baseHT = rowTotal / (1 + rate / 100);
+          const tvaVal = rowTotal - baseHT;
+
+          totalHT += baseHT;
+          totalTVA += tvaVal;
+
+          if (!taxStats[rate]) taxStats[rate] = { base: 0, tva: 0 };
+          taxStats[rate].base += baseHT;
+          taxStats[rate].tva += tvaVal;
+
+          return "<tr>" +
+            "<td>" + item.name + "</td>" +
+            "<td>" + item.id + "</td>" +
+            "<td>" + item.name + (item.selectedColor ? "(" + item.selectedColor + ")" : "") + "</td>" +
+            "<td style='text-align:center'>" + qty + "</td>" +
+            "<td style='text-align:right'>" + price.toFixed(3) + "</td>" +
+            "<td style='text-align:center'>" + disc + "%</td>" +
+            "<td style='text-align:right'>" + rowTotal.toFixed(3) + "</td>" +
+            "<td style='text-align:center'>" + rate + "%</td>" +
+            "</tr>";
+        }).join("");
+
+        const feesSum = (fees.transport || 0) + (fees.installation || 0) + (fees.frais || 0) + (fees.garantie || 0);
+        const grandTotal = totalHT + totalTVA + feesSum + (fees.timbre || 0) - (fees.retenue || 0);
+
+        // Integer / Decimal for Words
+        const intPart = Math.floor(grandTotal);
+        const decPart = Math.round((grandTotal - intPart) * 1000);
+
+        const taxTableHtml = Object.keys(taxStats).map(k =>
+          "<tr>" +
+          "<td>" + (taxStats[k].base + taxStats[k].tva).toFixed(3) + " (TTC incl.)</td>" +
+          "<td>" + taxStats[k].base.toFixed(3) + "</td>" +
+          "<td>" + k + "%</td>" +
+          "<td>" + taxStats[k].tva.toFixed(3) + "</td>" +
+          "</tr>"
+        ).join("");
+
+        // Print Window
+        const w = window.open("", "PrintInvoice", "width=800,height=900");
+        if (!w) return alert("Popup blocked!");
+
+        var html = "<html><head><title>" + inv.number + "</title>";
+        html += "<style>";
+        html += "body { font-family:'Arial Narrow', sans-serif; font-size:12px; margin:20px; }";
+        html += "table { width:100%; border-collapse:collapse; }";
+        html += "td, th { border:1px solid #000; padding:4px; }";
+        html += ".no-border td { border:none; }";
+        html += ".header-box { display:flex; justify-content:space-between; margin-bottom:20px; }";
+        html += ".title-box { border:1px solid #000; padding:5px; background:#ddd; font-weight:bold; margin:10px 0; display:flex; justify-content:space-between; }";
+        html += ".footer { margin-top:30px; font-size:10px; }";
+        html += "</style>";
+        html += "</head><body>";
+
+        // HEADER
+        html += "<div class='header-box'>";
+        html += "<div style='width:55%'>";
+        if (cmp.logo) html += "<img src='" + cmp.logo + "' style='max-height:60px; margin-bottom:10px;'>";
+        html += "<div style='font-size:16px; font-weight:bold; text-transform:uppercase;'>" + (cmp.name || "") + "</div>";
+        html += "<div>" + (cmp.address || "") + "</div>";
+        html += "<div>Tel: " + (cmp.phone || "") + " Fax: " + (cmp.fax || "") + "</div>";
+        html += "<div>" + (cmp.email || "") + "</div>";
+        html += "<div style='margin-top:5px; font-size:11px;'>Ref: " + inv.number + " / Date: " + inv.date.split(',')[0] + "</div>";
+        html += "</div>";
+        html += "<div style='width:40%; border:1px solid #000; padding:10px; border-radius:4px;'>";
+        html += "<div style='border-bottom:1px solid #000; font-weight:bold; margin-bottom:5px;'>LIVRÉ À:</div>";
+        html += "<div style='font-weight:bold; font-size:14px;'>" + (cli.name || "") + "</div>";
+        html += "<div>" + (cli.address || "") + "</div>";
+        html += "<div>Code: " + (cli.code || "") + "</div>";
+        html += "<div>MF/CIN: " + (cli.mfcin || "") + "</div>";
+        html += "<div style='margin-top:10px;'>Mode: <b>" + (meta.payment || "") + "</b></div>";
+        html += "</div></div>";
+
+        html += "<div class='title-box'>";
+        html += "<span>BON DE LIVRAISON / FACTURE</span>";
+        html += "<span>" + inv.number + "</span>";
+        html += "</div>";
+
+        html += "<table style='margin-bottom:15px; text-align:center;'>";
+        html += "<tr style='background:#eee;'><td>Date</td><td>Numéro</td><td>Client Ref</td><td>Chargé(e)</td></tr>";
+        html += "<tr>";
+        html += "<td>" + inv.date + "</td>";
+        html += "<td>" + inv.number + "</td>";
+        html += "<td>" + (cli.ref || "") + "</td>";
+        html += "<td>" + (meta.chargedTo || "") + "</td>";
+        html += "</tr></table>";
+
+        html += "<table>";
+        html += "<thead style='background:#eee;'><tr><th>Ref</th><th>Code</th><th>Désignation</th><th>Qté</th><th>PU TTC</th><th>Remise</th><th>Montant</th><th>TVA</th></tr></thead>";
+        html += "<tbody>" + itemsHtml + "</tbody>";
+        html += "</table>";
+
+        // FEES ROW
+        html += "<div style='border:1px solid #000; border-top:none; padding:5px; display:flex; justify-content:space-around; font-size:11px;'>";
+        html += "<span>Transport: " + fmt(fees.transport) + "</span>";
+        html += "<span>Installation: " + fmt(fees.installation) + "</span>";
+        html += "<span>Frais: " + fmt(fees.frais) + "</span>";
+        html += "<span>Retenue: " + fmt(fees.retenue) + "</span>";
+        html += "<span>Garantie: " + fmt(fees.garantie) + "</span>";
+        html += "</div>";
+
+        html += "<div style='display:flex; justify-content:space-between; margin-top:20px;'>";
+        html += "<div style='width:55%'>";
+        html += "<table style='font-size:11px;'>";
+        html += "<tr style='background:#eee;'><th>Total HT</th><th>Base TVA</th><th>Taux</th><th>Mont TVA</th></tr>";
+        html += taxTableHtml;
+        html += "</table>";
+        html += "<div style='margin-top:15px; font-style:italic;'>";
+        html += "Arrêtée la présente facture à la somme de:<br>";
+        html += "<b>" + intPart + " Dinars et " + decPart + " Millimes.</b>";
+        html += "</div></div>";
+
+        html += "<div style='width:40%'>";
+        html += "<table style='font-weight:bold;'>";
+        html += "<tr><td>Total HT</td><td style='text-align:right;'>" + totalHT.toFixed(3) + "</td></tr>";
+        html += "<tr><td>Total TVA</td><td style='text-align:right;'>" + totalTVA.toFixed(3) + "</td></tr>";
+        html += "<tr><td>Timbre Fiscal</td><td style='text-align:right;'>" + fmt(fees.timbre) + "</td></tr>";
+        html += "<tr style='background:#ddd; font-size:14px;'><td>NET À PAYER TTC</td><td style='text-align:right;'>" + grandTotal.toFixed(3) + "</td></tr>";
+        html += "</table></div></div>";
+
+        // Footer
+        html += "<div class='footer'>";
+        html += "<div style='border-top:1px solid #000; padding-top:5px; display:flex; justify-content:space-between;'>";
+        html += "<div style='width:60%'>";
+        html += "<b>Infos Légales:</b><br>";
+        html += "MF: " + (cmp.mf || "") + " | RC: " + (cmp.rc || "") + " | RIB: " + (cmp.rib || "") + "<br>";
+        html += "IMPORTANT: Marchandise reçue conforme...";
+        html += "</div>";
+        html += "<div style='text-align:right;'>Signature & Cachet<div style='border:1px solid #ccc; height:60px; width:150px; margin-top:5px;'></div></div>";
+        html += "</div></div>";
+
+        // Closing tags - split to avoid parser issues
+        html += "<" + "/body><" + "/html>";
+
+        w.document.write(html);
+        w.document.close();
+        w.setTimeout(() => w.print(), 500);
       }
 
-      document.getElementById("tab-stock").style.display = "flex"; // Side by side editing
-      document.getElementById("tab-invoices").style.display = "none";
-      document.getElementById("invoice-editor").style.display = "flex";
-
-      renderInvoiceEditorTable();
-    }
-
-    function printInvoice(num) {
-      const inv = invoices.find(i => i.number === num);
-      if (!inv) return;
-
-      // Safe helpers
-      const fmt = (n) => (n || 0).toFixed(3);
-      const cmp = inv.company || {};
-      const cli = inv.client || {};
-      const meta = inv.meta || {};
-      const fees = inv.fees || {};
-
-      // Calculate Totals for Print
-      let totalHT = 0;
-      let totalTVA = 0;
-
-      const taxStats = {}; // { 19: {base: x, tva: x}, 7: ... }
-
-      const itemsHtml = inv.items.map(item => {
-        const qty = item.quantity;
-        const price = item.price;
-        const disc = item.discount || 0;
-        const rate = item.tvaRate || 19;
-
-        // Line Calcs
-        const rowTotal = price * qty * (1 - disc / 100);
-        const baseHT = rowTotal / (1 + rate / 100);
-        const tvaVal = rowTotal - baseHT;
-
-        totalHT += baseHT;
-        totalTVA += tvaVal;
-
-        if (!taxStats[rate]) taxStats[rate] = { base: 0, tva: 0 };
-        taxStats[rate].base += baseHT;
-        taxStats[rate].tva += tvaVal;
-
-        return `
-      <tr>
-        <td>${item.name}</td>
-        <td>${item.id}</td>
-        <td>${item.name} ${item.selectedColor ? "(" + item.selectedColor + ")" : ""}</td>
-        <td style="text-align:center">${qty}</td>
-        <td style="text-align:right">${price.toFixed(3)}</td>
-        <td style="text-align:center">${disc}%</td>
-        <td style="text-align:right">${rowTotal.toFixed(3)}</td>
-        <td style="text-align:center">${rate}%</td>
-      </tr>
-    `;
-      }).join("");
-
-      const feesSum = (fees.transport || 0) + (fees.installation || 0) + (fees.frais || 0) + (fees.garantie || 0);
-      const grandTotal = totalHT + totalTVA + feesSum + (fees.timbre || 0) - (fees.retenue || 0);
-
-      // Integer / Decimal for Words
-      const intPart = Math.floor(grandTotal);
-      const decPart = Math.round((grandTotal - intPart) * 1000);
-
-      const taxTableHtml = Object.keys(taxStats).map(k => `
-    <tr>
-      <td>${(taxStats[k].base + taxStats[k].tva).toFixed(3)} (TTC incl.)</td> <!-- Actually classic view might differ -->
-      <td>${taxStats[k].base.toFixed(3)}</td>
-      <td>${k}%</td>
-      <td>${taxStats[k].tva.toFixed(3)}</td>
-    </tr>
-  `).join("");
-
-      // Print Window
-      const w = window.open("", "PrintInvoice", "width=800,height=900");
-      w.document.write(`
-    <html><head><title>${inv.number}</title>
-    <style>
-      body { font-family:'Arial Narrow', sans-serif; font-size:12px; margin:20px; }
-      table { width:100%; border-collapse:collapse; }
-      td, th { border:1px solid #000; padding:4px; }
-      .no-border td { border:none; }
-      .header-box { display:flex; justify-content:space-between; margin-bottom:20px; }
-      .title-box { border:1px solid #000; padding:5px; background:#ddd; font-weight:bold; margin:10px 0; display:flex; justify-content:space-between; }
-      .footer { margin-top:30px; font-size:10px; }
-    </style>
-    </head><body>
-      
-      <!-- HEADER -->
-      <div class="header-box">
-        <div style="width:55%">
-          ${cmp.logo ? `<img src="${cmp.logo}" style="max-height:60px; margin-bottom:10px;">` : ''}
-          <div style="font-size:16px; font-weight:bold; text-transform:uppercase;">${cmp.name}</div>
-          <div>${cmp.address}</div>
-          <div>Tel: ${cmp.phone} Fax: ${cmp.fax}</div>
-          <div>${cmp.email}</div>
-          <div style="margin-top:5px; font-size:11px;">Ref: ${inv.number} / Date: ${inv.date.split(',')[0]}</div>
-        </div>
-        <div style="width:40%; border:1px solid #000; padding:10px; border-radius:4px;">
-          <div style="border-bottom:1px solid #000; font-weight:bold; margin-bottom:5px;">LIVRÉ À:</div>
-          <div style="font-weight:bold; font-size:14px;">${cli.name}</div>
-          <div>${cli.address}</div>
-          <div>Code: ${cli.code}</div>
-          <div>MF/CIN: ${cli.mfcin}</div>
-          <div style="margin-top:10px;">Mode: <b>${meta.payment}</b></div>
-        </div>
-      </div>
-
-      <div class="title-box">
-        <span>BON DE LIVRAISON / FACTURE</span>
-        <span>${inv.number}</span>
-      </div>
-      
-      <table style="margin-bottom:15px; text-align:center;">
-        <tr style="background:#eee;">
-          <td>Date</td><td>Numéro</td><td>Client Ref</td><td>Chargé(e)</td>
-        </tr>
-        <tr>
-          <td>${inv.date}</td>
-          <td>${inv.number}</td>
-          <td>${cli.ref}</td>
-          <td>${meta.chargedTo}</td>
-        </tr>
-      </table>
-
-      <table>
-        <thead style="background:#eee;">
-          <tr>
-            <th>Ref</th><th>Code</th><th>Désignation</th><th>Qté</th><th>PU TTC</th><th>Remise</th><th>Montant</th><th>TVA</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${itemsHtml}
-        </tbody>
-      </table>
-      
-      <!-- FEES ROW -->
-      <div style="border:1px solid #000; border-top:none; padding:5px; display:flex; justify-content:space-around; font-size:11px;">
-        <span>Transport: ${fmt(fees.transport)}</span>
-        <span>Installation: ${fmt(fees.installation)}</span>
-        <span>Frais: ${fmt(fees.frais)}</span>
-        <span>Retenue: ${fmt(fees.retenue)}</span>
-        <span>Garantie: ${fmt(fees.garantie)}</span>
-      </div>
-
-      <div style="display:flex; justify-content:space-between; margin-top:20px;">
-        <div style="width:55%">
-          <table style="font-size:11px;">
-            <tr style="background:#eee;"><th>Total HT</th><th>Base TVA</th><th>Taux</th><th>Mont TVA</th></tr>
-            ${taxTableHtml}
-          </table>
-          <div style="margin-top:15px; font-style:italic;">
-            Arrêtée la présente facture à la somme de:<br>
-            <b>${intPart} Dinars et ${decPart} Millimes.</b>
-          </div>
-        </div>
-        
-        <div style="width:40%">
-           <table style="font-weight:bold;">
-             <tr><td>Total HT</td><td style="text-align:right;">${totalHT.toFixed(3)}</td></tr>
-             <tr><td>Total TVA</td><td style="text-align:right;">${totalTVA.toFixed(3)}</td></tr>
-             <tr><td>Timbre Fiscal</td><td style="text-align:right;">${fmt(fees.timbre)}</td></tr>
-             <tr style="background:#ddd; font-size:14px;"><td>NET À PAYER TTC</td><td style="text-align:right;">${grandTotal.toFixed(3)}</td></tr>
-           </table>
-        </div>
-      </div>
-
-      <div class="footer">
-        <div style="border-top:1px solid #000; padding-top:5px; display:flex; justify-content:space-between;">
-          <div style="width:60%">
-            <b>Infos Légales:</b><br>
-            MF: ${cmp.mf} | RC: ${cmp.rc} | RIB: ${cmp.rib}<br>
-            IMPORTANT: Marchandise reçue conforme...
-          </div>
-          <div style="text-align:right;">
-            Signature & Cachet
-            <div style="border:1px solid #ccc; height:60px; width:150px; margin-top:5px;"></div>
-          </div>
-        </div>
-      </div>
-
-    </body></html>
-  `);
-      w.document.close();
-      w.print();
-    }
-
-    init();
-  </script>
+      init();
+    </script>
 </body>
 
 </html>
