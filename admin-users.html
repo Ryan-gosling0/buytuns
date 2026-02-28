@@ -430,11 +430,19 @@
 
         onAuthStateChanged(auth, async (user) => {
             if (!user) { window.location.href = 'login.html'; return; }
-            const userDoc = await getDoc(doc(db, "users", user.uid));
-            if (!userDoc.exists() || userDoc.data().role !== 'admin') {
-                alert("Access denied. Admins only.");
-                window.location.href = 'login.html';
-                return;
+
+            try {
+                const userDoc = await getDoc(doc(db, "users", user.uid));
+                if (!userDoc.exists() || userDoc.data().role !== 'admin') {
+                    alert("Access denied. Admins only.");
+                    window.location.href = 'login.html';
+                    return;
+                }
+            } catch (err) {
+                console.warn("Auth check error (likely offline):", err);
+                if (user.email !== ADMIN_EMAIL) {
+                    window.location.href = 'login.html'; return;
+                }
             }
             loadUsers();
         });
@@ -450,10 +458,19 @@
                 allUsers.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
                 updateStats();
                 renderUsers(allUsers);
-            } catch (e) {
-                container.innerHTML = `<div class="loading"><p>Error: ${e.message}</p></div>`;
+            } catch (err) {
+                console.warn("Users load error (likely offline):", err);
+                if (!navigator.onLine) {
+                    // Even if it fails, maybe some data exists in the SDK cache
+                    // but getDocs might not return it if it defaults to server.
+                    // We just show a notification.
+                    container.innerHTML = '<div style="padding:20px;text-align:center;color:#666;">?? You appear to be offline. Users list might be incomplete.</div>' + container.innerHTML;
+                } else {
+                    container.innerHTML = `<div class="alert error">❌ Error: ${err.message}</div>`;
+                }
             }
         };
+
 
         function updateStats() {
             document.getElementById('stat-total').textContent = allUsers.length;

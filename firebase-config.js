@@ -16,13 +16,32 @@ const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 export const db = getFirestore(app);
 
-// Enable Offline Persistence
-enableMultiTabIndexedDbPersistence(db).catch((err) => {
-    if (err.code == 'failed-precondition') {
-        console.warn("Multiple tabs open, persistence can only be enabled in one tab at a time.");
-    } else if (err.code == 'unimplemented') {
-        console.warn("The current browser does not support all of the features required to enable persistence.");
+// Enable Offline Persistence with Fallback
+import { enableIndexedDbPersistence } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+async function initPersistence() {
+    try {
+        await enableMultiTabIndexedDbPersistence(db);
+        console.log("Firestore multi-tab persistence enabled.");
+    } catch (err) {
+        if (err.code === 'failed-precondition') {
+            // Probably multiple tabs open, we can try single-tab if needed but usually it's already active in one
+            console.warn("Multiple tabs open, persistence active in another tab.");
+        } else if (err.code === 'unimplemented') {
+            // Browser doesn't support multi-tab, try single-tab
+            try {
+                await enableIndexedDbPersistence(db);
+                console.log("Firestore single-tab persistence enabled.");
+            } catch (innerErr) {
+                console.error("Firestore persistence failed:", innerErr.message);
+            }
+        } else {
+            console.error("Firestore persistence error:", err.message);
+        }
     }
-});
+}
+
+initPersistence();
+
 
 export const ADMIN_EMAIL = "ahmedmidonajjar@gmail.com";

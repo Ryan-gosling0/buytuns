@@ -386,18 +386,27 @@
         // Check if already logged in
         onAuthStateChanged(auth, async (user) => {
             if (user) {
-                const userDoc = await getDoc(doc(db, "users", user.uid));
-                if (userDoc.exists()) {
-                    const data = userDoc.data();
-                    if (data.status === 'suspended') {
-                        await auth.signOut();
-                        showAlert('suspended', '🚫 Your account has been suspended.<br>Please contact the administrator at <b>ahmedmidonajjar@gmail.com</b> to resolve this issue.');
-                        return;
+                try {
+                    const userDoc = await getDoc(doc(db, "users", user.uid));
+                    if (userDoc.exists()) {
+                        const data = userDoc.data();
+                        if (data.status === 'suspended') {
+                            await auth.signOut();
+                            showAlert('suspended', '🚫 Your account has been suspended.<br>Please contact the administrator at <b>ahmedmidonajjar@gmail.com</b> to resolve this issue.');
+                            return;
+                        }
+                        if (data.role === 'admin') {
+                            window.location.href = 'admin.html';
+                        } else {
+                            window.location.href = 'client.html';
+                        }
                     }
-                    if (data.role === 'admin') {
-                        window.location.href = 'admin.html';
-                    } else {
-                        window.location.href = 'client.html';
+                } catch (err) {
+                    console.warn("Auth check error (likely offline):", err);
+                    // If offline and we have a user, proceed and let the dashboard handle its own offline state
+                    if (!navigator.onLine) {
+                        // We can't verify role/suspension, but redirecting to likely dashboard is better than a crash
+                        // Most users stay in their role, so we just wait or attempt to guess from cache if possible
                     }
                 }
             }
@@ -422,29 +431,27 @@
 
             try {
                 const cred = await signInWithEmailAndPassword(auth, email, password);
-                const userDoc = await getDoc(doc(db, "users", cred.user.uid));
 
-                if (!userDoc.exists()) {
-                    // Create user doc if it doesn't exist (e.g., admin first login)
-                    const isAdmin = email.toLowerCase() === ADMIN_EMAIL.toLowerCase();
-                    await setDoc(doc(db, "users", cred.user.uid), {
-                        name: isAdmin ? "Admin" : email.split('@')[0],
-                        email: email,
-                        role: isAdmin ? 'admin' : 'client',
-                        status: 'active',
-                        createdAt: serverTimestamp()
-                    });
-                    window.location.href = isAdmin ? 'admin.html' : 'client.html';
-                    return;
+                let data;
+                try {
+                    const userDoc = await getDoc(doc(db, "users", cred.user.uid));
+                    if (userDoc.exists()) {
+                        data = userDoc.data();
+                    }
+                } catch (docErr) {
+                    console.warn("Could not fetch user doc:", docErr);
+                    // If offline, we might have to use local storage or just redirect and let the next page handle it
                 }
 
-                const data = userDoc.data();
-                if (data.status === 'suspended') {
+                if (data && data.status === 'suspended') {
                     await auth.signOut();
                     showAlert('suspended', '🚫 Your account has been suspended.<br>Please contact the administrator at <b>ahmedmidonajjar@gmail.com</b>.');
                     return;
                 }
-                window.location.href = data.role === 'admin' ? 'admin.html' : 'client.html';
+
+                // If we have data, use it; otherwise, default to client (or check email for admin)
+                const isAdmin = data ? (data.role === 'admin') : (email.toLowerCase() === ADMIN_EMAIL.toLowerCase());
+                window.location.href = isAdmin ? 'admin.html' : 'client.html';
 
             } catch (err) {
                 const msg = err.code === 'auth/user-not-found' || err.code === 'auth/wrong-password' || err.code === 'auth/invalid-credential'
