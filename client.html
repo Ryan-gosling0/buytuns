@@ -1,0 +1,425 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NaggyStore – My Account</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f0f4f8;
+            color: #333;
+            min-height: 100vh;
+        }
+
+        .topbar {
+            background: linear-gradient(135deg, #1a1a2e, #302b63);
+            color: white;
+            padding: 0 24px;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.25);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .topbar-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .topbar-brand .icon {
+            width: 38px;
+            height: 38px;
+            background: linear-gradient(135deg, #4CAF50, #2196F3);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .user-chip {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 6px 14px;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .avatar {
+            width: 28px;
+            height: 28px;
+            background: linear-gradient(135deg, #4CAF50, #2196F3);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .btn-logout {
+            background: rgba(244, 67, 54, 0.2);
+            border: 1px solid rgba(244, 67, 54, 0.4);
+            color: #ff8a80;
+            padding: 7px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-family: 'Inter', sans-serif;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-logout:hover {
+            background: rgba(244, 67, 54, 0.35);
+        }
+
+        .main {
+            max-width: 1000px;
+            margin: 32px auto;
+            padding: 0 16px;
+        }
+
+        .welcome-card {
+            background: linear-gradient(135deg, #4CAF50 0%, #2196F3 100%);
+            border-radius: 20px;
+            padding: 28px 32px;
+            color: white;
+            margin-bottom: 28px;
+            box-shadow: 0 8px 24px rgba(76, 175, 80, 0.25);
+        }
+
+        .welcome-card h2 {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .welcome-card p {
+            opacity: 0.85;
+            font-size: 14px;
+        }
+
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 16px;
+            margin-bottom: 28px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+        }
+
+        .stat-card .value {
+            font-size: 28px;
+            font-weight: 700;
+            color: #4CAF50;
+        }
+
+        .stat-card .label {
+            font-size: 12px;
+            color: #999;
+            margin-top: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            color: #222;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .invoices-panel {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+            overflow: hidden;
+        }
+
+        .invoices-panel .panel-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: #f8f9fa;
+            color: #666;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 12px 24px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        td {
+            padding: 14px 24px;
+            font-size: 14px;
+            border-bottom: 1px solid #f5f5f5;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover td {
+            background: #fafafa;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .badge-paid {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .badge-pending {
+            background: #fff8e1;
+            color: #f57f17;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+
+        .empty-state .emoji {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+
+        .empty-state p {
+            font-size: 15px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #aaa;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 32px;
+            height: 32px;
+            border: 3px solid #eee;
+            border-top-color: #4CAF50;
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .amount {
+            font-weight: 600;
+            color: #333;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="topbar">
+        <div class="topbar-brand">
+            <div class="icon">🏪</div>
+            NaggyStore
+        </div>
+        <div class="topbar-right">
+            <div class="user-chip">
+                <div class="avatar" id="avatar-initial">?</div>
+                <span id="user-name-display">Loading...</span>
+            </div>
+            <button class="btn-logout" onclick="doLogout()">Sign Out</button>
+        </div>
+    </div>
+
+    <div class="main">
+        <div class="welcome-card">
+            <h2 id="welcome-heading">Welcome back! 👋</h2>
+            <p id="welcome-sub">Here's your account overview and invoice history.</p>
+        </div>
+
+        <div class="stats-row">
+            <div class="stat-card">
+                <div class="value" id="stat-total-invoices">—</div>
+                <div class="label">Total Invoices</div>
+            </div>
+            <div class="stat-card">
+                <div class="value" id="stat-total-spent">—</div>
+                <div class="label">Total Spent (DNT)</div>
+            </div>
+            <div class="stat-card">
+                <div class="value" id="stat-last-invoice">—</div>
+                <div class="label">Last Invoice</div>
+            </div>
+        </div>
+
+        <div class="section-title">📄 My Invoices</div>
+
+        <div class="invoices-panel">
+            <div id="invoices-content">
+                <div class="loading">
+                    <div class="spinner"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getFirestore, collection, query, where, getDocs, doc, getDoc, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBHN_I3NsFfw3xryVH1SImTjfMayYCm7hA",
+      authDomain: "naggystore-d3697.firebaseapp.com",
+      projectId: "naggystore-d3697",
+      storageBucket: "naggystore-d3697.firebasestorage.app",
+      messagingSenderId: "1083270919985",
+      appId: "1:1083270919985:web:83a9d2db42ad2458eae210"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        onAuthStateChanged(auth, async (user) => {
+            if (!user) { window.location.href = 'login.html'; return; }
+
+            const userDoc = await getDoc(doc(db, "users", user.uid));
+            if (!userDoc.exists()) { window.location.href = 'login.html'; return; }
+
+            const userData = userDoc.data();
+
+            if (userData.status === 'suspended') {
+                document.body.innerHTML = `<div style="display:flex;align-items:center;justify-content:center;min-height:100vh;font-family:Inter,sans-serif;background:#fff">
+          <div style="text-align:center;padding:40px;">
+            <div style="font-size:64px;margin-bottom:16px;">🚫</div>
+            <h2 style="color:#e53935;margin-bottom:8px;">Account Suspended</h2>
+            <p style="color:#666;">Please contact the admin at <a href="mailto:ahmedmidonajjar@gmail.com">ahmedmidonajjar@gmail.com</a></p>
+          </div>
+        </div>`;
+                await signOut(auth);
+                return;
+            }
+
+            if (userData.role === 'admin') { window.location.href = 'admin.html'; return; }
+
+            // Set UI
+            const name = userData.name || user.email;
+            document.getElementById('user-name-display').textContent = name;
+            document.getElementById('avatar-initial').textContent = name.charAt(0).toUpperCase();
+            document.getElementById('welcome-heading').textContent = `Welcome back, ${name.split(' ')[0]}! 👋`;
+
+            // Load invoices
+            await loadInvoices(user.uid);
+        });
+
+        async function loadInvoices(uid) {
+            const container = document.getElementById('invoices-content');
+            try {
+                const q = query(collection(db, "invoices"), where("clientUid", "==", uid));
+                const snap = await getDocs(q);
+
+                if (snap.empty) {
+                    container.innerHTML = `<div class="empty-state">
+            <div class="emoji">📭</div>
+            <p>No invoices yet. Your invoices will appear here once created by the store.</p>
+          </div>`;
+                    document.getElementById('stat-total-invoices').textContent = '0';
+                    document.getElementById('stat-total-spent').textContent = '0.000';
+                    document.getElementById('stat-last-invoice').textContent = '—';
+                    return;
+                }
+
+                let invoices = [];
+                snap.forEach(d => invoices.push({ id: d.id, ...d.data() }));
+                invoices.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+                const totalSpent = invoices.reduce((s, i) => s + (i.totalTTC || 0), 0);
+                document.getElementById('stat-total-invoices').textContent = invoices.length;
+                document.getElementById('stat-total-spent').textContent = totalSpent.toFixed(3);
+                document.getElementById('stat-last-invoice').textContent = invoices[0] ? (invoices[0].date || '—').split(',')[0] : '—';
+
+                let rows = invoices.map(inv => `
+          <tr>
+            <td><b>${inv.number || inv.id}</b></td>
+            <td>${inv.date || '—'}</td>
+            <td>${inv.items ? inv.items.length : 0} item(s)</td>
+            <td class="amount">${(inv.totalTTC || 0).toFixed(3)} DNT</td>
+            <td><span class="status-badge badge-paid">Issued</span></td>
+          </tr>
+        `).join('');
+
+                container.innerHTML = `<table>
+          <thead><tr>
+            <th>Invoice #</th><th>Date</th><th>Items</th><th>Amount</th><th>Status</th>
+          </tr></thead>
+          <tbody>${rows}</tbody>
+        </table>`;
+
+            } catch (e) {
+                container.innerHTML = `<div class="empty-state"><p>Error loading invoices: ${e.message}</p></div>`;
+            }
+        }
+
+        window.doLogout = async function () {
+            await signOut(auth);
+            window.location.href = 'login.html';
+        };
+    </script>
+</body>
+
+</html>

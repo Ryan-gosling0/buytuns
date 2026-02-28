@@ -1,10 +1,11 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="fr">
 
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Gestion Admin - Stock et Factures</title>
+  <title>NaggyStore Admin – Stock & Factures</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     /* GLOBAL STYLES */
     * {
@@ -22,6 +23,7 @@
     h2 {
       margin: 0 0 10px 0;
     }
+
     button {
       padding: 6px 12px;
       border: none;
@@ -311,17 +313,22 @@
 
   <h1 style="padding:10px 15px; background:#fff; border-bottom:1px solid #ddd; margin:0;">Gestion Admin - Stock et
     Factures</h1>
-  <div id="top-buttons" style="padding:15px; background:#fff; border-bottom:1px solid #eee;">
+  <div id="top-buttons"
+    style="padding:15px; background:#fff; border-bottom:1px solid #eee; display:flex; flex-wrap:wrap; align-items:center; gap:6px;">
+    <span id="firebase-status" style="font-size:12px; color:#4CAF50; font-weight:600; margin-right:6px;">☁️ Cloud</span>
     <button onclick="saveAllStocks()">Enregistrer les stocks</button>
     <button onclick="exportCSV()">Exporter (CSV)</button>
     <button onclick="switchTab('stock')">Stock</button>
     <button onclick="switchTab('invoices')">Historique des factures</button>
     <input type="file" id="import-file" accept=".csv,.txt,.tsv,.xlsx,.xls" style="font-size:12px;">
     <span
-      style="margin:0 10px; border-left:1px solid #ccc; height:20px; display:inline-block; vertical-align:middle;"></span>
+      style="margin:0 4px; border-left:1px solid #ccc; height:20px; display:inline-block; vertical-align:middle;"></span>
     <input type="text" id="search-bar" placeholder="Rechercher des produits...">
     <button onclick="startInvoice()" style="background:#2196F3;">Ajouter une facture</button>
     <input type="text" id="invoice-search-bar" placeholder="Rechercher des factures...">
+    <span style="flex:1;"></span>
+    <button onclick="window.location.href='admin-users.html'" style="background:#9c27b0;">👥 Manage Users</button>
+    <button onclick="doLogout()" style="background:#f44336;">🚪 Logout</button>
   </div>
 
   <div class="admin-layout">
@@ -490,14 +497,56 @@
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
-    <!-- Fallback to local if CDN fails, but let's prioritize local to ensure it works now -->
     <script src="assets/xlsx.full.min.js"></script>
-    <script>
+    <script type="module">
+      // =============================================
+      // FIREBASE INTEGRATION
+      // =============================================
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+      import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+      import {
+        getFirestore, collection, doc,
+        getDocs, getDoc, setDoc, updateDoc, deleteDoc,
+        onSnapshot, serverTimestamp, query, orderBy
+      } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+      const firebaseConfig = {
+        apiKey: "AIzaSyBHN_I3NsFfw3xryVH1SImTjfMayYCm7hA",
+      authDomain: "naggystore-d3697.firebaseapp.com",
+      projectId: "naggystore-d3697",
+      storageBucket: "naggystore-d3697.firebasestorage.app",
+      messagingSenderId: "1083270919985",
+      appId: "1:1083270919985:web:83a9d2db42ad2458eae210"
+      };
+
+      const ADMIN_EMAIL = "ahmedmidonajjar@gmail.com";
+      const app = initializeApp(firebaseConfig);
+      const auth = getAuth(app);
+      const db = getFirestore(app);
+
       // --- CONFIG & STATE ---
       const ADMIN_PASSWORD = "1234";
       let products = [], invoices = [], currentInvoice = [];
       let editMode = false;
       let editingInvoiceIndex = -1;
+
+      // --- AUTH GUARD ---
+      onAuthStateChanged(auth, async (user) => {
+        if (!user) { window.location.href = 'login.html'; return; }
+        const userSnap = await getDoc(doc(db, "users", user.uid));
+        if (!userSnap.exists() || userSnap.data().role !== 'admin') {
+          alert("Access denied. Admin only.");
+          await signOut(auth);
+          window.location.href = 'login.html';
+          return;
+        }
+        init();
+      });
+
+      window.doLogout = async function () {
+        await signOut(auth);
+        window.location.href = 'login.html';
+      };
 
       // --- INITIALIZATION ---
       function init() {
@@ -510,25 +559,8 @@
           alert("Attention: Certaines librairies sont manquantes (" + missing.join(", ") + ").\nL'import pourrait ne pas fonctionner hors ligne.");
         }
 
-        const p = localStorage.getItem("admin-products");
-        if (p) {
-          try {
-            products = JSON.parse(p);
-            // Sanitation check
-            products.forEach(prod => {
-              if (prod.id) prod.id = String(prod.id);
-            });
-          } catch (e) {
-            console.error("Error parsing products", e);
-            products = [];
-          }
-        }
-
-        const i = localStorage.getItem("admin-invoices");
-        if (i) invoices = JSON.parse(i);
-
-        renderStockTable();
-        renderInvoiceHistory();
+        // Load data from Firestore
+        loadFromFirestore();
 
         // Logos
         document.getElementById("company-logo").addEventListener("input", e => {
@@ -548,8 +580,59 @@
       }
 
       // --- STOCK MANAGEMENT ---
-      function saveProducts() { localStorage.setItem("admin-products", JSON.stringify(products)); }
-      function saveInvoices() { localStorage.setItem("admin-invoices", JSON.stringify(invoices)); }
+      // --- FIRESTORE DATA LAYER ---
+      async function loadFromFirestore() {
+        try {
+          // Load products
+          const prodSnap = await getDocs(collection(db, "products"));
+          products = [];
+          prodSnap.forEach(d => products.push({ ...d.data(), _docId: d.id }));
+          products.forEach(p => { if (p.id) p.id = String(p.id); });
+
+          // Load invoices
+          const invSnap = await getDocs(collection(db, "invoices"));
+          invoices = [];
+          invSnap.forEach(d => invoices.push({ ...d.data(), _docId: d.id }));
+
+          renderStockTable();
+          renderInvoiceHistory();
+          document.getElementById('firebase-status').textContent = '☁️ Synced';
+        } catch (e) {
+          console.error('Firestore load error:', e);
+          document.getElementById('firebase-status').textContent = '⚠️ Offline';
+          document.getElementById('firebase-status').style.color = '#f44336';
+        }
+      }
+
+      async function saveProducts() {
+        try {
+          for (const p of products) {
+            const docId = p._docId || p.id;
+            await setDoc(doc(db, "products", String(docId)), {
+              id: p.id, name: p.name, category: p.category,
+              price: p.price, stock: p.stock,
+              colors: p.colors || [], image: p.image || ''
+            });
+            p._docId = String(docId);
+          }
+          document.getElementById('firebase-status').textContent = '☁️ Saved';
+        } catch (e) {
+          alert('Cloud save error: ' + e.message);
+        }
+      }
+
+      async function saveInvoices() {
+        // Invoices are saved individually via validateInvoice()
+      }
+
+      async function saveOneInvoice(invData) {
+        const docId = invData.number.replace(/[^a-zA-Z0-9-_]/g, '_');
+        const toSave = { ...invData };
+        delete toSave._docId;
+        toSave.savedAt = serverTimestamp();
+        await setDoc(doc(db, "invoices", docId), toSave);
+        invData._docId = docId;
+      }
 
       function renderStockTable(filter = "") {
         const tbody = document.getElementById("admin-body");
@@ -586,20 +669,26 @@
         });
       }
 
-      function saveAllStocks() {
+      async function saveAllStocks() {
         products.forEach(p => {
           const el = document.getElementById(`stock-${p.id}`);
           if (el) p.stock = parseInt(el.value) || 0;
         });
-        saveProducts();
-        alert("Stocks mis à jour !");
+        await saveProducts();
+        alert("Stocks mis à jour et sauvegardés dans le cloud!");
       }
 
-      function deleteProduct(id) {
+      async function deleteProduct(id) {
         if (prompt("Password:") !== ADMIN_PASSWORD) return alert("Wrong password");
         if (!confirm("Delete this product?")) return;
+        const p = products.find(x => x.id === id);
+        if (p) {
+          try {
+            const docId = p._docId || p.id;
+            await deleteDoc(doc(db, "products", String(docId)));
+          } catch (e) { console.error(e); }
+        }
         products = products.filter(p => p.id !== id);
-        saveProducts();
         renderStockTable();
       }
 
@@ -725,15 +814,15 @@
             successCount++;
           });
 
-          saveProducts();
+          await saveProducts();
           renderStockTable();
 
-          let msg = "Import réussi: " + successCount + " produits.";
-          if (failCount > 0) msg += "\\n(" + failCount + " lignes ignorées sans ID)";
+          let msg = "Import réussi: " + successCount + " produits sauvegardés dans le cloud ☁️.";
+          if (failCount > 0) msg += "\n(" + failCount + " lignes ignorées sans ID)";
           if (successCount === 0) {
-            msg += "\\n\\nColonnes trouvées: " + debugKeys.join(", ");
-            msg += "\\n(Vérifiez que la colonne ID/Identifiant existe)";
-          } 
+            msg += "\n\nColonnes trouvées: " + debugKeys.join(", ");
+            msg += "\n(Vérifiez que la colonne ID/Identifiant existe)";
+          }
           alert(msg);
 
         } catch (e) {
@@ -944,13 +1033,14 @@
       }
 
       // --- VALIDATION & SAVING ---
-      function validateInvoice() {
+      async function validateInvoice() {
         if (currentInvoice.length === 0) return alert("Invoice is empty!");
 
         // Capture Data
         const invData = {
           number: document.getElementById("invoice-id").value,
           date: new Date().toLocaleString(),
+          clientEmail: document.getElementById("client-name").value,  // used for client lookup
           company: {
             name: document.getElementById("company-name").value,
             phone: document.getElementById("company-phone").value,
@@ -1009,17 +1099,18 @@
           const p = products.find(x => x.id === newItem.id);
           if (p) p.stock -= newItem.quantity;
         });
-        saveProducts();
+        await saveProducts();
         renderStockTable();
 
-        // Save Invoice
+        // Save Invoice to Firestore
         if (editMode && editingInvoiceIndex !== -1) {
-          // Keep original date or number? Usually keep number, maybe update date? Let's update Date as modified date.
           invoices[editingInvoiceIndex] = invData;
         } else {
           invoices.push(invData);
         }
-        saveInvoices();
+        try {
+          await saveOneInvoice(invData);
+        } catch (e) { alert('Error saving invoice to cloud: ' + e.message); return; }
 
         // Cleanup
         editMode = false;
@@ -1028,7 +1119,7 @@
         document.getElementById("invoice-editor").style.display = "none";
         switchTab("invoices");
         renderInvoiceHistory();
-        alert("Invoice Saved Successfully!");
+        alert("Invoice Saved to Cloud Successfully! \u2601️");
       }
 
       // --- HISTORY & PRINTING ---
@@ -1059,7 +1150,7 @@
         });
       }
 
-      function cancelInvoice(num) {
+      async function cancelInvoice(num) {
         if (prompt("Admin Password:") !== ADMIN_PASSWORD) return;
         const idx = invoices.findIndex(i => i.number === num);
         if (idx === -1) return;
@@ -1071,10 +1162,15 @@
             const p = products.find(x => x.id === item.id);
             if (p) p.stock += item.quantity;
           });
-          saveProducts();
-          // Remove invoice
+          await saveProducts();
+          // Remove from Firestore
+          if (inv._docId) {
+            try { await deleteDoc(doc(db, "invoices", inv._docId)); } catch (e) { }
+          } else {
+            const docId = inv.number.replace(/[^a-zA-Z0-9-_]/g, '_');
+            try { await deleteDoc(doc(db, "invoices", docId)); } catch (e) { }
+          }
           invoices.splice(idx, 1);
-          saveInvoices();
           renderStockTable();
           renderInvoiceHistory();
         }
