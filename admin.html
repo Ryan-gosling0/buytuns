@@ -676,7 +676,9 @@
 
             async function saveProducts() {
                 try {
-                    for (const p of products) {
+                    // Clone array to avoid race condition with Firestore listener
+                    const productsCopy = [...products];
+                    for (const p of productsCopy) {
                         // Sanitize product ID to prevent Firestore path errors
                         const docId = p._docId || sanitizeDocId(p.id);
                         await setDoc(doc(db, "products", String(docId)), {
@@ -684,9 +686,13 @@
                             price: p.price, stock: p.stock,
                             colors: p.colors || [], image: p.image || ''
                         });
-                        p._docId = String(docId);
+                        // Update original product's _docId if it still exists in the products array
+                        const origProduct = products.find(prod => prod.id === p.id);
+                        if (origProduct) {
+                            origProduct._docId = String(docId);
+                        }
                     }
-                    console.log("✅ Products saved to Firebase:", products.length);
+                    console.log("✅ Products saved to Firebase:", productsCopy.length);
                     document.getElementById('firebase-status').textContent = '✅ Saved';
                     document.getElementById('firebase-status').style.color = '#4CAF50';
                 } catch (e) {
