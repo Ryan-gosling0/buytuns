@@ -41,7 +41,7 @@ async function initPersistence() {
     }
 }
 
-initPersistence();
-
+// Initialize persistence and export a promise to wait on
+export const persistenceReady = initPersistence();
 
 export const ADMIN_EMAIL = "ahmedmidonajjar@gmail.com";
