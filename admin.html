@@ -328,8 +328,8 @@
         <button onclick="startInvoice()" style="background:#2196F3;">Ajouter une facture</button>
         <input type="text" id="invoice-search-bar" placeholder="Rechercher des factures...">
         <span style="flex:1;"></span>
-        <button onclick="window.location.href='admin-users.html'" style="background:#9c27b0;">?? Manage Users</button>
-        <button onclick="doLogout()" style="background:#f44336;">?? Logout</button>
+        <button onclick="(function() { console.log('Navigating to admin-users.html'); window.location.href='admin-users.html'; })()" style="background:#9c27b0;">👥 Manage Users</button>
+        <button onclick="doLogout()" style="background:#f44336;">👋 Logout</button>
     </div>
 
     <div class="admin-layout">
@@ -678,21 +678,26 @@
                 try {
                     // Clone array to avoid race condition with Firestore listener
                     const productsCopy = [...products];
-                    for (const p of productsCopy) {
-                        // Sanitize product ID to prevent Firestore path errors
+                    console.log("💾 Saving", productsCopy.length, "products to Firestore...");
+                    
+                    // Batch all saves together to avoid listener interference
+                    const savePromises = productsCopy.map(p => {
                         const docId = p._docId || sanitizeDocId(p.id);
-                        await setDoc(doc(db, "products", String(docId)), {
+                        return setDoc(doc(db, "products", String(docId)), {
                             id: p.id, name: p.name, category: p.category,
                             price: p.price, stock: p.stock,
                             colors: p.colors || [], image: p.image || ''
+                        }).then(() => {
+                            // Update original product's _docId if it still exists
+                            const origProduct = products.find(prod => prod.id === p.id);
+                            if (origProduct) {
+                                origProduct._docId = String(docId);
+                            }
                         });
-                        // Update original product's _docId if it still exists in the products array
-                        const origProduct = products.find(prod => prod.id === p.id);
-                        if (origProduct) {
-                            origProduct._docId = String(docId);
-                        }
-                    }
-                    console.log("✅ Products saved to Firebase:", productsCopy.length);
+                    });
+                    
+                    await Promise.all(savePromises);
+                    console.log("✅ All products saved to Firebase successfully");
                     document.getElementById('firebase-status').textContent = '✅ Saved';
                     document.getElementById('firebase-status').style.color = '#4CAF50';
                 } catch (e) {
@@ -840,12 +845,14 @@
                             r.readAsText(file); // Default encoding
                         });
 
+                        // Try different delimiters: comma, semicolon, tab
                         const parse = (delim) => Papa.parse(text, { header: true, skipEmptyLines: true, delimiter: delim });
-                        let res = parse("");
+                        let res = parse(",");
                         if (!res.data || res.data.length === 0 || Object.keys(res.data[0]).length < 2) res = parse(";");
                         if (!res.data || res.data.length === 0 || Object.keys(res.data[0]).length < 2) res = parse("\t");
 
                         importedData = res.data || [];
+                        console.log("📊 Parsed", importedData.length, "rows from CSV");
                     }
                 } catch (err) {
                     console.error(err);
@@ -858,9 +865,10 @@
                 let successCount = 0;
                 let failCount = 0;
                 const debugKeys = Object.keys(importedData[0] || {});
+                console.log("📥 Starting import of", importedData.length, "rows. Headers:", debugKeys);
 
                 try {
-                    importedData.forEach(raw => {
+                    importedData.forEach((raw, rowIdx) => {
                         // Normalize Helper
                         const get = (keys) => {
                             for (const k of keys) {
@@ -875,7 +883,7 @@
                         };
 
                         const id = (get(["id", "identifiant", "code", "ref"]) || "").toString().trim();
-                        if (!id) { failCount++; return; }
+                        if (!id) { failCount++; console.warn("❌ Row", rowIdx, "skipped: no ID found"); return; }
 
                         const name = (get(["name", "nom", "article", "designation"]) || "Produit").toString().trim();
                         const cat = (get(["category", "categorie", "famille"]) || "General").toString().trim();
@@ -903,21 +911,29 @@
                         const existing = products.find(p => p.id === id);
                         const pObj = { id, name, category: cat, price, stock, colors: colorArr, image: img };
 
-                        if (existing) Object.assign(existing, pObj);
-                        else products.push(pObj);
+                        if (existing) {
+                            Object.assign(existing, pObj);
+                            console.log("✏️ Row", rowIdx, "- Updated:", id);
+                        } else {
+                            products.push(pObj);
+                            console.log("✅ Row", rowIdx, "- Added:", id);
+                        }
                         successCount++;
                     });
 
+                    console.log("📊 Before saveProducts():", successCount, "items in products array");
                     await saveProducts();
+                    console.log("📊 After saveProducts():", products.length, "items in products array");
                     renderStockTable();
 
-                    let msg = "Import réussi: " + successCount + " produits sauvegardés dans le cloud ??.";
-                    if (failCount > 0) msg += "\n(" + failCount + " lignes ignorÃ©es sans ID)";
+                    let msg = "Import réussi: " + successCount + " produits sauvegardés dans le cloud ☁️.";
+                    if (failCount > 0) msg += "\n(" + failCount + " lignes ignorées sans ID)";
                     if (successCount === 0) {
                         msg += "\n\nColonnes trouvées: " + debugKeys.join(", ");
                         msg += "\n(Vérifiez que la colonne ID/Identifiant existe)";
                     }
                     alert(msg);
+
 
                 } catch (e) {
                     alert("Erreur traitement données: " + e.message);

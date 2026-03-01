@@ -389,9 +389,10 @@
             <div class="card">
                 <h2>Create & Manage Invoices</h2>
 
-                <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                <div style="display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap;">
                     <button class="btn-primary" onclick="newInvoice()">+ New Invoice</button>
                     <button class="btn-success" onclick="saveCurrentInvoice()">💾 Save Invoice</button>
+                    <input type="file" id="import-items" accept=".csv,.txt,.tsv,.xlsx,.xls" style="font-size:12px; flex:1; min-width:150px;" title="Import products from CSV/Excel">
                 </div>
 
                 <!-- Invoice Details -->
@@ -498,11 +499,26 @@
     <script type="module">
         import { auth, db, persistenceReady } from "./firebase-config.js";
         import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { collection, query, where, onSnapshot, setDoc, doc, serverTimestamp, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firestore.js";
+        import { collection, query, where, onSnapshot, setDoc, doc, serverTimestamp, getDocs, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firestore.js";
+
+        // Load required libraries
+        const scriptsToLoad = [
+            { name: 'Papa', src: 'https://cdnjs.cloudflare.com/ajax/libs/papaparse/5.4.1/papaparse.min.js' },
+            { name: 'XLSX', src: 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.min.js' }
+        ];
+
+        scriptsToLoad.forEach(({ name, src }) => {
+            if (typeof window[name] === 'undefined') {
+                const script = document.createElement('script');
+                script.src = src;
+                document.head.appendChild(script);
+            }
+        });
 
         // State
         let currentUser = null;
-        let products = [];
+        let storeProducts = [];  // Products from store catalog
+        let clientProducts = []; // Products imported by client
         let currentInvoice = [];
         let myInvoices = [];
         let editingInvoiceId = null;
@@ -511,6 +527,7 @@
         await persistenceReady;
         setupAuthListener();
         setupProductSync();
+        setupImportListener();
 
         async function setupAuthListener() {
             onAuthStateChanged(auth, async (user) => {
@@ -524,28 +541,47 @@
                 document.getElementById('client-email').value = user.email;
                 document.getElementById('invoice-date').valueAsDate = new Date();
 
+                loadClientProducts();
                 loadMyInvoices();
                 newInvoice();
+                updateFirebaseStatus(true);
             });
         }
 
         function setupProductSync() {
             try {
                 onSnapshot(collection(db, "products"), (snap) => {
-                    products = [];
+                    storeProducts = [];
                     snap.forEach(d => {
                         const data = d.data();
                         data._docId = d.id;
                         if (data.id) data.id = String(data.id);
-                        products.push(data);
+                        storeProducts.push(data);
                     });
-                    console.log("✅ Products loaded:", products.length);
+                    console.log("✅ Store products loaded:", storeProducts.length);
                     renderProductsList();
-                    updateFirebaseStatus(true);
                 });
             } catch (e) {
                 console.error("Products load error:", e);
-                updateFirebaseStatus(false);
+            }
+        }
+
+        function loadClientProducts() {
+            if (!currentUser) return;
+            try {
+                const q = query(collection(db, "clientProducts"), where("clientUid", "==", currentUser.uid));
+                onSnapshot(q, (snap) => {
+                    clientProducts = [];
+                    snap.forEach(d => {
+                        const data = d.data();
+                        data._docId = d.id;
+                        clientProducts.push(data);
+                    });
+                    console.log("✅ Client products loaded:", clientProducts.length);
+                    renderProductsList();
+                });
+            } catch (e) {
+                console.error("Client products load error:", e);
             }
         }
 
@@ -553,29 +589,32 @@
             const container = document.getElementById('products-list');
             const searchTerm = document.getElementById('product-search').value.toLowerCase();
 
-            const filtered = products.filter(p =>
+            // Combine store and client products
+            const allProducts = [...storeProducts, ...clientProducts];
+            const filtered = allProducts.filter(p =>
                 String(p.id).toLowerCase().includes(searchTerm) ||
                 String(p.name).toLowerCase().includes(searchTerm) ||
                 String(p.category).toLowerCase().includes(searchTerm)
             );
 
             if (filtered.length === 0) {
-                container.innerHTML = `<div class="empty-state"><p>No products found</p></div>`;
+                container.innerHTML = `<div class="empty-state"><p>No products found. Import items or browse the catalog.</p></div>`;
                 return;
             }
 
             container.innerHTML = filtered.map(p => `
-                <div class="product-item" onclick="addProductToInvoice('${p.id}')">
+                <div class="product-item" onclick="window.addProductToInvoice('${p.id}')">
                     <h4>${p.name}</h4>
                     <p><strong>${p.id}</strong> • ${p.category}</p>
                     <p>${p.colors ? (Array.isArray(p.colors) ? p.colors.join(", ") : p.colors) : "—"}</p>
-                    <p class="price">${Number(p.price || 0).toFixed(3)} DNT ${p.stock > 0 ? `(Stock: ${p.stock})` : "(Out of Stock)"}</p>
+                    <p class="price">${Number(p.price || 0).toFixed(3)} DNT ${p.stock > 0 ? `(Stock: ${p.stock})` : ""}</p>
                 </div>
             `).join('');
         }
 
         window.addProductToInvoice = function(productId) {
-            const p = products.find(prod => prod.id === productId);
+            // Find in client products first, then store products
+            let p = clientProducts.find(prod => prod.id === productId) || storeProducts.find(prod => prod.id === productId);
             if (!p) return;
 
             let colors = p.colors;
@@ -716,7 +755,6 @@
 
             const invNumber = document.getElementById("invoice-id").value || "INV-" + Date.now();
             
-            // Calculate totals
             let totalHT = 0, totalTVA = 0;
             currentInvoice.forEach(item => {
                 const qty = parseInt(item.quantity) || 1;
@@ -840,6 +878,125 @@
             document.querySelector('.card').scrollIntoView({ behavior: 'smooth' });
         };
 
+        // CSV/EXCEL IMPORT
+        function setupImportListener() {
+            document.getElementById("import-items").addEventListener("change", async e => {
+                const file = e.target.files[0];
+                if (!file) return;
+                e.target.value = '';
+
+                const filename = file.name.toLowerCase();
+                let importedData = [];
+
+                try {
+                    if (filename.endsWith('.xlsx') || filename.endsWith('.xls')) {
+                        if (typeof XLSX === 'undefined') throw new Error("Excel library not loaded.");
+                        const data = await file.arrayBuffer();
+                        const workbook = XLSX.read(data);
+                        const sheet = workbook.Sheets[workbook.SheetNames[0]];
+
+                        const rawInfo = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+                        let headerIdx = 0;
+                        for (let i = 0; i < Math.min(rawInfo.length, 25); i++) {
+                            const str = (JSON.stringify(rawInfo[i]) || "").toLowerCase();
+                            if (str.includes("identifiant") || str.includes("code") || (str.includes("id") && str.length < 200)) {
+                                headerIdx = i;
+                                break;
+                            }
+                        }
+                        importedData = XLSX.utils.sheet_to_json(sheet, { range: headerIdx, defval: "" });
+                    } else {
+                        if (typeof Papa === 'undefined') throw new Error("CSV library not loaded.");
+                        const text = await new Promise(resolve => {
+                            const r = new FileReader();
+                            r.onload = evt => resolve(evt.target.result);
+                            r.readAsText(file);
+                        });
+
+                        const parse = (delim) => Papa.parse(text, { header: true, skipEmptyLines: true, delimiter: delim });
+                        let res = parse(",");
+                        if (!res.data || res.data.length === 0 || Object.keys(res.data[0]).length < 2) res = parse(";");
+                        if (!res.data || res.data.length === 0 || Object.keys(res.data[0]).length < 2) res = parse("\t");
+
+                        importedData = res.data || [];
+                        console.log("📊 Parsed", importedData.length, "rows from CSV");
+                    }
+                } catch (err) {
+                    console.error(err);
+                    return alert("Error reading file: " + err.message);
+                }
+
+                if (!importedData.length) return alert("File is empty or format not recognized.");
+
+                let successCount = 0, failCount = 0;
+                const debugKeys = Object.keys(importedData[0] || {});
+                console.log("📥 Starting import of", importedData.length, "rows. Headers:", debugKeys);
+
+                try {
+                    importedData.forEach((raw, rowIdx) => {
+                        const get = (keys) => {
+                            for (const k of keys) {
+                                if (raw[k] !== undefined) return raw[k];
+                                for (const rawKey in raw) {
+                                    const n = rawKey.trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, "");
+                                    if (n === k) return raw[rawKey];
+                                }
+                            }
+                            return "";
+                        };
+
+                        const id = (get(["id", "identifiant", "code", "ref"]) || "").toString().trim();
+                        if (!id) { failCount++; console.warn("❌ Row", rowIdx, "skipped: no ID found"); return; }
+
+                        const name = (get(["name", "nom", "article", "designation"]) || "Product").toString().trim();
+                        const cat = (get(["category", "categorie", "famille"]) || "General").toString().trim();
+
+                        let priceStr = (get(["price", "prix", "montant"]) || "0").toString().replace(",", ".");
+                        const price = parseFloat(priceStr) || 0;
+
+                        let stockStr = (get(["stock", "quantite", "qte"]) || "0").toString().replace(",", ".");
+                        const stock = parseInt(stockStr) || 0;
+
+                        let colorVal = get(["colors", "couleurs", "color", "couleur"]);
+                        let colorArr = [];
+                        if (Array.isArray(colorVal)) colorArr = colorVal;
+                        else if (typeof colorVal === 'string') {
+                            if (colorVal.includes("|")) colorArr = colorVal.split("|");
+                            else if (colorVal.includes(",")) colorArr = colorVal.split(",");
+                            else colorArr = [colorVal];
+                        }
+                        colorArr = colorArr.map(c => c.trim()).filter(c => c);
+
+                        const img = (get(["image", "url", "photo"]) || "").toString().trim();
+
+                        const existing = clientProducts.find(p => p.id === id);
+                        const pObj = { id, name, category: cat, price, stock, colors: colorArr, image: img, clientUid: currentUser.uid };
+
+                        if (existing) {
+                            console.log("✏️ Row", rowIdx, "- Updated:", id);
+                        } else {
+                            console.log("✅ Row", rowIdx, "- Added:", id);
+                        }
+                        successCount++;
+
+                        // Save to Firestore
+                        const docId = (id + "_" + Date.now()).replace(/[^a-zA-Z0-9-_]/g, '_').substring(0, 255);
+                        setDoc(doc(db, "clientProducts", docId), pObj).catch(err => console.error("Save error:", err));
+                    });
+
+                    let msg = "✅ Import successful: " + successCount + " items imported!";
+                    if (failCount > 0) msg += "\n(" + failCount + " rows skipped without ID)";
+                    if (successCount === 0) {
+                        msg += "\n\nColumns found: " + debugKeys.join(", ");
+                        msg += "\n(Make sure ID/Identifiant column exists)";
+                    }
+                    alert(msg);
+                } catch (e) {
+                    alert("Error processing data: " + e.message);
+                }
+            });
+        }
+
         function updateFirebaseStatus(online) {
             const el = document.getElementById('firebase-status');
             if (online) {
@@ -858,6 +1015,7 @@
             window.location.href = 'login.html';
         };
     </script>
+
 </body>
 
 </html>
