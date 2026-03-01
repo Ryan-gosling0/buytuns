@@ -315,8 +315,8 @@
         Factures</h1>
     <div id="top-buttons"
         style="padding:15px; background:#fff; border-bottom:1px solid #eee; display:flex; flex-wrap:wrap; align-items:center; gap:6px;">
-        <span id="firebase-status" style="font-size:12px; color:#4CAF50; font-weight:600; margin-right:6px;">??
-            Cloud</span>
+        <span id="firebase-status" style="font-size:12px; color:#4CAF50; font-weight:600; margin-right:6px;">🟢 Checking...
+        </span>
         <button onclick="saveAllStocks()">Enregistrer les stocks</button>
         <button onclick="exportCSV()">Exporter (CSV)</button>
         <button onclick="switchTab('stock')">Stock</button>
@@ -553,6 +553,8 @@
 
             // --- INITIALIZATION ---
             function init() {
+                console.log("🚀 Admin panel initialization started...");
+                
                 // Library Check
                 const missing = [];
                 if (typeof Papa === 'undefined') missing.push("PapaParse (CSV)");
@@ -563,38 +565,53 @@
                 }
 
                 // Load data from Firestore
+                console.log("📡 Loading data from Firestore...");
                 loadFromFirestore();
+                console.log("✅ Firestore listeners set up");
 
                 // Logos
-                document.getElementById("company-logo").addEventListener("input", e => {
-                    document.getElementById("logo-preview").src = e.target.value;
-                });
+                const logoInput = document.getElementById("company-logo");
+                if (logoInput) {
+                    logoInput.addEventListener("input", e => {
+                        document.getElementById("logo-preview").src = e.target.value;
+                    });
+                }
 
                 // Search
-                document.getElementById("search-bar").addEventListener("input", () => {
-                    renderStockTable(document.getElementById("search-bar").value);
-                });
-                document.getElementById("invoice-search-bar").addEventListener("input", renderInvoiceHistory);
+                const searchBar = document.getElementById("search-bar");
+                if (searchBar) {
+                    searchBar.addEventListener("input", () => {
+                        renderStockTable(document.getElementById("search-bar").value);
+                    });
+                }
+                
+                const invoiceSearchBar = document.getElementById("invoice-search-bar");
+                if (invoiceSearchBar) {
+                    invoiceSearchBar.addEventListener("input", renderInvoiceHistory);
+                }
 
                 // Fee Listeners for live update
                 ["fee-transport", "fee-installation", "fee-frais", "fee-retenue", "fee-garantie", "timbre-fiscal"].forEach(id => {
-                    document.getElementById(id).addEventListener("input", renderInvoiceEditorTable);
+                    const el = document.getElementById(id);
+                    if (el) el.addEventListener("input", renderInvoiceEditorTable);
                 });
 
                 // Connection monitoring
                 window.addEventListener('online', updateConnectionStatus);
                 window.addEventListener('offline', updateConnectionStatus);
                 updateConnectionStatus();
+                
+                console.log("✅ Admin panel ready!");
             }
 
             function updateConnectionStatus() {
                 const status = document.getElementById('firebase-status');
                 if (!status) return;
                 if (navigator.onLine) {
-                    status.textContent = '?? Online';
+                    status.textContent = '🟢 Online';
                     status.style.color = '#4CAF50';
                 } else {
-                    status.textContent = '?? Offline (Local Cache)';
+                    status.textContent = '🟡 Offline (Local Cache)';
                     status.style.color = '#ff9800';
                 }
             }
@@ -611,11 +628,13 @@
                             if (data.id) data.id = String(data.id);
                             products.push(data);
                         });
+                        console.log("✅ Products loaded from Firestore:", products.length);
                         renderStockTable();
-                        document.getElementById('firebase-status').textContent = '?? Synced';
+                        document.getElementById('firebase-status').textContent = '✅ Synced';
+                        document.getElementById('firebase-status').style.color = '#4CAF50';
                     }, (err) => {
                         console.error('Products Snapshot error:', err);
-                        document.getElementById('firebase-status').textContent = '?? Error';
+                        document.getElementById('firebase-status').textContent = '❌ Error';
                         document.getElementById('firebase-status').style.color = '#f44336';
                     });
                     onSnapshot(collection(db, "invoices"), (snap) => {
@@ -625,13 +644,14 @@
                             data._docId = d.id;
                             invoices.push(data);
                         });
+                        console.log("✅ Invoices loaded from Firestore:", invoices.length);
                         renderInvoiceHistory();
                     }, (err) => {
                         console.error('Invoices Snapshot error:', err);
                     });
                 } catch (e) {
                     console.error('Firestore load error:', e);
-                    document.getElementById('firebase-status').textContent = '?? Offline';
+                    document.getElementById('firebase-status').textContent = '❌ Offline';
                     document.getElementById('firebase-status').style.color = '#f44336';
                 }
             }
@@ -647,9 +667,14 @@
                         });
                         p._docId = String(docId);
                     }
-                    document.getElementById('firebase-status').textContent = '?? Saved';
+                    console.log("✅ Products saved to Firebase:", products.length);
+                    document.getElementById('firebase-status').textContent = '✅ Saved';
+                    document.getElementById('firebase-status').style.color = '#4CAF50';
                 } catch (e) {
+                    console.error("Save error:", e);
                     alert('Cloud save error: ' + e.message);
+                    document.getElementById('firebase-status').textContent = '❌ Save Failed';
+                    document.getElementById('firebase-status').style.color = '#f44336';
                 }
             }
 
@@ -1414,6 +1439,28 @@
                 w.setTimeout(() => w.print(), 500);
             }
 
+            // ========================================
+            // EXPOSE ALL FUNCTIONS TO GLOBAL SCOPE
+            // ========================================
+            window.saveAllStocks = saveAllStocks;
+            window.exportCSV = exportCSV;
+            window.switchTab = switchTab;
+            window.startInvoice = startInvoice;
+            window.renderInvoiceEditorTable = renderInvoiceEditorTable;
+            window.updateInvItem = updateInvItem;
+            window.removeInvItem = removeInvItem;
+            window.renderInvoiceHistory = renderInvoiceHistory;
+            window.deleteProduct = deleteProduct;
+            window.addToInvoice = addToInvoice;
+            window.validateInvoice = validateInvoice;
+            window.printInvoice = printInvoice;
+            window.editInvoice = editInvoice;
+            window.cancelInvoice = cancelInvoice;
+            window.cancelInvoiceEditor = cancelInvoiceEditor;
+            window.renderStockTable = renderStockTable;
+            window.loadFromFirestore = loadFromFirestore;
+            window.saveProducts = saveProducts;
+            window.saveOneInvoice = saveOneInvoice;
 
         </script>
 </body>

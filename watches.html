@@ -70,6 +70,11 @@
     </div>
   </div>
 
+  <!-- Load Firebase products in real-time -->
+  <script type="module">
+    import { initFirebaseProducts } from "./firebase-products.js";
+    window.firebaseProductsReady = initFirebaseProducts();
+  </script>
   <script src="script.js"></script>
   <script>
     initializeCategory('Watches');
