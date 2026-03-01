@@ -469,7 +469,7 @@
                     renderUsers(allUsers);
                 }
             } catch (err) {
-                console.error("Users load error:\", err);
+                console.error('Users load error:', err);
                 if (!navigator.onLine) {
                     container.innerHTML = `<div style="padding:20px;text-align:center;background:#fff3cd;border-radius:8px;color:#856404;">
                         🟡 You appear to be offline. Cannot load users list.

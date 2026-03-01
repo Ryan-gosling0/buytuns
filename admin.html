@@ -389,9 +389,9 @@
                         <label>Identifiant fiscal (MF)<input type="text" id="company-mf" placeholder="MF"></label>
                         <label>RC<input type="text" id="company-rc" placeholder="RC"></label>
                         <label>RIB<input type="text" id="company-rib" placeholder="RIB"></label>
-                        <label>URL du logo<input type="text" id="company-logo" placeholder="http://..."></label>
+                        <label>Logo <input type="file" id="company-logo" accept="image/*"></label>
                     </div>
-                    <img id="logo-preview" alt="Aperçu du logo">
+                    <img id="logo-preview" alt="Aperçu du logo" style="max-width:100px; max-height:100px;">
                 </div>
 
                 <!-- Client Info -->
@@ -399,6 +399,7 @@
                     <h3>Détails du client</h3>
                     <div class="editor-fields">
                         <label>Nom du client<input type="text" id="client-name" placeholder="Nom du client"></label>
+                        <label>Email<input type="email" id="client-email" placeholder="client@example.com"></label>
                         <label>TÃ©lÃ©phone<input type="text" id="client-phone" placeholder="TÃ©lÃ©phone"></label>
                         <label>Adresse<textarea id="client-address" placeholder="Adresse"></textarea></label>
                         <label>Code client<input type="text" id="client-code" placeholder="Code"></label>
@@ -572,8 +573,16 @@
                 // Logos
                 const logoInput = document.getElementById("company-logo");
                 if (logoInput) {
-                    logoInput.addEventListener("input", e => {
-                        document.getElementById("logo-preview").src = e.target.value;
+                    // when a file is selected, convert it to a data URL for preview/storage
+                    logoInput.addEventListener("change", e => {
+                        const file = e.target.files && e.target.files[0];
+                        if (file) {
+                            const reader = new FileReader();
+                            reader.onload = ev => {
+                                document.getElementById("logo-preview").src = ev.target.result;
+                            };
+                            reader.readAsDataURL(file);
+                        }
                     });
                 }
 
@@ -1133,10 +1142,11 @@
                 if (currentInvoice.length === 0) return alert("Invoice is empty!");
 
                 // Capture Data
+                console.log('validateInvoice() called, editMode=', editMode, 'editingInvoiceIndex=', editingInvoiceIndex);
                 const invData = {
                     number: document.getElementById("invoice-id").value,
                     date: new Date().toLocaleString(),
-                    clientEmail: document.getElementById("client-name").value,  // used for client lookup
+                    clientEmail: (document.getElementById("client-email").value || '').toLowerCase(),
                     company: {
                         name: document.getElementById("company-name").value,
                         phone: document.getElementById("company-phone").value,
@@ -1147,7 +1157,7 @@
                         mf: document.getElementById("company-mf").value,
                         rc: document.getElementById("company-rc").value,
                         rib: document.getElementById("company-rib").value,
-                        logo: document.getElementById("company-logo").value
+                        logo: document.getElementById("logo-preview").src
                     },
                     client: {
                         name: document.getElementById("client-name").value,
@@ -1294,12 +1304,13 @@
                     document.getElementById("company-mf").value = inv.company.mf || "";
                     document.getElementById("company-rc").value = inv.company.rc || "";
                     document.getElementById("company-rib").value = inv.company.rib || "";
-                    document.getElementById("company-logo").value = inv.company.logo || "";
+                    // file inputs cannot be pre-filled for security reasons; just update preview
                     document.getElementById("logo-preview").src = inv.company.logo || "";
                 }
 
                 if (inv.client) {
                     document.getElementById("client-name").value = inv.client.name || "";
+                    document.getElementById("client-email").value = inv.client.email || "";
                     document.getElementById("client-phone").value = inv.client.phone || "";
                     document.getElementById("client-address").value = inv.client.address || "";
                     document.getElementById("client-code").value = inv.client.code || "";
