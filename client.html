@@ -367,7 +367,7 @@
 
 
             // Load invoices
-            await loadInvoices(user.uid);
+            await loadInvoices(user.uid, user.email);
 
             // Connection monitoring
             window.addEventListener('online', updateConnectionStatus);
@@ -387,23 +387,53 @@
             }
         }
 
-        function loadInvoices(uid) {
+        function loadInvoices(uid, userEmail) {
             const container = document.getElementById('invoices-content');
 
+            // Try primary query by clientUid
             const q = query(collection(db, "invoices"), where("clientUid", "==", uid));
+            
             onSnapshot(q, (snap) => {
-                if (snap.empty) {
+                let invoices = [];
+                snap.forEach(d => invoices.push({ id: d.id, ...d.data() }));
+                
+                // Fallback: if no invoices found by clientUid, query by clientEmail
+                if (invoices.length === 0 && userEmail) {
+                    console.log("ℹ️ No invoices by clientUid, trying clientEmail fallback...");
+                    const qEmail = query(collection(db, "invoices"), where("clientEmail", "==", userEmail.toLowerCase()));
+                    onSnapshot(qEmail, (emailSnap) => {
+                        invoices = [];
+                        emailSnap.forEach(d => {
+                            const invData = d.data();
+                            // Only include invoices that match our email
+                            if ((invData.clientEmail || '').toLowerCase() === userEmail.toLowerCase()) {
+                                invoices.push({ id: d.id, ...invData });
+                            }
+                        });
+                        renderInvoiceTable(invoices);
+                    }, (err) => {
+                        console.error("Email fallback error:", err);
+                        renderInvoiceTable(invoices);
+                    });
+                } else {
+                    renderInvoiceTable(invoices);
+                }
+            }, (err) => {
+                console.error("Invoices load error:", err);
+                container.innerHTML = `<div class="empty-state"><p>Error loading invoices: ${err.message}</p></div>`;
+            });
+            
+            function renderInvoiceTable(invoices) {
+                if (invoices.length === 0) {
                     container.innerHTML = `<div class="empty-state">
-            <div class="emoji">??</div>
-            <p>No invoices yet. Your invoices will appear here once created by the store.</p></div>`;
+                <div class="emoji">📭</div>
+                <p>No invoices yet. Your invoices will appear here once created by the store.</p></div>`;
                     document.getElementById('stat-total-invoices').textContent = '0';
                     document.getElementById('stat-total-spent').textContent = '0.000';
-                    document.getElementById('stat-last-invoice').textContent = 'Â—';
+                    document.getElementById('stat-last-invoice').textContent = '—';
                     return;
                 }
 
-                let invoices = [];
-                snap.forEach(d => invoices.push({ id: d.id, ...d.data() }));
                 invoices.sort((a, b) => new Date(b.date) - new Date(a.date));
 
                 const totalSpent = invoices.reduce((s, i) => s + (i.totalTTC || 0), 0);
@@ -427,9 +457,7 @@
           </tr></thead>
           <tbody>${rows}</tbody>
         </table>`;
-            }, (err) => {
-                container.innerHTML = `<div class="empty-state"><p>Error loading invoices: ${err.message}</p></div>`;
-            });
+            }
         }
 
         window.doLogout = async function () {

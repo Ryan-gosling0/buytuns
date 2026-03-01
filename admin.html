@@ -510,7 +510,7 @@
             import {
                 collection, doc,
                 getDocs, getDoc, setDoc, updateDoc, deleteDoc,
-                onSnapshot, serverTimestamp, query, orderBy
+                onSnapshot, serverTimestamp, query, orderBy, where
             } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 
@@ -656,10 +656,29 @@
                 }
             }
 
+            // Helper: Sanitize doc IDs (remove slashes and special chars)
+            function sanitizeDocId(id) {
+                return String(id).replace(/[^a-zA-Z0-9-_]/g, '_').substring(0, 255);
+            }
+
+            // Helper: Find user UID by email
+            async function findUserByEmail(email) {
+                if (!email) return null;
+                try {
+                    const q = query(collection(db, "users"), where("email", "==", email.toLowerCase()));
+                    const snap = await getDocs(q);
+                    if (!snap.empty) return snap.docs[0].id;
+                } catch (e) {
+                    console.warn("Error finding user by email:", e);
+                }
+                return null;
+            }
+
             async function saveProducts() {
                 try {
                     for (const p of products) {
-                        const docId = p._docId || p.id;
+                        // Sanitize product ID to prevent Firestore path errors
+                        const docId = p._docId || sanitizeDocId(p.id);
                         await setDoc(doc(db, "products", String(docId)), {
                             id: p.id, name: p.name, category: p.category,
                             price: p.price, stock: p.stock,
@@ -683,10 +702,22 @@
             }
 
             async function saveOneInvoice(invData) {
-                const docId = invData.number.replace(/[^a-zA-Z0-9-_]/g, '_');
+                const docId = sanitizeDocId(invData.number);
                 const toSave = { ...invData };
                 delete toSave._docId;
                 toSave.savedAt = serverTimestamp();
+                
+                // Look up client UID by email to enable client-side filtering
+                if (toSave.clientEmail) {
+                    const clientUid = await findUserByEmail(toSave.clientEmail);
+                    if (clientUid) {
+                        toSave.clientUid = clientUid;
+                        console.log("✅ Invoice linked to client UID:", clientUid);
+                    } else {
+                        console.warn("⚠️ Could not find user with email:", toSave.clientEmail);
+                    }
+                }
+                
                 await setDoc(doc(db, "invoices", docId), toSave);
                 invData._docId = docId;
             }
@@ -1461,6 +1492,8 @@
             window.loadFromFirestore = loadFromFirestore;
             window.saveProducts = saveProducts;
             window.saveOneInvoice = saveOneInvoice;
+            window.sanitizeDocId = sanitizeDocId;
+            window.findUserByEmail = findUserByEmail;
 
         </script>
 </body>
