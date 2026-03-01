@@ -1,0 +1,863 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Invoice - NaggyStore</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        header h1 {
+            color: #667eea;
+            font-size: 24px;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5568d3;
+        }
+
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+
+        .btn-success {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .btn-danger {
+            background: #f44336;
+            color: white;
+        }
+
+        .btn-logout {
+            background: #ff6b6b;
+            color: white;
+        }
+
+        main {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 1200px) {
+            main {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .card h2 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 18px;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .field-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #333;
+            font-size: 12px;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="number"],
+        input[type="date"],
+        select {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 13px;
+        }
+
+        input:focus,
+        select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 4px rgba(102, 126, 234, 0.3);
+        }
+
+        .editor-fields {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .editor-fields label {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .invoice-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+            margin: 15px 0;
+        }
+
+        .invoice-table thead {
+            background: #f5f5f5;
+            border: 1px solid #ddd;
+        }
+
+        .invoice-table th {
+            padding: 10px;
+            text-align: left;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .invoice-table td {
+            padding: 8px 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .invoice-table input[type="number"],
+        .invoice-table select {
+            width: 100%;
+            padding: 4px;
+            font-size: 11px;
+        }
+
+        .delete-btn {
+            background: #f44336;
+            color: white;
+            padding: 4px 8px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 11px;
+        }
+
+        .delete-btn:hover {
+            background: #da190b;
+        }
+
+        .summary {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 4px;
+            margin-top: 15px;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 13px;
+        }
+
+        .summary-row strong {
+            color: #667eea;
+        }
+
+        .total-row {
+            display: flex;
+            justify-content: space-between;
+            padding-top: 10px;
+            border-top: 2px solid #667eea;
+            font-size: 14px;
+            font-weight: bold;
+            color: #667eea;
+            margin-top: 10px;
+        }
+
+        .stock-view {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 4px;
+            max-height: 600px;
+            overflow-y: auto;
+        }
+
+        .product-item {
+            background: white;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .product-item:hover {
+            border-color: #667eea;
+            background: #f0f5ff;
+            box-shadow: 0 2px 6px rgba(102, 126, 234, 0.2);
+        }
+
+        .product-item h4 {
+            color: #333;
+            margin-bottom: 4px;
+            font-size: 12px;
+        }
+
+        .product-item p {
+            color: #666;
+            font-size: 11px;
+            margin: 2px 0;
+        }
+
+        .product-item .price {
+            color: #667eea;
+            font-weight: bold;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #999;
+        }
+
+        .empty-state .emoji {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .tab-btn {
+            padding: 8px 16px;
+            background: #f0f0f0;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .tab-btn.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: bold;
+        }
+
+        .status-draft {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-saved {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        #firebase-status {
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .search-box {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 13px;
+        }
+
+        .invoices-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .invoice-card {
+            background: #f9f9f9;
+            padding: 10px;
+            margin-bottom: 8px;
+            border-left: 4px solid #667eea;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .invoice-card:hover {
+            background: #f0f5ff;
+        }
+
+        .invoice-card h4 {
+            color: #333;
+            font-size: 12px;
+            margin-bottom: 4px;
+        }
+
+        .invoice-card p {
+            color: #666;
+            font-size: 11px;
+            margin: 2px 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <div>
+                <h1>📋 Invoice Creator</h1>
+            </div>
+            <div class="header-actions">
+                <span id="firebase-status">Loading...</span>
+                <button class="btn-secondary" onclick="window.location.href='client.html'">← Back to Invoices</button>
+                <button class="btn-logout" onclick="doLogout()">Sign Out</button>
+            </div>
+        </header>
+
+        <main>
+            <!-- Left: Invoice Editor -->
+            <div class="card">
+                <h2>Create & Manage Invoices</h2>
+
+                <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                    <button class="btn-primary" onclick="newInvoice()">+ New Invoice</button>
+                    <button class="btn-success" onclick="saveCurrentInvoice()">💾 Save Invoice</button>
+                </div>
+
+                <!-- Invoice Details -->
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px;">
+                    <div class="field-group">
+                        <label>Invoice #</label>
+                        <input type="text" id="invoice-id" placeholder="INV-..." readonly style="background: #f5f5f5;">
+                    </div>
+                    <div class="field-group">
+                        <label>Date</label>
+                        <input type="date" id="invoice-date">
+                    </div>
+                </div>
+
+                <!-- Client Info (Pre-filled) -->
+                <div class="field-group">
+                    <label style="font-weight: bold; color: #667eea;">Your Details</label>
+                </div>
+                <div class="editor-fields">
+                    <label>Name<input type="text" id="client-name" readonly style="background: #f5f5f5;"></label>
+                    <label>Email<input type="email" id="client-email" readonly style="background: #f5f5f5;"></label>
+                    <label>Phone<input type="text" id="client-phone"></label>
+                    <label>Address<input type="text" id="client-address"></label>
+                </div>
+
+                <!-- Items Table -->
+                <div style="overflow:auto; border:1px solid #ccc; border-radius:4px; margin:15px 0;">
+                    <table class="invoice-table" id="invoice-table">
+                        <thead>
+                            <tr>
+                                <th width="12%">Ref</th>
+                                <th width="22%">Article</th>
+                                <th width="10%">Color</th>
+                                <th width="8%">Qty</th>
+                                <th width="10%">Price</th>
+                                <th width="8%">Discount %</th>
+                                <th width="10%">Amount</th>
+                                <th width="8%">VAT %</th>
+                                <th width="5%">Del</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+
+                <!-- Fees -->
+                <div class="field-group">
+                    <label style="font-weight: bold; color: #667eea;">Fees & Adjustments</label>
+                </div>
+                <div class="editor-fields">
+                    <label>Transport<input type="number" step="0.001" id="fee-transport" value="0"></label>
+                    <label>Installation<input type="number" step="0.001" id="fee-installation" value="0"></label>
+                    <label>Charges<input type="number" step="0.001" id="fee-frais" value="0"></label>
+                    <label>Warranty<input type="number" step="0.001" id="fee-garantie" value="0"></label>
+                </div>
+
+                <!-- Totals -->
+                <div class="summary">
+                    <div class="summary-row">
+                        <span>Subtotal HT:</span>
+                        <strong id="subtotal">0.000</strong>
+                    </div>
+                    <div class="summary-row">
+                        <span>VAT:</span>
+                        <strong id="tva">0.000</strong>
+                    </div>
+                    <div class="summary-row">
+                        <span>Fees:</span>
+                        <strong id="fees-total">0.000</strong>
+                    </div>
+                    <div class="total-row">
+                        <span>Total TTC:</span>
+                        <span id="total">0.000 DNT</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right: Product Catalog & My Invoices -->
+            <div>
+                <div class="card" style="margin-bottom: 20px;">
+                    <h2>Products</h2>
+                    <input type="text" class="search-box" id="product-search" placeholder="Search products...">
+                    <div class="stock-view" id="products-list">
+                        <div class="empty-state">
+                            <div class="emoji">📦</div>
+                            <p>Loading products...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2>My Invoices</h2>
+                    <div class="invoices-list" id="my-invoices-list">
+                        <div class="empty-state">
+                            <div class="emoji">📁</div>
+                            <p>No invoices yet</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script type="module">
+        import { auth, db, persistenceReady } from "./firebase-config.js";
+        import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { collection, query, where, onSnapshot, setDoc, doc, serverTimestamp, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firestore.js";
+
+        // State
+        let currentUser = null;
+        let products = [];
+        let currentInvoice = [];
+        let myInvoices = [];
+        let editingInvoiceId = null;
+
+        // Initialize
+        await persistenceReady;
+        setupAuthListener();
+        setupProductSync();
+
+        async function setupAuthListener() {
+            onAuthStateChanged(auth, async (user) => {
+                if (!user) {
+                    window.location.href = 'login.html';
+                    return;
+                }
+
+                currentUser = user;
+                document.getElementById('client-name').value = user.displayName || user.email.split('@')[0];
+                document.getElementById('client-email').value = user.email;
+                document.getElementById('invoice-date').valueAsDate = new Date();
+
+                loadMyInvoices();
+                newInvoice();
+            });
+        }
+
+        function setupProductSync() {
+            try {
+                onSnapshot(collection(db, "products"), (snap) => {
+                    products = [];
+                    snap.forEach(d => {
+                        const data = d.data();
+                        data._docId = d.id;
+                        if (data.id) data.id = String(data.id);
+                        products.push(data);
+                    });
+                    console.log("✅ Products loaded:", products.length);
+                    renderProductsList();
+                    updateFirebaseStatus(true);
+                });
+            } catch (e) {
+                console.error("Products load error:", e);
+                updateFirebaseStatus(false);
+            }
+        }
+
+        function renderProductsList() {
+            const container = document.getElementById('products-list');
+            const searchTerm = document.getElementById('product-search').value.toLowerCase();
+
+            const filtered = products.filter(p =>
+                String(p.id).toLowerCase().includes(searchTerm) ||
+                String(p.name).toLowerCase().includes(searchTerm) ||
+                String(p.category).toLowerCase().includes(searchTerm)
+            );
+
+            if (filtered.length === 0) {
+                container.innerHTML = `<div class="empty-state"><p>No products found</p></div>`;
+                return;
+            }
+
+            container.innerHTML = filtered.map(p => `
+                <div class="product-item" onclick="addProductToInvoice('${p.id}')">
+                    <h4>${p.name}</h4>
+                    <p><strong>${p.id}</strong> • ${p.category}</p>
+                    <p>${p.colors ? (Array.isArray(p.colors) ? p.colors.join(", ") : p.colors) : "—"}</p>
+                    <p class="price">${Number(p.price || 0).toFixed(3)} DNT ${p.stock > 0 ? `(Stock: ${p.stock})` : "(Out of Stock)"}</p>
+                </div>
+            `).join('');
+        }
+
+        window.addProductToInvoice = function(productId) {
+            const p = products.find(prod => prod.id === productId);
+            if (!p) return;
+
+            let colors = p.colors;
+            if (typeof colors === 'string') {
+                colors = colors.split(/[,|]/).map(c => c.trim()).filter(c => c);
+            } else if (!Array.isArray(colors)) {
+                colors = [];
+            }
+
+            currentInvoice.push({
+                ...p,
+                colors: colors,
+                quantity: 1,
+                selectedColor: colors[0] || "",
+                tvaRate: 19,
+                discount: 0
+            });
+
+            renderInvoiceTable();
+            updateTotals();
+        };
+
+        window.removeInvoiceItem = function(idx) {
+            currentInvoice.splice(idx, 1);
+            renderInvoiceTable();
+            updateTotals();
+        };
+
+        window.updateInvItem = function(idx, field, val) {
+            if (!currentInvoice[idx]) return;
+
+            if (field === "qty") {
+                let v = parseInt(val) || 1;
+                if (v < 1) v = 1;
+                currentInvoice[idx].quantity = v;
+            } else if (field === "color") {
+                currentInvoice[idx].selectedColor = val;
+            } else if (field === "disc") {
+                currentInvoice[idx].discount = parseFloat(val) || 0;
+            } else if (field === "tva") {
+                currentInvoice[idx].tvaRate = parseFloat(val) || 0;
+            }
+
+            renderInvoiceTable();
+            updateTotals();
+        };
+
+        function renderInvoiceTable() {
+            const tbody = document.querySelector("#invoice-table tbody");
+            tbody.innerHTML = "";
+
+            currentInvoice.forEach((item, idx) => {
+                const qty = parseInt(item.quantity) || 1;
+                const price = parseFloat(item.price) || 0;
+                const disc = parseFloat(item.discount) || 0;
+                const tvaRate = parseFloat(item.tvaRate) || 19;
+
+                const rowTotal = price * qty * (1 - disc / 100);
+
+                const colorOpts = (Array.isArray(item.colors) ? item.colors : [])
+                    .map(c => `<option value="${c}" ${c === item.selectedColor ? "selected" : ""}>${c}</option>`)
+                    .join("");
+
+                const tr = document.createElement("tr");
+                tr.innerHTML = `
+                    <td>${item.id}</td>
+                    <td>${item.name}</td>
+                    <td><select onchange="window.updateInvItem(${idx}, 'color', this.value)">${colorOpts}</select></td>
+                    <td><input type="number" min="1" value="${qty}" onchange="window.updateInvItem(${idx}, 'qty', this.value)"></td>
+                    <td>${price.toFixed(3)}</td>
+                    <td><input type="number" min="0" max="100" value="${disc}" onchange="window.updateInvItem(${idx}, 'disc', this.value)"></td>
+                    <td><b>${rowTotal.toFixed(3)}</b></td>
+                    <td><input type="number" value="${tvaRate}" onchange="window.updateInvItem(${idx}, 'tva', this.value)"></td>
+                    <td><button class="delete-btn" onclick="window.removeInvoiceItem(${idx})">x</button></td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function updateTotals() {
+            let totalHT = 0;
+            let totalTVA = 0;
+
+            currentInvoice.forEach(item => {
+                const qty = parseInt(item.quantity) || 1;
+                const price = parseFloat(item.price) || 0;
+                const disc = parseFloat(item.discount) || 0;
+                const tvaRate = parseFloat(item.tvaRate) || 19;
+
+                const rowTotal = price * qty * (1 - disc / 100);
+                const baseHT = rowTotal / (1 + tvaRate / 100);
+                const tvaVal = rowTotal - baseHT;
+
+                totalHT += baseHT;
+                totalTVA += tvaVal;
+            });
+
+            const transport = parseFloat(document.getElementById("fee-transport").value) || 0;
+            const installation = parseFloat(document.getElementById("fee-installation").value) || 0;
+            const frais = parseFloat(document.getElementById("fee-frais").value) || 0;
+            const garantie = parseFloat(document.getElementById("fee-garantie").value) || 0;
+
+            const feesTotal = transport + installation + frais + garantie;
+
+            document.getElementById("subtotal").textContent = totalHT.toFixed(3);
+            document.getElementById("tva").textContent = totalTVA.toFixed(3);
+            document.getElementById("fees-total").textContent = feesTotal.toFixed(3);
+
+            const grandTotal = (totalHT + totalTVA) + feesTotal;
+            document.getElementById("total").textContent = grandTotal.toFixed(3) + " DNT";
+        }
+
+        window.newInvoice = function() {
+            currentInvoice = [];
+            editingInvoiceId = null;
+            document.getElementById("invoice-id").value = "INV-" + Date.now();
+            document.getElementById("invoice-date").valueAsDate = new Date();
+            document.getElementById("client-phone").value = "";
+            document.getElementById("client-address").value = "";
+            document.getElementById("fee-transport").value = 0;
+            document.getElementById("fee-installation").value = 0;
+            document.getElementById("fee-frais").value = 0;
+            document.getElementById("fee-garantie").value = 0;
+            renderInvoiceTable();
+            updateTotals();
+        };
+
+        window.saveCurrentInvoice = async function() {
+            if (!currentUser) {
+                alert("You must be logged in to save invoices");
+                return;
+            }
+
+            if (currentInvoice.length === 0) {
+                alert("Please add at least one item to the invoice");
+                return;
+            }
+
+            const invNumber = document.getElementById("invoice-id").value || "INV-" + Date.now();
+            
+            // Calculate totals
+            let totalHT = 0, totalTVA = 0;
+            currentInvoice.forEach(item => {
+                const qty = parseInt(item.quantity) || 1;
+                const price = parseFloat(item.price) || 0;
+                const disc = parseFloat(item.discount) || 0;
+                const tvaRate = parseFloat(item.tvaRate) || 19;
+                const rowTotal = price * qty * (1 - disc / 100);
+                const baseHT = rowTotal / (1 + tvaRate / 100);
+                totalHT += baseHT;
+                totalTVA += rowTotal - baseHT;
+            });
+
+            const transport = parseFloat(document.getElementById("fee-transport").value) || 0;
+            const installation = parseFloat(document.getElementById("fee-installation").value) || 0;
+            const frais = parseFloat(document.getElementById("fee-frais").value) || 0;
+            const garantie = parseFloat(document.getElementById("fee-garantie").value) || 0;
+            const feesTotal = transport + installation + frais + garantie;
+            const totalTTC = (totalHT + totalTVA) + feesTotal;
+
+            const invoiceData = {
+                number: invNumber,
+                date: document.getElementById("invoice-date").value,
+                clientUid: currentUser.uid,
+                clientEmail: currentUser.email,
+                clientName: document.getElementById("client-name").value,
+                clientPhone: document.getElementById("client-phone").value,
+                clientAddress: document.getElementById("client-address").value,
+                items: currentInvoice.map(item => ({
+                    id: item.id,
+                    name: item.name,
+                    price: item.price,
+                    quantity: item.quantity,
+                    selectedColor: item.selectedColor,
+                    discount: item.discount,
+                    tvaRate: item.tvaRate
+                })),
+                totals: {
+                    ht: totalHT,
+                    tva: totalTVA,
+                    fees: feesTotal,
+                    ttc: totalTTC
+                },
+                fees: {
+                    transport,
+                    installation,
+                    frais,
+                    garantie
+                },
+                savedAt: serverTimestamp(),
+                status: "draft"
+            };
+
+            try {
+                const docId = invNumber.replace(/[^a-zA-Z0-9-_]/g, '_').substring(0, 255);
+                await setDoc(doc(db, "invoices", docId), invoiceData);
+                alert("✅ Invoice saved successfully!");
+                loadMyInvoices();
+                newInvoice();
+            } catch (e) {
+                console.error("Save error:", e);
+                alert("❌ Error saving invoice: " + e.message);
+            }
+        };
+
+        function loadMyInvoices() {
+            if (!currentUser) return;
+
+            const q = query(collection(db, "invoices"), where("clientUid", "==", currentUser.uid));
+            try {
+                onSnapshot(q, (snap) => {
+                    myInvoices = [];
+                    snap.forEach(d => {
+                        myInvoices.push({ id: d.id, ...d.data() });
+                    });
+                    renderMyInvoicesList();
+                });
+            } catch (e) {
+                console.error("Load invoices error:", e);
+            }
+        }
+
+        function renderMyInvoicesList() {
+            const container = document.getElementById('my-invoices-list');
+            if (myInvoices.length === 0) {
+                container.innerHTML = `<div class="empty-state"><div class="emoji">📁</div><p>No invoices yet</p></div>`;
+                return;
+            }
+
+            myInvoices.sort((a, b) => new Date(b.savedAt || 0) - new Date(a.savedAt || 0));
+
+            container.innerHTML = myInvoices.map(inv => `
+                <div class="invoice-card" onclick="window.editInvoice('${inv.id}')">
+                    <h4>${inv.number}</h4>
+                    <p><strong>${inv.date}</strong></p>
+                    <p>${inv.items ? inv.items.length : 0} items — <span class="price">${(inv.totals?.ttc || 0).toFixed(3)} DNT</span></p>
+                    <span class="status status-draft">${inv.status || 'draft'}</span>
+                </div>
+            `).join('');
+        }
+
+        window.editInvoice = function(invId) {
+            const inv = myInvoices.find(i => i.id === invId);
+            if (!inv) return;
+
+            editingInvoiceId = invId;
+            currentInvoice = JSON.parse(JSON.stringify(inv.items || []));
+            document.getElementById("invoice-id").value = inv.number;
+            document.getElementById("invoice-date").value = inv.date;
+            document.getElementById("client-phone").value = inv.clientPhone || "";
+            document.getElementById("client-address").value = inv.clientAddress || "";
+
+            if (inv.fees) {
+                document.getElementById("fee-transport").value = inv.fees.transport || 0;
+                document.getElementById("fee-installation").value = inv.fees.installation || 0;
+                document.getElementById("fee-frais").value = inv.fees.frais || 0;
+                document.getElementById("fee-garantie").value = inv.fees.garantie || 0;
+            }
+
+            renderInvoiceTable();
+            updateTotals();
+            document.querySelector('.card').scrollIntoView({ behavior: 'smooth' });
+        };
+
+        function updateFirebaseStatus(online) {
+            const el = document.getElementById('firebase-status');
+            if (online) {
+                el.textContent = '✅ Synced';
+                el.style.color = '#4CAF50';
+            } else {
+                el.textContent = '❌ Offline';
+                el.style.color = '#f44336';
+            }
+        }
+
+        document.getElementById('product-search').addEventListener('input', renderProductsList);
+
+        window.doLogout = async function() {
+            await signOut(auth);
+            window.location.href = 'login.html';
+        };
+    </script>
+</body>
+
+</html>
