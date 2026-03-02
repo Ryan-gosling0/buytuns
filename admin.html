@@ -654,17 +654,7 @@
                 console.log("🚀 Admin panel initialization started...");
                 // If we're a client (not an admin), hide the manage-users button was handled above,
                 // but also prefill client fields whenever we create a new invoice.
-                if (currentUserRole !== 'admin' && auth.currentUser) {
-                    const emailEl = document.getElementById('client-email');
-                    if (emailEl) {
-                        emailEl.value = auth.currentUser.email || '';
-                        emailEl.readOnly = true;
-                    }
-                    const nameEl = document.getElementById('client-name');
-                    if (nameEl) {
-                        nameEl.value = auth.currentUser.displayName || (auth.currentUser.email || '').split('@')[0];
-                    }
-                }
+                // No auto-prefill for client info, allowing manual entry for all users.
 
                 // Default tab
                 switchTab('dashboard');
