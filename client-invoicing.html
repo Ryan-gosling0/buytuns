@@ -590,11 +590,6 @@
                 if (currentUserRole !== 'admin') {
                     const btn = document.getElementById('manage-users-btn');
                     if (btn) btn.style.display = 'none';
-                    // also hide the column header for client in the invoices table
-                    const ths = document.querySelectorAll('#tab-invoices table thead th');
-                    if (ths && ths.length >= 3) {
-                        ths[2].style.display = 'none';
-                    }
                 }
 
                 // Load data from Firestore
@@ -1419,9 +1414,6 @@
                 if (!invData.number) {
                     return alert("Invoice ID is missing. Please try again.");
                 }
-                if (!editMode && invoices.some(i => i.number === invData.number)) {
-                    return alert("An invoice with this number already exists.");
-                }
                 // ensure item quantities positive
                 for (const it of invData.items) {
                     if ((parseFloat(it.quantity) || 0) <= 0) {
@@ -1509,11 +1501,10 @@
                     if (term && !searchStr.includes(term)) return;
 
                     const tr = document.createElement("tr");
-                    const isClientView = currentUserRole !== 'admin';
                     tr.innerHTML = `
       <td>${inv.number}</td>
       <td>${inv.date}</td>
-      ${isClientView ? '' : `<td>${inv.client.name}</td>`}
+      <td>${inv.client?.name || ""}</td>
       <td>${inv.items.length}</td>
       <td><b>${(inv.totalTTC || 0).toFixed(3)}</b></td>
       <td>

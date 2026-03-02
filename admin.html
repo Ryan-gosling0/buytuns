@@ -266,6 +266,50 @@
             font-size: 16px;
         }
 
+        /* DASHBOARD CARDS */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            border-bottom: 4px solid #4CAF50;
+            transition: transform 0.2s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-card .value {
+            font-size: 32px;
+            font-weight: 800;
+            color: #2c3e50;
+            margin-bottom: 8px;
+        }
+
+        .stat-card .label {
+            font-size: 14px;
+            color: #7f8c8d;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+        }
+
+        .dashboard-panel {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
         /* PRINT STYLES */
         @page {
             size: A4;
@@ -315,10 +359,12 @@
         Factures</h1>
     <div id="top-buttons"
         style="padding:15px; background:#fff; border-bottom:1px solid #eee; display:flex; flex-wrap:wrap; align-items:center; gap:6px;">
-        <span id="firebase-status" style="font-size:12px; color:#4CAF50; font-weight:600; margin-right:6px;">🟢 Checking...
+        <span id="firebase-status" style="font-size:12px; color:#4CAF50; font-weight:600; margin-right:6px;">🟢
+            Checking...
         </span>
         <button onclick="saveAllStocks()">Enregistrer les stocks</button>
         <button onclick="exportCSV()">Exporter (CSV)</button>
+        <button onclick="switchTab('dashboard')" style="background:#673ab7;">📊 Dashboard</button>
         <button onclick="switchTab('stock')">Stock</button>
         <button onclick="switchTab('invoices')">Historique des factures</button>
         <input type="file" id="import-file" accept=".csv,.txt,.tsv,.xlsx,.xls" style="font-size:12px;">
@@ -328,11 +374,55 @@
         <button onclick="startInvoice()" style="background:#2196F3;">Ajouter une facture</button>
         <input type="text" id="invoice-search-bar" placeholder="Rechercher des factures...">
         <span style="flex:1;"></span>
-        <button id="manage-users-btn" onclick="(function() { console.log('Navigating to admin-users.html'); window.location.href='admin-users.html'; })()" style="background:#9c27b0;">👥 Manage Users</button>
+        <button id="manage-users-btn"
+            onclick="(function() { console.log('Navigating to admin-users.html'); window.location.href='admin-users.html'; })()"
+            style="background:#9c27b0;">👥 Manage Users</button>
         <button onclick="doLogout()" style="background:#f44336;">👋 Logout</button>
     </div>
 
     <div class="admin-layout">
+        <!-- DASHBOARD TAB -->
+        <div class="dashboard-panel" id="tab-dashboard" style="display:none;">
+            <h2>Admin Analytics Dashboard</h2>
+            <div class="stats-row">
+                <div class="stat-card" style="border-bottom-color: #4CAF50;">
+                    <div class="value" id="dash-total-sales">0.000</div>
+                    <div class="label">Total Revenue (DNT)</div>
+                </div>
+                <div class="stat-card" style="border-bottom-color: #2196F3;">
+                    <div class="value" id="dash-total-products">0</div>
+                    <div class="label">Total Products</div>
+                </div>
+                <div class="stat-card" style="border-bottom-color: #ff9800;">
+                    <div class="value" id="dash-low-stock">0</div>
+                    <div class="label">Low Stock Alerts</div>
+                </div>
+                <div class="stat-card" style="border-bottom-color: #9c27b0;">
+                    <div class="value" id="dash-total-invoices">0</div>
+                    <div class="label">Total Invoices</div>
+                </div>
+            </div>
+
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px;">
+                <div class="field-group">
+                    <h3>Recent Growth</h3>
+                    <p style="color:#666; font-size:13px;">Manage your store effectively by monitoring these real-time
+                        signals.</p>
+                </div>
+                <div class="field-group">
+                    <h3>Quick Links</h3>
+                    <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                        <button onclick="switchTab('stock')" style="background:#eee; color:#333; font-size:12px;">Manage
+                            Stock</button>
+                        <button onclick="switchTab('invoices')"
+                            style="background:#eee; color:#333; font-size:12px;">View Invoices</button>
+                        <button onclick="window.location.href='admin-users.html'"
+                            style="background:#eee; color:#333; font-size:12px;">User List</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- STOCK TAB -->
         <div class="stock-panel" id="tab-stock">
             <h2>Stock Management</h2>
@@ -522,8 +612,9 @@
             function mergeProducts() {
                 // combine arrays; client items may duplicate store items intentionally
                 products = [...storeProducts, ...clientProducts];
-                console.log("🔀 Merged products, total:", products.length);
+                console.log("✅ Products merged:", products.length);
                 renderStockTable();
+                if (typeof updateDashboard === 'function') updateDashboard();
             }
             let editMode = false;
             let editingInvoiceIndex = -1;
@@ -571,10 +662,13 @@
                     }
                     const nameEl = document.getElementById('client-name');
                     if (nameEl) {
-                        nameEl.value = auth.currentUser.displayName || (auth.currentUser.email||'').split('@')[0];
+                        nameEl.value = auth.currentUser.displayName || (auth.currentUser.email || '').split('@')[0];
                     }
                 }
-                
+
+                // Default tab
+                switchTab('dashboard');
+
                 // Library Check
                 const missing = [];
                 if (typeof Papa === 'undefined') missing.push("PapaParse (CSV)");
@@ -623,7 +717,7 @@
                         renderStockTable(document.getElementById("search-bar").value);
                     });
                 }
-                
+
                 const invoiceSearchBar = document.getElementById("invoice-search-bar");
                 if (invoiceSearchBar) {
                     invoiceSearchBar.addEventListener("input", renderInvoiceHistory);
@@ -639,7 +733,7 @@
                 window.addEventListener('online', updateConnectionStatus);
                 window.addEventListener('offline', updateConnectionStatus);
                 updateConnectionStatus();
-                
+
                 console.log("✅ Admin panel ready!");
             }
 
@@ -692,7 +786,7 @@
                             console.error('Error setting up products listener:', e);
                         }
                     };
-                    
+
                     // Setup client products if not admin
                     const setupClientProducts = () => {
                         if (currentUserRole !== 'admin' && auth.currentUser) {
@@ -718,7 +812,7 @@
                             }
                         }
                     };
-                    
+
                     // Setup invoices listener
                     const setupInvoicesListener = () => {
                         try {
@@ -750,6 +844,7 @@
                                 }
                                 console.log("✅ Invoices loaded from Firestore:", invoices.length);
                                 renderInvoiceHistory();
+                                if (typeof updateDashboard === 'function') updateDashboard();
                             }, (err) => {
                                 console.warn('Invoices Snapshot error (expected if DB not created):', err.message);
                                 renderInvoiceHistory();
@@ -759,12 +854,12 @@
                             renderInvoiceHistory();
                         }
                     };
-                    
+
                     // Setup all listeners
                     setupProductsListener();
                     setupClientProducts();
                     setupInvoicesListener();
-                    
+
                 } catch (e) {
                     console.error('Firestore load error:', e);
                     const statEl = document.getElementById('firebase-status');
@@ -900,7 +995,7 @@
                     toSave.clientUid = auth.currentUser.uid;
                     toSave.clientEmail = (auth.currentUser.email || '').toLowerCase();
                 }
-                
+
                 // Look up client UID by email to enable client-side filtering if still missing
                 if (toSave.clientEmail && !toSave.clientUid) {
                     const clientUid = await findUserByEmail(toSave.clientEmail);
@@ -911,7 +1006,7 @@
                         console.warn("⚠️ Could not find user with email:", toSave.clientEmail);
                     }
                 }
-                
+
                 try {
                     await setDoc(doc(db, "invoices", docId), toSave);
                     console.log('setDoc success for invoice', docId);
@@ -1166,12 +1261,20 @@
 
             // --- INVOICE EDITOR LOGIC ---
             function switchTab(tab) {
-                if (tab === "stock") {
+                if (tab === "dashboard") {
+                    document.getElementById("tab-dashboard").style.display = "flex";
+                    document.getElementById("tab-stock").style.display = "none";
+                    document.getElementById("tab-invoices").style.display = "none";
+                    document.getElementById("invoice-editor").style.display = "none";
+                    updateDashboard();
+                } else if (tab === "stock") {
+                    document.getElementById("tab-dashboard").style.display = "none";
                     document.getElementById("tab-stock").style.display = "flex";
                     document.getElementById("tab-invoices").style.display = "none";
                     // If invoice editor was open, keep it open (side-by-side)
                     // If not, it stays hidden
                 } else if (tab === "invoices") {
+                    document.getElementById("tab-dashboard").style.display = "none";
                     document.getElementById("tab-stock").style.display = "none";
                     document.getElementById("invoice-editor").style.display = "none";
                     document.getElementById("tab-invoices").style.display = "flex";
@@ -1179,6 +1282,23 @@
                     const invSearch = document.getElementById("invoice-search-bar");
                     if (invSearch) invSearch.value = '';
                 }
+            }
+
+            function updateDashboard() {
+                // 1. Total Revenue
+                const revenue = invoices.reduce((sum, inv) => sum + (parseFloat(inv.totalTTC) || 0), 0);
+                document.getElementById('dash-total-sales').textContent = revenue.toFixed(3);
+
+                // 2. Total Invoices
+                document.getElementById('dash-total-invoices').textContent = invoices.length;
+
+                // 3. Products Stats
+                const totalProducts = products.length;
+                document.getElementById('dash-total-products').textContent = totalProducts;
+
+                // 4. Low Stock
+                const lowStockItems = products.filter(p => (parseInt(p.stock) || 0) < 5).length;
+                document.getElementById('dash-low-stock').textContent = lowStockItems;
             }
 
             function addToInvoice(id) {
@@ -1238,7 +1358,7 @@
                 // for clients, prefill their own information automatically
                 if (currentUserRole !== 'admin' && auth.currentUser) {
                     document.getElementById("client-email").value = auth.currentUser.email || "";
-                    document.getElementById("client-name").value = auth.currentUser.displayName || (auth.currentUser.email||'').split('@')[0];
+                    document.getElementById("client-name").value = auth.currentUser.displayName || (auth.currentUser.email || '').split('@')[0];
                 }
                 renderInvoiceEditorTable();
             }
@@ -1417,13 +1537,6 @@
                 if (!invData.number) {
                     return alert("Invoice ID is missing. Please try again.");
                 }
-                if (!editMode && invoices.some(i => i.number === invData.number)) {
-                    return alert("An invoice with this number already exists.");
-                }
-                // Allow offline invoices without email (they'll sync with email when online)
-                if (currentUserRole !== 'admin' && !invData.clientEmail && navigator.onLine) {
-                    return alert("Client email is required. Please add it to your invoice details.");
-                }
                 // ensure item quantities positive
                 for (const it of invData.items) {
                     if ((parseFloat(it.quantity) || 0) <= 0) {
@@ -1508,7 +1621,7 @@
 
                 invoices.forEach(inv => {
                     // Search filter
-                    const searchStr = (inv.number + (inv.client?.name||"") + inv.date).toLowerCase();
+                    const searchStr = (inv.number + (inv.client?.name || "") + inv.date).toLowerCase();
                     if (term && !searchStr.includes(term)) return;
 
                     const tr = document.createElement("tr");
