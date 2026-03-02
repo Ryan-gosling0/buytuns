@@ -1325,6 +1325,23 @@
                     items: JSON.parse(JSON.stringify(currentInvoice))
                 };
 
+                // --- additional validation ---
+                if (!invData.number) {
+                    return alert("Invoice ID is missing. Please try again.");
+                }
+                if (!editMode && invoices.some(i => i.number === invData.number)) {
+                    return alert("An invoice with this number already exists.");
+                }
+                if (currentUserRole !== 'admin' && !invData.clientEmail) {
+                    return alert("Client email is required for your invoices.");
+                }
+                // ensure item quantities positive
+                for (const it of invData.items) {
+                    if ((parseFloat(it.quantity) || 0) <= 0) {
+                        return alert("Quantity must be greater than zero for item " + it.id);
+                    }
+                }
+
                 // Calculate final totals for generic view
                 let rawTotal = 0;
                 invData.items.forEach(i => {
