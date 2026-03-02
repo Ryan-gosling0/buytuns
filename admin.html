@@ -1287,6 +1287,9 @@
                     editingInvoiceIndex = -1;
                     document.getElementById("invoice-editor").style.display = "none";
                     document.getElementById("tab-stock").style.display = "flex"; // Ensure stock comes back
+                    // reset ID so new invoice gets a fresh number
+                    const idEl = document.getElementById("invoice-id");
+                    if (idEl) idEl.value = '';
                 }
             }
 
@@ -1382,7 +1385,15 @@
                     if (p) p.stock -= newItem.quantity;
                 });
                 // persist stocks for both store and client lists
-                await persistAllStocks();
+                console.log('📦 persisting stock updates before invoice save...');
+                try {
+                    await persistAllStocks();
+                    console.log('✅ stock persistence complete');
+                } catch (err) {
+                    console.error('❌ persistAllStocks failed', err);
+                    alert('Error updating stock: ' + err.message);
+                    return;
+                }
                 renderStockTable();
 
                 // Save Invoice to Firestore
@@ -1391,6 +1402,7 @@
                 } else {
                     invoices.push(invData);
                 }
+                console.log('📝 invoices array now', invoices);
                 try {
                     console.log('📝 saving invoice to Firestore...');
                     await saveOneInvoice(invData);

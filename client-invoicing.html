@@ -710,6 +710,7 @@
                                 data._docId = d.id;
                                 invoices.push(data);
                             });
+                        console.log('📥 invoices snapshot', invoices);
                             // fallback by email if client and no results
                             if (currentUserRole !== 'admin' && invoices.length === 0 && auth.currentUser && auth.currentUser.email) {
                                 console.log("ℹ️ No invoices by clientUid, trying clientEmail fallback...");
@@ -1288,6 +1289,8 @@
                     editingInvoiceIndex = -1;
                     document.getElementById("invoice-editor").style.display = "none";
                     document.getElementById("tab-stock").style.display = "flex"; // Ensure stock comes back
+                    const idEl = document.getElementById("invoice-id");
+                    if (idEl) idEl.value = '';
                 }
             }
 
@@ -1383,7 +1386,15 @@
                     if (p) p.stock -= newItem.quantity;
                 });
                 // persist stocks for both store and client lists
-                await persistAllStocks();
+                console.log('📦 persisting stock updates before invoice save...');
+                try {
+                    await persistAllStocks();
+                    console.log('✅ stock persistence complete');
+                } catch (err) {
+                    console.error('❌ persistAllStocks failed', err);
+                    alert('Error updating stock: ' + err.message);
+                    return;
+                }
                 renderStockTable();
 
                 // Save Invoice to Firestore
@@ -1410,11 +1421,8 @@
                 switchTab("invoices");
                 renderInvoiceHistory();
                 alert("Invoice Saved to Cloud Successfully! ☁️");
-                if (window.location.pathname.toLowerCase().endsWith('client-invoicing.html')) {
-                    if (confirm('Invoice saved. Return to your dashboard?')) {
-                        window.location.href = 'client.html';
-                    }
-                }
+                // clear ID for next invoice
+                const idEl = document.getElementById("invoice-id"); if (idEl) idEl.value = '';
                 if (window.location.pathname.toLowerCase().endsWith('client-invoicing.html')) {
                     if (confirm('Invoice saved. Return to your dashboard?')) {
                         window.location.href = 'client.html';
