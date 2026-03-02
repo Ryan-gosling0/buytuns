@@ -1098,6 +1098,9 @@
                     document.getElementById("tab-stock").style.display = "none";
                     document.getElementById("invoice-editor").style.display = "none";
                     document.getElementById("tab-invoices").style.display = "flex";
+                    // clear any existing filter so newly added invoices appear
+                    const invSearch = document.getElementById("invoice-search-bar");
+                    if (invSearch) invSearch.value = '';
                 }
             }
 
@@ -1384,6 +1387,9 @@
                 editingInvoiceIndex = -1;
                 currentInvoice = [];
                 document.getElementById("invoice-editor").style.display = "none";
+                // clear search so saved invoice is visible
+                const invSearch = document.getElementById("invoice-search-bar");
+                if (invSearch) invSearch.value = '';
                 switchTab("invoices");
                 renderInvoiceHistory();
                 alert("Invoice Saved to Cloud Successfully! ☁️");

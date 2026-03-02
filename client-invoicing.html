@@ -1,204 +1,24 @@
 ﻿<!DOCTYPE html>
-<html lang="fr">
-
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NaggyStore Admin – Stock & Factures</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        /* GLOBAL STYLES */
-        * {
-            box-sizing: border-box;
-        }
-
-        body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-            background: #f1f3f6;
-            color: #000;
-        }
-
-        h1,
-        h2 {
-            margin: 0 0 10px 0;
-        }
-
-        button {
-            padding: 6px 12px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: 0.3s;
-            font-size: 12px;
-            font-family: Verdana, sans-serif;
-        }
-
-        /* BUTTONSs */
-        button {
-            text-align: center;
-            font-size: 13px;
-            margin: 0 5px 5px 0;
-            padding: 8px 14px;
-            border-radius: 6px;
-            background-color: #4CAF50;
-            color: white;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-
-        button:hover {
-            background-color: #43a047;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
-        }
-
-        button:active {
-            transform: translateY(2px);
-            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
-        }
-
-        .delete-btn {
-            background-color: #dc3545;
-        }
-
-        .delete-btn:hover {
-            background-color: #c82333;
-        }
-
-        .cancel-btn {
-            background-color: #ff9800;
-        }
-
-        .cancel-btn:hover {
-            background-color: #e68900;
-        }
-
-        #top-buttons button {
-            margin-bottom: 6px;
-        }
-
-        /* LAYOUT */
-        #search-bar,
-        #invoice-search-bar {
-            width: 250px;
-            padding: 6px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-        }
-
-        .admin-layout {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            padding: 15px;
-            height: calc(100vh - 80px);
-        }
-
-        .stock-panel,
-        #tab-stock,
-        .invoice-panel,
-        #invoice-editor,
-        #tab-invoices {
-            background: white;
-            border: 1px solid #ddd;
-            padding: 15px;
-            display: flex;
-            flex-direction: column;
-            border-radius: 4px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
-        }
-
-        .stock-panel h2,
-        #tab-stock h2,
-        .invoice-panel h2,
-        #invoice-editor h2 {
-            padding: 10px;
-            background: #4CAF50;
-            color: white;
-            border-radius: 4px 4px 0 0;
-            margin: -15px -15px 15px -15px;
-        }
-
-        /* TABLES */
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 10px;
-        }
-
-        th,
-        td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: center;
-            font-size: 13px;
-        }
-
-        thead th {
-            position: sticky;
-            top: 0;
-            background: #f8f9fa;
-            color: #333;
-            z-index: 2;
-            border-bottom: 2px solid #ddd;
-        }
-
-        img {
-            max-width: 50px;
-            max-height: 50px;
-            object-fit: contain;
-        }
-
-        /* INVOICE EDITOR SPECIFIC */
-        .invoice-panel {
-            overflow-y: auto;
-        }
-
-        .editor-fields {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-        }
-
-        .editor-fields label {
-            display: flex;
-            flex-direction: column;
-            font-size: 12px;
-            font-weight: bold;
-            color: #555;
-        }
-
-        .editor-fields input,
-        .editor-fields textarea,
-        .editor-fields select {
-            padding: 6px;
-            border: 1px solid #ccc;
-            border-radius: 3px;
-            font-size: 12px;
-            margin-top: 4px;
-        }
-
-        .editor-fields textarea {
-            resize: vertical;
-            min-height: 40px;
-            font-family: inherit;
-        }
-
-        .field-group {
-            border: 1px solid #eee;
-            padding: 10px;
-            border-radius: 6px;
-            background: #fafafa;
-        }
-
-        .field-group h3 {
-            margin: 0 0 10px 0;
-            font-size: 14px;
-            color: #4CAF50;
-            border-bottom: 1px solid #eee;
-            padding-bottom: 5px;
-        }
-
+    <title>Redirecting</title>
+</head>
+<body>
+    <p style="font-family:sans-serif; text-align:center; margin-top:40px;">Redirecting to dashboard</p>
+    <script type="module">
+        import { auth } from "./firebase-config.js";
+        import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        onAuthStateChanged(auth, user => {
+            if (user) {
+                window.location.href = 'admin.html';
+            } else {
+                window.location.href = 'login.html';
+            }
+        });
+    </script>
+</body>
+</html>
         #logo-preview {
             max-height: 60px;
             max-width: 150px;
