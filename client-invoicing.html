@@ -400,7 +400,7 @@
     <script type="module">
         import { auth, db, persistenceReady } from "./firebase-config.js";
         import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { collection, query, where, onSnapshot, setDoc, doc, serverTimestamp, getDocs, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firestore.js";
+        import { collection, query, where, onSnapshot, setDoc, doc, serverTimestamp, getDocs, deleteDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firestore.js";
 
         // Load required libraries
         const scriptsToLoad = [
@@ -705,12 +705,16 @@
                     garantie
                 },
                 savedAt: serverTimestamp(),
-                status: "draft"
+                status: "saved"
             };
 
             try {
                 const docId = invNumber.replace(/[^a-zA-Z0-9-_]/g, '_').substring(0, 255);
                 await setDoc(doc(db, "invoices", docId), invoiceData);
+
+                // decrement stock for each item (client-specific first, fallback to store)
+                await adjustStockOnSave(invoiceData.items);
+
                 alert("✅ Invoice saved successfully!");
                 loadMyInvoices();
                 newInvoice();
@@ -731,6 +735,7 @@
                         myInvoices.push({ id: d.id, ...d.data() });
                     });
                     renderMyInvoicesList();
+                    updateFirebaseStatus(true);
                 });
             } catch (e) {
                 console.error("Load invoices error:", e);
@@ -746,14 +751,23 @@
 
             myInvoices.sort((a, b) => new Date(b.savedAt || 0) - new Date(a.savedAt || 0));
 
-            container.innerHTML = myInvoices.map(inv => `
-                <div class="invoice-card" onclick="window.editInvoice('${inv.id}')">
+            container.innerHTML = myInvoices.map(inv => {
+                const cls = inv.status === 'saved' ? 'status-saved' : 'status-draft';
+                const text = inv.status || 'draft';
+                return `
+                <div class="invoice-card">
                     <h4>${inv.number}</h4>
                     <p><strong>${inv.date}</strong></p>
                     <p>${inv.items ? inv.items.length : 0} items — <span class="price">${(inv.totals?.ttc || 0).toFixed(3)} DNT</span></p>
-                    <span class="status status-draft">${inv.status || 'draft'}</span>
+                    <span class="status ${cls}">${text}</span>
+                    <div style="margin-top:8px; display:flex; gap:6px; flex-wrap:wrap;">
+                        <button onclick="window.editInvoice('${inv.id}')">Edit</button>
+                        <button onclick="window.printInvoice('${inv.id}')">Print</button>
+                        <button class="cancel-btn" onclick="window.cancelInvoice('${inv.id}')">Cancel</button>
+                    </div>
                 </div>
-            `).join('');
+            `;
+            }).join('');
         }
 
         window.editInvoice = function(invId) {
@@ -778,6 +792,145 @@
             updateTotals();
             document.querySelector('.card').scrollIntoView({ behavior: 'smooth' });
         };
+
+        // allow cancellation from client side
+        window.cancelInvoice = async function(invId) {
+            if (!confirm('Cancel this invoice? Stock will be restored and the invoice removed.')) return;
+            const idx = myInvoices.findIndex(i => i.id === invId);
+            if (idx === -1) return;
+            const inv = myInvoices[idx];
+
+            // restore stock locally
+            inv.items.forEach(item => {
+                const cp = clientProducts.find(p => p.id === item.id && p.clientUid === currentUser.uid);
+                if (cp) {
+                    cp.stock = (parseInt(cp.stock) || 0) + (parseInt(item.quantity) || 0);
+                } else {
+                    const sp = storeProducts.find(p => p.id === item.id);
+                    if (sp) sp.stock = (parseInt(sp.stock) || 0) + (parseInt(item.quantity) || 0);
+                }
+            });
+
+            // persist stock changes
+            const updatePromises = [];
+            clientProducts.forEach(p => {
+                if (p._docId) updatePromises.push(updateDoc(doc(db, 'clientProducts', p._docId), { stock: p.stock }).catch(() => {}));
+            });
+            storeProducts.forEach(p => {
+                if (p._docId) updatePromises.push(updateDoc(doc(db, 'products', p._docId), { stock: p.stock }).catch(() => {}));
+            });
+            await Promise.all(updatePromises);
+
+            // delete invoice document
+            if (inv.id) {
+                try { await deleteDoc(doc(db, 'invoices', inv.id)); } catch (e) {}
+            }
+            myInvoices.splice(idx, 1);
+            renderMyInvoicesList();
+            renderProductsList();
+        };
+
+        window.printInvoice = function(invId) {
+            const inv = myInvoices.find(i => i.id === invId);
+            if (!inv) return;
+            const fmt = n => (n || 0).toFixed(3);
+            const cli = {
+                name: inv.clientName || '',
+                phone: inv.clientPhone || '',
+                address: inv.clientAddress || '',
+                email: inv.clientEmail || ''
+            };
+            const fees = inv.fees || {};
+
+            // compute totals and tax breakdown
+            let totalHT = 0, totalTVA = 0;
+            const taxStats = {};
+            const itemsHtml = (inv.items || []).map(item => {
+                const qty = parseInt(item.quantity) || 0;
+                const price = parseFloat(item.price) || 0;
+                const disc = parseFloat(item.discount) || 0;
+                const rate = parseFloat(item.tvaRate) || 0;
+                const rowTotal = price * qty * (1 - disc / 100);
+                const baseHT = rowTotal / (1 + rate / 100);
+                const tvaVal = rowTotal - baseHT;
+                totalHT += baseHT;
+                totalTVA += tvaVal;
+                if (!taxStats[rate]) taxStats[rate] = { base: 0, tva: 0 };
+                taxStats[rate].base += baseHT;
+                taxStats[rate].tva += tvaVal;
+                return `<tr>
+                        <td>${item.name}</td>
+                        <td>${item.id}</td>
+                        <td>${qty}</td>
+                        <td style="text-align:right">${price.toFixed(3)}</td>
+                        <td style="text-align:center">${disc}%</td>
+                        <td style="text-align:right">${rowTotal.toFixed(3)}</td>
+                        <td style="text-align:center">${rate}%</td>
+                    </tr>`;
+            }).join('');
+            const feesSum = (fees.transport||0)+(fees.installation||0)+(fees.frais||0)+(fees.garantie||0);
+            const grandTotal = totalHT + totalTVA + feesSum;
+
+            const taxTableHtml = Object.keys(taxStats).map(k =>
+                `<tr><td>${(taxStats[k].base+taxStats[k].tva).toFixed(3)}</td><td>${taxStats[k].base.toFixed(3)}</td><td>${k}%</td><td>${taxStats[k].tva.toFixed(3)}</td></tr>`
+            ).join('');
+
+            const w = window.open('', 'PrintInvoice', 'width=800,height=900');
+            if (!w) return alert('Popup blocked!');
+            let html = '<html><head><title>' + inv.number + '</title>';
+            html += '<style>body{font-family:Arial,Helvetica,sans-serif;font-size:12px;margin:20px;}table{width:100%;border-collapse:collapse;}td,th{border:1px solid #000;padding:4px;} .header{margin-bottom:20px;} .footer{margin-top:30px;font-size:10px;}</style>';
+            html += '</head><body>';
+            html += '<div class="header"><h2>Invoice ' + inv.number + '</h2>';
+            html += '<div>Date: ' + inv.date + '</div>';
+            html += '<div>Client: ' + cli.name + '</div>';
+            html += '<div>Phone: ' + cli.phone + '</div>';
+            html += '<div>Address: ' + cli.address + '</div></div>';
+            html += '<table><thead><tr><th>Article</th><th>Ref</th><th>Qty</th><th>PU</th><th>Disc</th><th>Total</th><th>VAT</th></tr></thead><tbody>' + itemsHtml + '</tbody></table>';
+            html += '<div class="footer"><strong>Subtotal HT:</strong> ' + fmt(totalHT) + '<br>';
+            html += '<strong>VAT:</strong> ' + fmt(totalTVA) + '<br>';
+            html += '<strong>Fees:</strong> ' + fmt(feesSum) + '<br>';
+            html += '<strong>Total:</strong> ' + fmt(grandTotal) + '</div>';
+            html += '</body></html>';
+            w.document.write(html);
+            w.document.close();
+            w.focus();
+            w.setTimeout(() => w.print(), 500);
+        };
+
+        // adjust stock quantities after an invoice is saved
+        async function adjustStockOnSave(items) {
+            if (!items || !items.length) return;
+            for (const item of items) {
+                const qty = parseInt(item.quantity) || 0;
+                if (qty <= 0) continue;
+
+                // try client products first
+                const cp = clientProducts.find(p => p.id === item.id && p.clientUid === currentUser.uid);
+                if (cp && cp._docId) {
+                    const newStock = Math.max(0, (parseInt(cp.stock) || 0) - qty);
+                    try {
+                        await updateDoc(doc(db, "clientProducts", cp._docId), { stock: newStock });
+                        cp.stock = newStock; // keep local state in sync
+                    } catch (err) {
+                        console.error("Stock update error (client):", err);
+                    }
+                    continue;
+                }
+
+                // fallback: update store product
+                const sp = storeProducts.find(p => p.id === item.id);
+                if (sp && sp._docId) {
+                    const newStock = Math.max(0, (parseInt(sp.stock) || 0) - qty);
+                    try {
+                        await updateDoc(doc(db, "products", sp._docId), { stock: newStock });
+                        sp.stock = newStock;
+                    } catch (err) {
+                        console.error("Stock update error (store):", err);
+                    }
+                }
+            }
+            renderProductsList();
+        }
 
         // CSV/EXCEL IMPORT
         function setupImportListener() {
@@ -873,16 +1026,18 @@
                         const existing = clientProducts.find(p => p.id === id);
                         const pObj = { id, name, category: cat, price, stock, colors: colorArr, image: img, clientUid: currentUser.uid };
 
-                        if (existing) {
+                        let refId;
+                        if (existing && existing._docId) {
                             console.log("✏️ Row", rowIdx, "- Updated:", id);
+                            refId = existing._docId;
                         } else {
                             console.log("✅ Row", rowIdx, "- Added:", id);
+                            refId = (id + "_" + Date.now()).replace(/[^a-zA-Z0-9-_]/g, '_').substring(0, 255);
                         }
                         successCount++;
 
-                        // Save to Firestore
-                        const docId = (id + "_" + Date.now()).replace(/[^a-zA-Z0-9-_]/g, '_').substring(0, 255);
-                        setDoc(doc(db, "clientProducts", docId), pObj).catch(err => console.error("Save error:", err));
+                        // Save to Firestore (update when existing, create new otherwise)
+                        setDoc(doc(db, "clientProducts", refId), pObj).catch(err => console.error("Save error:", err));
                     });
 
                     let msg = "✅ Import successful: " + successCount + " items imported!";
