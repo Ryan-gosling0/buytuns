@@ -751,6 +751,31 @@
                 return null;
             }
 
+            // save only specific product ids (passed as set)
+            async function persistStockSubset(idSet) {
+                try {
+                    const writes = [];
+                    idSet.forEach(id => {
+                        const p = storeProducts.find(x => x.id === id) || clientProducts.find(x => x.id === id);
+                        if (p) {
+                            const docId = p._docId || sanitizeDocId(p.id);
+                            writes.push(setDoc(doc(db, p._origin === 'client' ? "clientProducts" : "products", String(docId)), {
+                                id: p.id, name: p.name, category: p.category,
+                                price: p.price, stock: p.stock,
+                                colors: p.colors || [], image: p.image || ''
+                            }).then(() => {
+                                const orig = (p._origin === 'client' ? clientProducts : storeProducts).find(prod => prod.id === p.id);
+                                if (orig) orig._docId = String(docId);
+                            }));
+                        }
+                    });
+                    await Promise.all(writes);
+                    console.log("✅ Selected stocks saved");
+                } catch (e) {
+                    console.error("Subset save error:", e);
+                }
+            }
+
             // original save for backward compatibility (store products)
             async function saveStoreProducts() {
                 try {
@@ -1380,23 +1405,18 @@
                     });
                 }
                 // 2. Deduct new stock
+                // determine which products will change stock
+                const changed = new Set();
                 invData.items.forEach(newItem => {
                     const p = products.find(x => x.id === newItem.id);
-                    if (p) p.stock -= newItem.quantity;
+                    if (p) {
+                        p.stock -= newItem.quantity;
+                        changed.add(p.id);
+                    }
                 });
-                // persist stocks for both store and client lists
-                console.log('📦 persisting stock updates before invoice save...');
-                try {
-                    await persistAllStocks();
-                    console.log('✅ stock persistence complete');
-                } catch (err) {
-                    console.error('❌ persistAllStocks failed', err);
-                    alert('Error updating stock: ' + err.message);
-                    return;
-                }
                 renderStockTable();
 
-                // Save Invoice to Firestore
+                // Save Invoice to Firestore first so user sees immediate feedback
                 if (editMode && editingInvoiceIndex !== -1) {
                     invoices[editingInvoiceIndex] = invData;
                 } else {
@@ -1409,6 +1429,17 @@
                     console.log('✅ saveOneInvoice completed');
                     const statEl = document.getElementById('firebase-status'); if (statEl) { statEl.textContent = '✅ Saved'; statEl.style.color = '#4CAF50'; }
                 } catch (e) { console.error('❌ saveOneInvoice error', e); alert('Error saving invoice to cloud: ' + e.message); return; }
+
+                // now persist only the changed products asynchronously
+                (async () => {
+                    try {
+                        console.log('📦 persisting changed stocks', Array.from(changed));
+                        await persistStockSubset(changed);
+                        console.log('✅ subset stock persistence complete');
+                    } catch (err) {
+                        console.error('❌ subset persist failed', err);
+                    }
+                })();
 
                 // Cleanup
                 editMode = false;
