@@ -517,7 +517,14 @@
 
             // --- CONFIG & STATE ---
             const ADMIN_PASSWORD = "1234";
-            let products = [], invoices = [], currentInvoice = [];
+            let storeProducts = [], clientProducts = [], products = [], invoices = [], currentInvoice = [];
+
+            function mergeProducts() {
+                // combine arrays; client items may duplicate store items intentionally
+                products = [...storeProducts, ...clientProducts];
+                console.log("🔀 Merged products, total:", products.length);
+                renderStockTable();
+            }
             let editMode = false;
             let editingInvoiceIndex = -1;
             let currentUserRole = null; // 'admin' or 'client' or other
@@ -653,15 +660,16 @@
             async function loadFromFirestore() {
                 try {
                     onSnapshot(collection(db, "products"), (snap) => {
-                        products = [];
+                        storeProducts = [];
                         snap.forEach(d => {
                             const data = d.data();
                             data._docId = d.id;
                             if (data.id) data.id = String(data.id);
-                            products.push(data);
+                            data._origin = 'store';
+                            storeProducts.push(data);
                         });
-                        console.log("✅ Products loaded from Firestore:", products.length);
-                        renderStockTable();
+                        console.log("✅ Store products loaded from Firestore:", storeProducts.length);
+                        mergeProducts();
                         document.getElementById('firebase-status').textContent = '✅ Synced';
                         document.getElementById('firebase-status').style.color = '#4CAF50';
                     }, (err) => {
@@ -669,6 +677,25 @@
                         document.getElementById('firebase-status').textContent = '❌ Error';
                         document.getElementById('firebase-status').style.color = '#f44336';
                     });
+                    
+                    // also listen to client-specific products if not admin
+                    if (currentUserRole !== 'admin' && auth.currentUser) {
+                        const clientCol = query(collection(db, "clientProducts"), where("clientUid", "==", auth.currentUser.uid));
+                        onSnapshot(clientCol, (snap) => {
+                            clientProducts = [];
+                            snap.forEach(d => {
+                                const data = d.data();
+                                data._docId = d.id;
+                                if (data.id) data.id = String(data.id);
+                                data._origin = 'client';
+                                clientProducts.push(data);
+                            });
+                            console.log("✅ Client products loaded from Firestore:", clientProducts.length);
+                            mergeProducts();
+                        }, (err) => {
+                            console.error('ClientProducts Snapshot error:', err);
+                        });
+                    }
                     {
                         // choose query depending on role
                         let invQuery = collection(db, "invoices");
@@ -724,13 +751,11 @@
                 return null;
             }
 
-            async function saveProducts() {
+            // original save for backward compatibility (store products)
+            async function saveStoreProducts() {
                 try {
-                    // Clone array to avoid race condition with Firestore listener
-                    const productsCopy = [...products];
-                    console.log("💾 Saving", productsCopy.length, "products to Firestore...");
-                    
-                    // Batch all saves together to avoid listener interference
+                    const productsCopy = [...storeProducts];
+                    console.log("💾 Saving", productsCopy.length, "store products to Firestore...");
                     const savePromises = productsCopy.map(p => {
                         const docId = p._docId || sanitizeDocId(p.id);
                         return setDoc(doc(db, "products", String(docId)), {
@@ -738,16 +763,12 @@
                             price: p.price, stock: p.stock,
                             colors: p.colors || [], image: p.image || ''
                         }).then(() => {
-                            // Update original product's _docId if it still exists
-                            const origProduct = products.find(prod => prod.id === p.id);
-                            if (origProduct) {
-                                origProduct._docId = String(docId);
-                            }
+                            const orig = storeProducts.find(prod => prod.id === p.id);
+                            if (orig) orig._docId = String(docId);
                         });
                     });
-                    
                     await Promise.all(savePromises);
-                    console.log("✅ All products saved to Firebase successfully");
+                    console.log("✅ Store products saved to Firebase successfully");
                     document.getElementById('firebase-status').textContent = '✅ Saved';
                     document.getElementById('firebase-status').style.color = '#4CAF50';
                 } catch (e) {
@@ -756,6 +777,41 @@
                     document.getElementById('firebase-status').textContent = '❌ Save Failed';
                     document.getElementById('firebase-status').style.color = '#f44336';
                 }
+            }
+
+            async function saveClientProducts() {
+                try {
+                    const productsCopy = [...clientProducts];
+                    console.log("💾 Saving", productsCopy.length, "client products to Firestore...");
+                    const savePromises = productsCopy.map(p => {
+                        const docId = p._docId || sanitizeDocId(p.id + "_" + currentUser.uid);
+                        return setDoc(doc(db, "clientProducts", String(docId)), {
+                            id: p.id, name: p.name, category: p.category,
+                            price: p.price, stock: p.stock,
+                            colors: p.colors || [], image: p.image || '', clientUid: currentUser.uid
+                        }).then(() => {
+                            const orig = clientProducts.find(prod => prod.id === p.id);
+                            if (orig) orig._docId = String(docId);
+                        });
+                    });
+                    await Promise.all(savePromises);
+                    console.log("✅ Client products saved to Firebase successfully");
+                } catch (e) {
+                    console.error("Client save error:", e);
+                }
+            }
+
+            // generic persistence wrapper
+            async function persistAllStocks() {
+                await saveStoreProducts();
+                if (currentUserRole !== 'admin') {
+                    await saveClientProducts();
+                }
+            }
+
+            // backwards compatible alias
+            async function saveProducts() {
+                return saveStoreProducts();
             }
 
             async function saveInvoices() {
@@ -844,26 +900,40 @@
             }
 
             async function saveAllStocks() {
-                products.forEach(p => {
-                    const el = document.getElementById(`stock-${p.id}`);
-                    if (el) p.stock = parseInt(el.value) || 0;
-                });
-                await saveProducts();
+                if (currentUserRole === 'admin') {
+                    storeProducts.forEach(p => {
+                        const el = document.getElementById(`stock-${p.id}`);
+                        if (el) p.stock = parseInt(el.value) || 0;
+                    });
+                    await saveStoreProducts();
+                } else {
+                    clientProducts.forEach(p => {
+                        const el = document.getElementById(`stock-${p.id}`);
+                        if (el) p.stock = parseInt(el.value) || 0;
+                    });
+                    await saveClientProducts();
+                }
                 alert("Stocks mis à jour et sauvegardés dans le cloud!");
+                // refresh display in case any stock values changed externally
+                mergeProducts();
             }
 
             async function deleteProduct(id) {
                 if (prompt("Password:") !== ADMIN_PASSWORD) return alert("Wrong password");
                 if (!confirm("Delete this product?")) return;
-                const p = products.find(x => x.id === id);
-                if (p) {
-                    try {
+                let p = products.find(x => x.id === id);
+                if (!p) return;
+                try {
+                    if (p._origin === 'client') {
+                        if (p._docId) await deleteDoc(doc(db, "clientProducts", p._docId));
+                        clientProducts = clientProducts.filter(x => x.id !== id);
+                    } else {
                         const docId = p._docId || p.id;
                         await deleteDoc(doc(db, "products", String(docId)));
-                    } catch (e) { console.error(e); }
-                }
-                products = products.filter(p => p.id !== id);
-                renderStockTable();
+                        storeProducts = storeProducts.filter(x => x.id !== id);
+                    }
+                } catch (e) { console.error(e); }
+                mergeProducts();
             }
 
             // --- CSV/EXCEL IMPORT/EXPORT ---
@@ -982,24 +1052,26 @@
 
                         const img = (get(["image", "url", "photo"]) || "").toString().trim();
 
-                        // Merge
-                        const existing = products.find(p => p.id === id);
+                        // Merge into correct list depending on role
+                        const targetList = (currentUserRole === 'admin') ? storeProducts : clientProducts;
+                        const existing = targetList.find(p => p.id === id);
                         const pObj = { id, name, category: cat, price, stock, colors: colorArr, image: img };
 
                         if (existing) {
                             Object.assign(existing, pObj);
                             console.log("✏️ Row", rowIdx, "- Updated:", id);
                         } else {
-                            products.push(pObj);
+                            targetList.push(pObj);
                             console.log("✅ Row", rowIdx, "- Added:", id);
                         }
                         successCount++;
                     });
 
-                    console.log("📊 Before saveProducts():", successCount, "items in products array");
-                    await saveProducts();
-                    console.log("📊 After saveProducts():", products.length, "items in products array");
-                    renderStockTable();
+                    console.log("📊 Before saving imported items:", successCount);
+                    // persist both lists (wrapper will handle role check)
+                    await persistAllStocks();
+                    console.log("📊 After save, storeProducts:", storeProducts.length, "clientProducts:", clientProducts.length);
+                    mergeProducts();
 
                     let msg = "Import réussi: " + successCount + " produits sauvegardés dans le cloud ☁️.";
                     if (failCount > 0) msg += "\n(" + failCount + " lignes ignorées sans ID)";
@@ -1276,7 +1348,8 @@
                     const p = products.find(x => x.id === newItem.id);
                     if (p) p.stock -= newItem.quantity;
                 });
-                await saveProducts();
+                // persist stocks for both store and client lists
+                await persistAllStocks();
                 renderStockTable();
 
                 // Save Invoice to Firestore
@@ -1340,7 +1413,7 @@
                         const p = products.find(x => x.id === item.id);
                         if (p) p.stock += item.quantity;
                     });
-                    await saveProducts();
+                    await persistAllStocks();
                     // Remove from Firestore
                     if (inv._docId) {
                         try { await deleteDoc(doc(db, "invoices", inv._docId)); } catch (e) { }
