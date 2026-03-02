@@ -340,11 +340,11 @@
                 <table>
                     <thead>
                         <tr>
-                            <th width="40">SÃ©lectionner</th>
+                            <th width="40"><input type="checkbox" id="select-all" title="Select all"></th>
                             <th width="80">ID</th>
                             <th width="60">Image</th>
                             <th>Nom</th>
-                            <th>CatÃ©gorie</th>
+                            <th>Catégorie</th>
                             <th>Prix</th>
                             <th>Couleurs</th>
                             <th width="60">Stock</th>
@@ -381,7 +381,7 @@
                     <h3>Détails de l'entreprise</h3>
                     <div class="editor-fields">
                         <label>Nom<input type="text" id="company-name" placeholder="Nom de l'entreprise"></label>
-                        <label>TÃ©lÃ©phone<input type="text" id="company-phone" placeholder="TÃ©lÃ©phone"></label>
+                        <label>Téléphone<input type="text" id="company-phone" placeholder="Téléphone"></label>
                         <label>Adresse<input type="text" id="company-address" placeholder="Adresse"></label>
                         <label>Fax<input type="text" id="company-fax" placeholder="Fax"></label>
                         <label>Email<input type="text" id="company-email" placeholder="Email"></label>
@@ -400,25 +400,25 @@
                     <div class="editor-fields">
                         <label>Nom du client<input type="text" id="client-name" placeholder="Nom du client"></label>
                         <label>Email<input type="email" id="client-email" placeholder="client@example.com"></label>
-                        <label>TÃ©lÃ©phone<input type="text" id="client-phone" placeholder="TÃ©lÃ©phone"></label>
+                        <label>Téléphone<input type="text" id="client-phone" placeholder="Téléphone"></label>
                         <label>Adresse<textarea id="client-address" placeholder="Adresse"></textarea></label>
                         <label>Code client<input type="text" id="client-code" placeholder="Code"></label>
                         <label>MF / CIN<input type="text" id="client-mfcin" placeholder="MF ou CIN"></label>
-                        <label>RÃ©f. facture<input type="text" id="client-ref" placeholder="RÃ©fÃ©rence"></label>
+                        <label>Réf. facture<input type="text" id="client-ref" placeholder="Référence"></label>
                     </div>
                     <div style="margin-top:10px; border-top:1px solid #eee; padding-top: -2px;">
                         <label style="font-size:12px; font-weight:bold;">Mode de paiement</label>
                         <select id="payment-mode"
                             style="width:100%; padding:6px; margin-top:4px; border:1px solid #ccc; border-radius:3px;">
                             <option value="CAISSE">CAISSE</option>
-                            <option value="CHÃˆQUE">CHÃˆQUE</option>
+                            <option value="CHÈQUE">CHÈQUE</option>
                             <option value="VIREMENT">VIREMENT</option>
                             <option value="ESPÈCES">ESPÈCES</option>
                             <option value="A TERME">A TERME</option>
                         </select>
                     </div>
                     <div style="margin-top:10px;">
-                        <label style="font-size:12px; font-weight:bold;">ChargÃ©(e)</label>
+                        <label style="font-size:12px; font-weight:bold;">Chargé(e)</label>
                         <input type="text" id="charged-to" placeholder="Nom"
                             style="width:100%; padding:6px; margin-top:4px; border:1px solid #ccc; border-radius:3px;">
                     </div>
@@ -799,6 +799,9 @@
                     String(p.name).toLowerCase().includes(filter) ||
                     String(p.category).toLowerCase().includes(filter)
                 ).forEach(p => {
+                    // each time we re-render we will reset the header checkbox
+                    const headerBox = document.getElementById('select-all');
+                    if (headerBox) headerBox.checked = false;
                     const tr = document.createElement("tr");
                     tr.style.background = p.stock === 0 ? "#fff0f0" : (p.stock < 5 ? "#fffbef" : "#f0fff4");
 
@@ -816,12 +819,28 @@
       <td>${colors}</td>
       <td><input type="number" id="stock-${p.id}" value="${p.stock}" style="width:60px;"></td>
       <td>
-        <button onclick="addToInvoice('${p.id}')" title="Ajouter Ã  la facture" style="background:#2196F3; padding:4px 8px; margin-right:5px;">+</button>
+        <button onclick="addToInvoice('${p.id}')" title="Ajouter à la facture" style="background:#2196F3; padding:4px 8px; margin-right:5px;">+</button>
         <button class="delete-btn" onclick="deleteProduct('${p.id}')">Suppr</button>
       </td>
     `;
                     tbody.appendChild(tr);
                 });
+
+                // select‑all header checkbox logic
+                const rowBoxes = tbody.querySelectorAll('.select-item');
+                const headerBox = document.getElementById('select-all');
+                rowBoxes.forEach(cb => {
+                    cb.onchange = () => {
+                        if (headerBox) {
+                            headerBox.checked = Array.from(rowBoxes).every(x => x.checked);
+                        }
+                    };
+                });
+                if (headerBox) {
+                    headerBox.onchange = () => {
+                        rowBoxes.forEach(x => x.checked = headerBox.checked);
+                    };
+                }
             }
 
             async function saveAllStocks() {
@@ -830,7 +849,7 @@
                     if (el) p.stock = parseInt(el.value) || 0;
                 });
                 await saveProducts();
-                alert("Stocks mis Ã  jour et sauvegardÃ©s dans le cloud!");
+                alert("Stocks mis à jour et sauvegardés dans le cloud!");
             }
 
             async function deleteProduct(id) {
@@ -875,7 +894,7 @@
                 try {
                     if (filename.endsWith('.xlsx') || filename.endsWith('.xls')) {
                         // Excel Logic
-                        if (typeof XLSX === 'undefined') throw new Error("Erreur: Librairie Excel non chargÃ©e.");
+                        if (typeof XLSX === 'undefined') throw new Error("Erreur: Librairie Excel non chargée.");
                         const data = await file.arrayBuffer();
                         const workbook = XLSX.read(data);
                         const sheet = workbook.Sheets[workbook.SheetNames[0]];
@@ -1534,7 +1553,7 @@
                 html += "<tr><td>Total HT</td><td style='text-align:right;'>" + totalHT.toFixed(3) + "</td></tr>";
                 html += "<tr><td>Total TVA</td><td style='text-align:right;'>" + totalTVA.toFixed(3) + "</td></tr>";
                 html += "<tr><td>Timbre Fiscal</td><td style='text-align:right;'>" + fmt(fees.timbre) + "</td></tr>";
-                html += "<tr style='background:#ddd; font-size:14px;'><td>NET Ã€ PAYER TTC</td><td style='text-align:right;'>" + grandTotal.toFixed(3) + "</td></tr>";
+                html += "<tr style='background:#ddd; font-size:14px;'><td>NET À PAYER TTC</td><td style='text-align:right;'>" + grandTotal.toFixed(3) + "</td></tr>";
                 html += "</table></div></div>";
 
                 // Footer

@@ -273,7 +273,7 @@
 
     <div class="topbar">
         <div class="topbar-brand">
-            <div class="icon">??</div>
+            <div class="icon">👤</div>
             NaggyStore
         </div>
         <div class="topbar-right">
@@ -283,7 +283,7 @@
                 <div class="avatar" id="avatar-initial">?</div>
                 <span id="user-name-display">Loading...</span>
             </div>
-            <button class="btn-secondary" onclick="window.location.href='admin.html'" style="background: #667eea; color: white;">+ Create Invoice</button>
+            <button class="btn-secondary" onclick="window.location.href='client-invoicing.html'" style="background: #667eea; color: white;">+ Create Invoice</button>
             <button class="btn-logout" onclick="doLogout()">Sign Out</button>
         </div>
     </div>
@@ -309,7 +309,7 @@
             </div>
         </div>
 
-        <div class="section-title">?? My Invoices</div>
+        <div class="section-title">📄 My Invoices</div>
 
         <div class="invoices-panel">
             <div id="invoices-content">
@@ -348,7 +348,7 @@
             if (userData && userData.status === 'suspended') {
                 document.body.innerHTML = `<div style="display:flex;align-items:center;justify-content:center;min-height:100vh;font-family:Inter,sans-serif;background:#fff">
           <div style="text-align:center;padding:40px;">
-            <div style="font-size:64px;margin-bottom:16px;">??</div>
+            <div style="font-size:64px;margin-bottom:16px;">🚫</div>
             <h2 style="color:#e53935;margin-bottom:8px;">Account Suspended</h2>
             <p style="color:#666;">Please contact the admin at <a href="mailto:ahmedmidonajjar@gmail.com">ahmedmidonajjar@gmail.com</a></p>
           </div>
@@ -364,7 +364,7 @@
             const name = userData.name || user.email;
             document.getElementById('user-name-display').textContent = name;
             document.getElementById('avatar-initial').textContent = name.charAt(0).toUpperCase();
-            document.getElementById('welcome-heading').textContent = `Welcome back, ${name.split(' ')[0]}! ??`;
+            document.getElementById('welcome-heading').textContent = `Welcome back, ${name.split(' ')[0]}! 👋`;
 
 
             // Load invoices
@@ -380,10 +380,10 @@
             const status = document.getElementById('connection-status');
             if (!status) return;
             if (navigator.onLine) {
-                status.textContent = '?? Online';
+                status.textContent = '🟢 Online';
                 status.style.color = '#4CAF50';
             } else {
-                status.textContent = '?? Offline (Using Cache)';
+                status.textContent = '🟡 Offline (Using Cache)';
                 status.style.color = '#ff9800';
             }
         }
