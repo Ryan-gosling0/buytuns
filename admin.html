@@ -820,6 +820,7 @@
 
             async function saveOneInvoice(invData) {
                 const docId = sanitizeDocId(invData.number);
+                console.log('saveOneInvoice called', { invData, docId, currentUserRole });
                 const toSave = { ...invData };
                 delete toSave._docId;
                 toSave.savedAt = serverTimestamp();
@@ -841,7 +842,13 @@
                     }
                 }
                 
-                await setDoc(doc(db, "invoices", docId), toSave);
+                try {
+                    await setDoc(doc(db, "invoices", docId), toSave);
+                    console.log('setDoc success for invoice', docId);
+                } catch (e) {
+                    console.error('setDoc failed', e);
+                    throw e;
+                }
                 invData._docId = docId;
             }
 
@@ -1285,7 +1292,12 @@
 
             // --- VALIDATION & SAVING ---
             async function validateInvoice() {
+                console.log('🔍 validateInvoice start', { currentInvoice });
                 if (currentInvoice.length === 0) return alert("Invoice is empty!");
+                // make sure invoice has an id (in case editor wasn't opened via add/start)
+                if (!document.getElementById("invoice-id").value) {
+                    document.getElementById("invoice-id").value = "INV-" + Date.now();
+                }
 
                 // Capture Data
                 console.log('validateInvoice() called, editMode=', editMode, 'editingInvoiceIndex=', editingInvoiceIndex);
@@ -1345,6 +1357,7 @@
                     }
                 }
 
+                console.log('Prepared invData', invData);
                 // Calculate final totals for generic view
                 let rawTotal = 0;
                 invData.items.forEach(i => {
@@ -1379,8 +1392,11 @@
                     invoices.push(invData);
                 }
                 try {
+                    console.log('📝 saving invoice to Firestore...');
                     await saveOneInvoice(invData);
-                } catch (e) { alert('Error saving invoice to cloud: ' + e.message); return; }
+                    console.log('✅ saveOneInvoice completed');
+                    const statEl = document.getElementById('firebase-status'); if (statEl) { statEl.textContent = '✅ Saved'; statEl.style.color = '#4CAF50'; }
+                } catch (e) { console.error('❌ saveOneInvoice error', e); alert('Error saving invoice to cloud: ' + e.message); return; }
 
                 // Cleanup
                 editMode = false;

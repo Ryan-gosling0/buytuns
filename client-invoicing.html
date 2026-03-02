@@ -315,7 +315,7 @@
         Factures</h1>
     <div id="top-buttons"
         style="padding:15px; background:#fff; border-bottom:1px solid #eee; display:flex; flex-wrap:wrap; align-items:center; gap:6px;">
-        <span id="firebase-status" style="font-size:12px; color:#4CAF50; font-weight:600; margin-right:6px;">?? Checking...
+        <span id="firebase-status" style="font-size:12px; color:#4CAF50; font-weight:600; margin-right:6px;">🟢 Checking...
         </span>
         <button onclick="saveAllStocks()">Enregistrer les stocks</button>
         <button onclick="exportCSV()">Exporter (CSV)</button>
@@ -328,6 +328,7 @@
         <button onclick="startInvoice()" style="background:#2196F3;">Ajouter une facture</button>
         <input type="text" id="invoice-search-bar" placeholder="Rechercher des factures...">
         <span style="flex:1;"></span>
+
         <button onclick="window.location.href='client.html'" style="background:#2196F3;">🏠 Dashboard</button>
         <button onclick="doLogout()" style="background:#f44336;">👋 Logout</button>
     </div>
@@ -344,7 +345,7 @@
                             <th width="80">ID</th>
                             <th width="60">Image</th>
                             <th>Nom</th>
-                            <th>Cat�gorie</th>
+                            <th>Catégorie</th>
                             <th>Prix</th>
                             <th>Couleurs</th>
                             <th width="60">Stock</th>
@@ -358,7 +359,7 @@
 
         <!-- INVOICE EDITOR -->
         <div class="invoice-panel" id="invoice-editor" style="display:none;">
-            <h2>�diteur de facture</h2>
+            <h2>Éditeur de facture</h2>
 
             <!-- Top Meta -->
             <div
@@ -378,10 +379,10 @@
             <div style="display:flex; gap:15px; margin-bottom:15px;">
                 <!-- Company Info -->
                 <div class="field-group" style="flex:1;">
-                    <h3>D�tails de l'entreprise</h3>
+                    <h3>Détails de l'entreprise</h3>
                     <div class="editor-fields">
                         <label>Nom<input type="text" id="company-name" placeholder="Nom de l'entreprise"></label>
-                        <label>T�l�phone<input type="text" id="company-phone" placeholder="T�l�phone"></label>
+                        <label>Téléphone<input type="text" id="company-phone" placeholder="Téléphone"></label>
                         <label>Adresse<input type="text" id="company-address" placeholder="Adresse"></label>
                         <label>Fax<input type="text" id="company-fax" placeholder="Fax"></label>
                         <label>Email<input type="text" id="company-email" placeholder="Email"></label>
@@ -391,34 +392,34 @@
                         <label>RIB<input type="text" id="company-rib" placeholder="RIB"></label>
                         <label>Logo <input type="file" id="company-logo" accept="image/*"></label>
                     </div>
-                    <img id="logo-preview" alt="Aper�u du logo" style="max-width:100px; max-height:100px;">
+                    <img id="logo-preview" alt="Aperçu du logo" style="max-width:100px; max-height:100px;">
                 </div>
 
                 <!-- Client Info -->
                 <div class="field-group" style="flex:1;">
-                    <h3>D�tails du client</h3>
+                    <h3>Détails du client</h3>
                     <div class="editor-fields">
                         <label>Nom du client<input type="text" id="client-name" placeholder="Nom du client"></label>
                         <label>Email<input type="email" id="client-email" placeholder="client@example.com"></label>
-                        <label>T�l�phone<input type="text" id="client-phone" placeholder="T�l�phone"></label>
+                        <label>Téléphone<input type="text" id="client-phone" placeholder="Téléphone"></label>
                         <label>Adresse<textarea id="client-address" placeholder="Adresse"></textarea></label>
                         <label>Code client<input type="text" id="client-code" placeholder="Code"></label>
                         <label>MF / CIN<input type="text" id="client-mfcin" placeholder="MF ou CIN"></label>
-                        <label>R�f. facture<input type="text" id="client-ref" placeholder="R�f�rence"></label>
+                        <label>Réf. facture<input type="text" id="client-ref" placeholder="Référence"></label>
                     </div>
                     <div style="margin-top:10px; border-top:1px solid #eee; padding-top: -2px;">
                         <label style="font-size:12px; font-weight:bold;">Mode de paiement</label>
                         <select id="payment-mode"
                             style="width:100%; padding:6px; margin-top:4px; border:1px solid #ccc; border-radius:3px;">
                             <option value="CAISSE">CAISSE</option>
-                            <option value="CH�QUE">CH�QUE</option>
+                            <option value="CHÈQUE">CHÈQUE</option>
                             <option value="VIREMENT">VIREMENT</option>
-                            <option value="ESP�CES">ESP�CES</option>
+                            <option value="ESPÈCES">ESPÈCES</option>
                             <option value="A TERME">A TERME</option>
                         </select>
                     </div>
                     <div style="margin-top:10px;">
-                        <label style="font-size:12px; font-weight:bold;">Charg�(e)</label>
+                        <label style="font-size:12px; font-weight:bold;">Chargé(e)</label>
                         <input type="text" id="charged-to" placeholder="Nom"
                             style="width:100%; padding:6px; margin-top:4px; border:1px solid #ccc; border-radius:3px;">
                     </div>
@@ -430,10 +431,10 @@
                 <table class="invoice-table" id="invoice-table">
                     <thead>
                         <tr>
-                            <th width="15%">R�f</th>
+                            <th width="15%">Réf</th>
                             <th width="25%">Article</th>
                             <th width="10%">Couleur</th>
-                            <th width="8%">Qt�</th>
+                            <th width="8%">Qté</th>
                             <th width="10%">PU TTC</th>
                             <th width="8%">Remise %</th>
                             <th width="10%">Montant</th>
@@ -466,7 +467,7 @@
                     <span>Frais: <b id="fees-total">0.000</b></span>
                     <span>Timbre: <b id="timbre-display">1.000</b></span>
                     <div class="total-separator">
-                        <span>Net � payer (TTC): <b id="total" style="font-size:18px;">0.000 DNT</b></span>
+                        <span>Net à payer (TTC): <b id="total" style="font-size:18px;">0.000 DNT</b></span>
                     </div>
                 </div>
             </div>
@@ -522,7 +523,7 @@
             function mergeProducts() {
                 // combine arrays; client items may duplicate store items intentionally
                 products = [...storeProducts, ...clientProducts];
-                console.log("?? Merged products, total:", products.length);
+                console.log("🔀 Merged products, total:", products.length);
                 renderStockTable();
             }
             let editMode = false;
@@ -584,16 +585,21 @@
                     alert("Attention: Certaines librairies sont manquantes (" + missing.join(", ") + ").\nL'import pourrait ne pas fonctionner hors ligne.");
                 }
 
-                // if this is a client-specific page we never show manage users
-                const ths = document.querySelectorAll('#tab-invoices table thead th');
-                if (ths && ths.length >= 3) {
-                    ths[2].style.display = 'none';
+                // Hide manage users button for non-admins
+                if (currentUserRole !== 'admin') {
+                    const btn = document.getElementById('manage-users-btn');
+                    if (btn) btn.style.display = 'none';
+                    // also hide the column header for client in the invoices table
+                    const ths = document.querySelectorAll('#tab-invoices table thead th');
+                    if (ths && ths.length >= 3) {
+                        ths[2].style.display = 'none';
+                    }
                 }
 
                 // Load data from Firestore
-                console.log("?? Loading data from Firestore...");
+                console.log("📡 Loading data from Firestore...");
                 loadFromFirestore();
-                console.log("? Firestore listeners set up");
+                console.log("✅ Firestore listeners set up");
 
                 // Logos
                 const logoInput = document.getElementById("company-logo");
@@ -635,17 +641,17 @@
                 window.addEventListener('offline', updateConnectionStatus);
                 updateConnectionStatus();
                 
-                console.log("✅ Client invoice page ready!");
+                console.log("✅ Admin panel ready!");
             }
 
             function updateConnectionStatus() {
                 const status = document.getElementById('firebase-status');
                 if (!status) return;
                 if (navigator.onLine) {
-                    status.textContent = '?? Online';
+                    status.textContent = '🟢 Online';
                     status.style.color = '#4CAF50';
                 } else {
-                    status.textContent = '?? Offline (Local Cache)';
+                    status.textContent = '🟡 Offline (Local Cache)';
                     status.style.color = '#ff9800';
                 }
             }
@@ -663,13 +669,13 @@
                             data._origin = 'store';
                             storeProducts.push(data);
                         });
-                        console.log("? Store products loaded from Firestore:", storeProducts.length);
+                        console.log("✅ Store products loaded from Firestore:", storeProducts.length);
                         mergeProducts();
-                        document.getElementById('firebase-status').textContent = '? Synced';
+                        document.getElementById('firebase-status').textContent = '✅ Synced';
                         document.getElementById('firebase-status').style.color = '#4CAF50';
                     }, (err) => {
                         console.error('Products Snapshot error:', err);
-                        document.getElementById('firebase-status').textContent = '? Error';
+                        document.getElementById('firebase-status').textContent = '❌ Error';
                         document.getElementById('firebase-status').style.color = '#f44336';
                     });
                     
@@ -685,7 +691,7 @@
                                 data._origin = 'client';
                                 clientProducts.push(data);
                             });
-                            console.log("? Client products loaded from Firestore:", clientProducts.length);
+                            console.log("✅ Client products loaded from Firestore:", clientProducts.length);
                             mergeProducts();
                         }, (err) => {
                             console.error('ClientProducts Snapshot error:', err);
@@ -706,7 +712,7 @@
                             });
                             // fallback by email if client and no results
                             if (currentUserRole !== 'admin' && invoices.length === 0 && auth.currentUser && auth.currentUser.email) {
-                                console.log("?? No invoices by clientUid, trying clientEmail fallback...");
+                                console.log("ℹ️ No invoices by clientUid, trying clientEmail fallback...");
                                 const emailQ = query(collection(db, "invoices"), where("clientEmail", "==", auth.currentUser.email.toLowerCase()));
                                 const emailSnap = await getDocs(emailQ);
                                 emailSnap.forEach(d => {
@@ -715,7 +721,7 @@
                                     invoices.push(data);
                                 });
                             }
-                            console.log("? Invoices loaded from Firestore:", invoices.length);
+                            console.log("✅ Invoices loaded from Firestore:", invoices.length);
                             renderInvoiceHistory();
                         }, (err) => {
                             console.error('Invoices Snapshot error:', err);
@@ -723,7 +729,7 @@
                     }
                 } catch (e) {
                     console.error('Firestore load error:', e);
-                    document.getElementById('firebase-status').textContent = '? Offline';
+                    document.getElementById('firebase-status').textContent = '❌ Offline';
                     document.getElementById('firebase-status').style.color = '#f44336';
                 }
             }
@@ -750,7 +756,7 @@
             async function saveStoreProducts() {
                 try {
                     const productsCopy = [...storeProducts];
-                    console.log("?? Saving", productsCopy.length, "store products to Firestore...");
+                    console.log("💾 Saving", productsCopy.length, "store products to Firestore...");
                     const savePromises = productsCopy.map(p => {
                         const docId = p._docId || sanitizeDocId(p.id);
                         return setDoc(doc(db, "products", String(docId)), {
@@ -763,13 +769,13 @@
                         });
                     });
                     await Promise.all(savePromises);
-                    console.log("? Store products saved to Firebase successfully");
-                    document.getElementById('firebase-status').textContent = '? Saved';
+                    console.log("✅ Store products saved to Firebase successfully");
+                    document.getElementById('firebase-status').textContent = '✅ Saved';
                     document.getElementById('firebase-status').style.color = '#4CAF50';
                 } catch (e) {
                     console.error("Save error:", e);
                     alert('Cloud save error: ' + e.message);
-                    document.getElementById('firebase-status').textContent = '? Save Failed';
+                    document.getElementById('firebase-status').textContent = '❌ Save Failed';
                     document.getElementById('firebase-status').style.color = '#f44336';
                 }
             }
@@ -777,7 +783,7 @@
             async function saveClientProducts() {
                 try {
                     const productsCopy = [...clientProducts];
-                    console.log("?? Saving", productsCopy.length, "client products to Firestore...");
+                    console.log("💾 Saving", productsCopy.length, "client products to Firestore...");
                     const savePromises = productsCopy.map(p => {
                         const docId = p._docId || sanitizeDocId(p.id + "_" + currentUser.uid);
                         return setDoc(doc(db, "clientProducts", String(docId)), {
@@ -790,7 +796,7 @@
                         });
                     });
                     await Promise.all(savePromises);
-                    console.log("? Client products saved to Firebase successfully");
+                    console.log("✅ Client products saved to Firebase successfully");
                 } catch (e) {
                     console.error("Client save error:", e);
                 }
@@ -815,6 +821,7 @@
 
             async function saveOneInvoice(invData) {
                 const docId = sanitizeDocId(invData.number);
+                console.log('saveOneInvoice called', { invData, docId, currentUserRole });
                 const toSave = { ...invData };
                 delete toSave._docId;
                 toSave.savedAt = serverTimestamp();
@@ -830,13 +837,19 @@
                     const clientUid = await findUserByEmail(toSave.clientEmail);
                     if (clientUid) {
                         toSave.clientUid = clientUid;
-                        console.log("? Invoice linked to client UID:", clientUid);
+                        console.log("✅ Invoice linked to client UID:", clientUid);
                     } else {
-                        console.warn("?? Could not find user with email:", toSave.clientEmail);
+                        console.warn("⚠️ Could not find user with email:", toSave.clientEmail);
                     }
                 }
                 
-                await setDoc(doc(db, "invoices", docId), toSave);
+                try {
+                    await setDoc(doc(db, "invoices", docId), toSave);
+                    console.log('setDoc success for invoice', docId);
+                } catch (e) {
+                    console.error('setDoc failed', e);
+                    throw e;
+                }
                 invData._docId = docId;
             }
 
@@ -870,14 +883,14 @@
       <td>${colors}</td>
       <td><input type="number" id="stock-${p.id}" value="${p.stock}" style="width:60px;"></td>
       <td>
-        <button onclick="addToInvoice('${p.id}')" title="Ajouter � la facture" style="background:#2196F3; padding:4px 8px; margin-right:5px;">+</button>
+        <button onclick="addToInvoice('${p.id}')" title="Ajouter à la facture" style="background:#2196F3; padding:4px 8px; margin-right:5px;">+</button>
         <button class="delete-btn" onclick="deleteProduct('${p.id}')">Suppr</button>
       </td>
     `;
                     tbody.appendChild(tr);
                 });
 
-                // select-all header checkbox logic
+                // select‑all header checkbox logic
                 const rowBoxes = tbody.querySelectorAll('.select-item');
                 const headerBox = document.getElementById('select-all');
                 rowBoxes.forEach(cb => {
@@ -908,7 +921,7 @@
                     });
                     await saveClientProducts();
                 }
-                alert("Stocks mis � jour et sauvegard�s dans le cloud!");
+                alert("Stocks mis à jour et sauvegardés dans le cloud!");
                 // refresh display in case any stock values changed externally
                 mergeProducts();
             }
@@ -959,7 +972,7 @@
                 try {
                     if (filename.endsWith('.xlsx') || filename.endsWith('.xls')) {
                         // Excel Logic
-                        if (typeof XLSX === 'undefined') throw new Error("Erreur: Librairie Excel non charg�e.");
+                        if (typeof XLSX === 'undefined') throw new Error("Erreur: Librairie Excel non chargée.");
                         const data = await file.arrayBuffer();
                         const workbook = XLSX.read(data);
                         const sheet = workbook.Sheets[workbook.SheetNames[0]];
@@ -992,7 +1005,7 @@
                         if (!res.data || res.data.length === 0 || Object.keys(res.data[0]).length < 2) res = parse("\t");
 
                         importedData = res.data || [];
-                        console.log("?? Parsed", importedData.length, "rows from CSV");
+                        console.log("📊 Parsed", importedData.length, "rows from CSV");
                     }
                 } catch (err) {
                     console.error(err);
@@ -1005,7 +1018,7 @@
                 let successCount = 0;
                 let failCount = 0;
                 const debugKeys = Object.keys(importedData[0] || {});
-                console.log("?? Starting import of", importedData.length, "rows. Headers:", debugKeys);
+                console.log("📥 Starting import of", importedData.length, "rows. Headers:", debugKeys);
 
                 try {
                     importedData.forEach((raw, rowIdx) => {
@@ -1023,7 +1036,7 @@
                         };
 
                         const id = (get(["id", "identifiant", "code", "ref"]) || "").toString().trim();
-                        if (!id) { failCount++; console.warn("? Row", rowIdx, "skipped: no ID found"); return; }
+                        if (!id) { failCount++; console.warn("❌ Row", rowIdx, "skipped: no ID found"); return; }
 
                         const name = (get(["name", "nom", "article", "designation"]) || "Produit").toString().trim();
                         const cat = (get(["category", "categorie", "famille"]) || "General").toString().trim();
@@ -1054,31 +1067,31 @@
 
                         if (existing) {
                             Object.assign(existing, pObj);
-                            console.log("?? Row", rowIdx, "- Updated:", id);
+                            console.log("✏️ Row", rowIdx, "- Updated:", id);
                         } else {
                             targetList.push(pObj);
-                            console.log("? Row", rowIdx, "- Added:", id);
+                            console.log("✅ Row", rowIdx, "- Added:", id);
                         }
                         successCount++;
                     });
 
-                    console.log("?? Before saving imported items:", successCount);
+                    console.log("📊 Before saving imported items:", successCount);
                     // persist both lists (wrapper will handle role check)
                     await persistAllStocks();
-                    console.log("?? After save, storeProducts:", storeProducts.length, "clientProducts:", clientProducts.length);
+                    console.log("📊 After save, storeProducts:", storeProducts.length, "clientProducts:", clientProducts.length);
                     mergeProducts();
 
-                    let msg = "Import r�ussi: " + successCount + " produits sauvegard�s dans le cloud ??.";
-                    if (failCount > 0) msg += "\n(" + failCount + " lignes ignor�es sans ID)";
+                    let msg = "Import réussi: " + successCount + " produits sauvegardés dans le cloud ☁️.";
+                    if (failCount > 0) msg += "\n(" + failCount + " lignes ignorées sans ID)";
                     if (successCount === 0) {
-                        msg += "\n\nColonnes trouv�es: " + debugKeys.join(", ");
-                        msg += "\n(V�rifiez que la colonne ID/Identifiant existe)";
+                        msg += "\n\nColonnes trouvées: " + debugKeys.join(", ");
+                        msg += "\n(Vérifiez que la colonne ID/Identifiant existe)";
                     }
                     alert(msg);
 
 
                 } catch (e) {
-                    alert("Erreur traitement donn�es: " + e.message);
+                    alert("Erreur traitement données: " + e.message);
                 }
             });
 
@@ -1280,7 +1293,12 @@
 
             // --- VALIDATION & SAVING ---
             async function validateInvoice() {
+                console.log('🔍 validateInvoice start', { currentInvoice });
                 if (currentInvoice.length === 0) return alert("Invoice is empty!");
+                // make sure invoice has an id (in case editor wasn't opened via add/start)
+                if (!document.getElementById("invoice-id").value) {
+                    document.getElementById("invoice-id").value = "INV-" + Date.now();
+                }
 
                 // Capture Data
                 console.log('validateInvoice() called, editMode=', editMode, 'editingInvoiceIndex=', editingInvoiceIndex);
@@ -1340,6 +1358,7 @@
                     }
                 }
 
+                console.log('Prepared invData', invData);
                 // Calculate final totals for generic view
                 let rawTotal = 0;
                 invData.items.forEach(i => {
@@ -1374,8 +1393,11 @@
                     invoices.push(invData);
                 }
                 try {
+                    console.log('📝 saving invoice to Firestore...');
                     await saveOneInvoice(invData);
-                } catch (e) { alert('Error saving invoice to cloud: ' + e.message); return; }
+                    console.log('✅ saveOneInvoice completed');
+                    const statEl = document.getElementById('firebase-status'); if (statEl) { statEl.textContent = '✅ Saved'; statEl.style.color = '#4CAF50'; }
+                } catch (e) { console.error('❌ saveOneInvoice error', e); alert('Error saving invoice to cloud: ' + e.message); return; }
 
                 // Cleanup
                 editMode = false;
@@ -1388,6 +1410,11 @@
                 switchTab("invoices");
                 renderInvoiceHistory();
                 alert("Invoice Saved to Cloud Successfully! ☁️");
+                if (window.location.pathname.toLowerCase().endsWith('client-invoicing.html')) {
+                    if (confirm('Invoice saved. Return to your dashboard?')) {
+                        window.location.href = 'client.html';
+                    }
+                }
                 if (window.location.pathname.toLowerCase().endsWith('client-invoicing.html')) {
                     if (confirm('Invoice saved. Return to your dashboard?')) {
                         window.location.href = 'client.html';
@@ -1597,7 +1624,7 @@
                 html += "<div style='margin-top:5px; font-size:11px;'>Ref: " + inv.number + " / Date: " + (inv.date || '').split(',')[0] + "</div>";
                 html += "</div>";
                 html += "<div style='width:40%; border:1px solid #000; padding:10px; border-radius:4px;'>";
-                html += "<div style='border-bottom:1px solid #000; font-weight:bold; margin-bottom:5px;'>LIVR� �:</div>";
+                html += "<div style='border-bottom:1px solid #000; font-weight:bold; margin-bottom:5px;'>LIVRÉ À:</div>";
                 html += "<div style='font-weight:bold; font-size:14px;'>" + (cli.name || "") + "</div>";
                 html += "<div>" + (cli.address || "") + "</div>";
                 html += "<div>Code: " + (cli.code || "") + "</div>";
@@ -1611,7 +1638,7 @@
                 html += "</div>";
 
                 html += "<table style='margin-bottom:15px; text-align:center;'>";
-                html += "<tr style='background:#eee;'><td>Date</td><td>Num�ro</td><td>Client Ref</td><td>Charg�(e)</td></tr>";
+                html += "<tr style='background:#eee;'><td>Date</td><td>Numéro</td><td>Client Ref</td><td>Chargé(e)</td></tr>";
                 html += "<tr>";
                 html += "<td>" + inv.date + "</td>";
                 html += "<td>" + inv.number + "</td>";
@@ -1620,7 +1647,7 @@
                 html += "</tr></table>";
 
                 html += "<table>";
-                html += "<thead style='background:#eee;'><tr><th>Ref</th><th>Code</th><th>D�signation</th><th>Qt�</th><th>PU TTC</th><th>Remise</th><th>Montant</th><th>TVA</th></tr></thead>";
+                html += "<thead style='background:#eee;'><tr><th>Ref</th><th>Code</th><th>Désignation</th><th>Qté</th><th>PU TTC</th><th>Remise</th><th>Montant</th><th>TVA</th></tr></thead>";
                 html += "<tbody>" + itemsHtml + "</tbody>";
                 html += "</table>";
 
@@ -1640,7 +1667,7 @@
                 html += taxTableHtml;
                 html += "</table>";
                 html += "<div style='margin-top:15px; font-style:italic;'>";
-                html += "Arr�t�e la pr�sente facture � la somme de:<br>";
+                html += "Arrêtée la présente facture à la somme de:<br>";
                 html += "<b>" + intPart + " Dinars et " + decPart + " Millimes.</b>";
                 html += "</div></div>";
 
@@ -1649,16 +1676,16 @@
                 html += "<tr><td>Total HT</td><td style='text-align:right;'>" + totalHT.toFixed(3) + "</td></tr>";
                 html += "<tr><td>Total TVA</td><td style='text-align:right;'>" + totalTVA.toFixed(3) + "</td></tr>";
                 html += "<tr><td>Timbre Fiscal</td><td style='text-align:right;'>" + fmt(fees.timbre) + "</td></tr>";
-                html += "<tr style='background:#ddd; font-size:14px;'><td>NET � PAYER TTC</td><td style='text-align:right;'>" + grandTotal.toFixed(3) + "</td></tr>";
+                html += "<tr style='background:#ddd; font-size:14px;'><td>NET À PAYER TTC</td><td style='text-align:right;'>" + grandTotal.toFixed(3) + "</td></tr>";
                 html += "</table></div></div>";
 
                 // Footer
                 html += "<div class='footer'>";
                 html += "<div style='border-top:1px solid #000; padding-top:5px; display:flex; justify-content:space-between;'>";
                 html += "<div style='width:60%'>";
-                html += "<b>Infos L�gales:</b><br>";
+                html += "<b>Infos Légales:</b><br>";
                 html += "MF: " + (cmp.mf || "") + " | RC: " + (cmp.rc || "") + " | RIB: " + (cmp.rib || "") + "<br>";
-                html += "IMPORTANT: Marchandise re�ue conforme...";
+                html += "IMPORTANT: Marchandise reçue conforme...";
                 html += "</div>";
                 html += "<div style='text-align:right;'>Signature & Cachet<div style='border:1px solid #ccc; height:60px; width:150px; margin-top:5px;'></div></div>";
                 html += "</div></div>";
