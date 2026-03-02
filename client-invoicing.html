@@ -1438,7 +1438,7 @@
                     }
                 })();
 
-                // Cleanup - close editor immediately without prompts
+                // Cleanup
                 editMode = false;
                 editingInvoiceIndex = -1;
                 currentInvoice = [];
@@ -1447,13 +1447,8 @@
                 const invSearch = document.getElementById("invoice-search-bar");
                 if (invSearch) invSearch.value = '';
                 switchTab("invoices");
-                try {
-                    renderInvoiceHistory();
-                } catch (err) {
-                    console.error('❌ renderInvoiceHistory failed', err);
-                }
-                // clear ID for next invoice
-                const idEl = document.getElementById("invoice-id"); if (idEl) idEl.value = '';
+                renderInvoiceHistory();
+                alert("Invoice Saved to Cloud Successfully! ☁️");
             }
 
             // --- HISTORY & PRINTING ---
@@ -1467,22 +1462,20 @@
                     const searchStr = (inv.number + (inv.client?.name||"") + inv.date).toLowerCase();
                     if (term && !searchStr.includes(term)) return;
 
-                                        const tr = document.createElement("tr");
-                                        // Show company name and address (nom de l'entreprise et adresse), fall back to client name/address
-                                        const companyName = (inv.company && inv.company.name) ? inv.company.name : (inv.client && inv.client.name ? inv.client.name : '—');
-                                        const companyAddress = (inv.company && inv.company.address) ? inv.company.address : (inv.client && inv.client.address ? inv.client.address : '—');
-                                        tr.innerHTML = `
-            <td>${inv.number}</td>
-            <td>${inv.date}</td>
-            <td>${companyName}<br><small style="color:#666">${companyAddress}</small></td>
-            <td>${inv.items.length}</td>
-            <td><b>${(inv.totalTTC || 0).toFixed(3)}</b></td>
-            <td>
-                <button onclick="printInvoice('${inv.number}')">Print</button>
-                <button onclick="editInvoice('${inv.number}')" style="background:#2196F3;">Edit</button>
-                <button onclick="cancelInvoice('${inv.number}')" class="cancel-btn">Cancel</button>
-            </td>
-        `;
+                    const tr = document.createElement("tr");
+                    const isClientView = currentUserRole !== 'admin';
+                    tr.innerHTML = `
+      <td>${inv.number}</td>
+      <td>${inv.date}</td>
+      ${isClientView ? '' : `<td>${inv.client.name}</td>`}
+      <td>${inv.items.length}</td>
+      <td><b>${(inv.totalTTC || 0).toFixed(3)}</b></td>
+      <td>
+        <button onclick="printInvoice('${inv.number}')">Print</button>
+        <button onclick="editInvoice('${inv.number}')" style="background:#2196F3;">Edit</button>
+        <button onclick="cancelInvoice('${inv.number}')" class="cancel-btn">Cancel</button>
+      </td>
+    `;
                     tbody.appendChild(tr);
                 });
             }
