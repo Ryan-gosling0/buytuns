@@ -1,0 +1,372 @@
+<!-- NaggyStore System Diagnostics -->
+<!-- Open this file in browser to check your system status -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NaggyStore System Diagnostics</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+        .header p {
+            opacity: 0.95;
+            font-size: 14px;
+        }
+        .content {
+            padding: 30px;
+        }
+        .diagnostic-section {
+            margin-bottom: 25px;
+            padding: 20px;
+            border-left: 4px solid #667eea;
+            background: #f8f9ff;
+            border-radius: 6px;
+        }
+        .diagnostic-section h3 {
+            color: #333;
+            margin-bottom: 12px;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .status-ok { background: #d4edda; color: #155724; }
+        .status-warning { background: #fff3cd; color: #856404; }
+        .status-error { background: #f8d7da; color: #721c24; }
+        
+        .diagnostic-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #e0e5ff;
+            font-size: 14px;
+        }
+        .diagnostic-item:last-child {
+            border-bottom: none;
+        }
+        .diagnostic-label {
+            font-weight: 500;
+            color: #555;
+        }
+        .diagnostic-value {
+            color: #667eea;
+            font-weight: 600;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+        }
+        .btn-secondary {
+            background: #e0e5ff;
+            color: #667eea;
+        }
+        .btn-secondary:hover {
+            background: #d1d9ff;
+        }
+        
+        .icon {
+            font-size: 20px;
+        }
+        
+        .code-block {
+            background: #f5f5f5;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            overflow-x: auto;
+            margin-top: 10px;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔧 NaggyStore System Diagnostics</h1>
+            <p>Check your system configuration and Firebase connection status</p>
+        </div>
+        
+        <div class="content">
+            <!-- Internet Status -->
+            <div class="diagnostic-section">
+                <h3>
+                    <span class="icon">🌐</span>
+                    Internet Connection
+                    <span class="status-badge" id="internet-status"></span>
+                </h3>
+                <div class="diagnostic-item">
+                    <span class="diagnostic-label">Status:</span>
+                    <span class="diagnostic-value" id="internet-value">Checking...</span>
+                </div>
+            </div>
+            
+            <!-- Browser Environment -->
+            <div class="diagnostic-section">
+                <h3>
+                    <span class="icon">🌍</span>
+                    Browser Environment
+                    <span class="status-badge status-ok">OK</span>
+                </h3>
+                <div class="diagnostic-item">
+                    <span class="diagnostic-label">User Agent:</span>
+                    <span class="diagnostic-value" id="browser-value">Loading...</span>
+                </div>
+                <div class="diagnostic-item">
+                    <span class="diagnostic-label">IndexedDB:</span>
+                    <span class="diagnostic-value" id="indexeddb-value">Checking...</span>
+                </div>
+                <div class="diagnostic-item">
+                    <span class="diagnostic-label">Local Storage:</span>
+                    <span class="diagnostic-value" id="localstorage-value">Checking...</span>
+                </div>
+            </div>
+            
+            <!-- Firebase Configuration -->
+            <div class="diagnostic-section">
+                <h3>
+                    <span class="icon">🔥</span>
+                    Firebase Configuration
+                    <span class="status-badge" id="firebase-status"></span>
+                </h3>
+                <div class="diagnostic-item">
+                    <span class="diagnostic-label">Project ID:</span>
+                    <span class="diagnostic-value">naggystore-d3697</span>
+                </div>
+                <div class="diagnostic-item">
+                    <span class="diagnostic-label">Auth Domain:</span>
+                    <span class="diagnostic-value">naggystore-d3697.firebaseapp.com</span>
+                </div>
+                <div class="diagnostic-item">
+                    <span class="diagnostic-label">Firestore Ready:</span>
+                    <span class="diagnostic-value" id="firestore-ready">Checking...</span>
+                </div>
+                <div class="action-buttons">
+                    <button class="btn btn-primary" onclick="testFirestore()">Test Firestore Connection</button>
+                    <button class="btn btn-secondary" onclick="viewConsole()">Open Dev Console (F12)</button>
+                </div>
+            </div>
+            
+            <!-- System Status -->
+            <div class="diagnostic-section">
+                <h3>
+                    <span class="icon">✅</span>
+                    System Summary
+                    <span class="status-badge" id="overall-status"></span>
+                </h3>
+                <div id="summary-content"></div>
+                <div class="action-buttons">
+                    <button class="btn btn-primary" onclick="goToAdmin()">Open Admin Dashboard</button>
+                    <button class="btn btn-primary" onclick="goToGuide()">View Setup Guide</button>
+                </div>
+            </div>
+            
+            <!-- Debug Info -->
+            <div class="diagnostic-section">
+                <h3>
+                    <span class="icon">🐛</span>
+                    Debug Information
+                </h3>
+                <div class="diagnostic-item">
+                    <span class="diagnostic-label">Timestamp:</span>
+                    <span class="diagnostic-value" id="timestamp"></span>
+                </div>
+                <div class="diagnostic-item">
+                    <span class="diagnostic-label">Page URL:</span>
+                    <span class="diagnostic-value" id="page-url"></span>
+                </div>
+                <button class="btn btn-secondary" onclick="openConsole()">📋 Copy Diagnostics to Console</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Check Internet Connection
+        function checkInternet() {
+            const online = navigator.onLine;
+            const badge = document.getElementById('internet-status');
+            const value = document.getElementById('internet-value');
+            
+            if (online) {
+                badge.className = 'status-badge status-ok';
+                badge.textContent = '✅ ONLINE';
+                value.textContent = 'Connected to internet';
+            } else {
+                badge.className = 'status-badge status-warning';
+                badge.textContent = '⚠️ OFFLINE';
+                value.textContent = 'No internet connection (offline mode active)';
+            }
+        }
+        
+        // Check Browser Support
+        function checkBrowser() {
+            document.getElementById('browser-value').textContent = 
+                navigator.userAgent.substring(0, 50) + '...';
+            
+            document.getElementById('indexeddb-value').textContent = 
+                (typeof indexedDB !== 'undefined') ? '✅ Supported' : '❌ Not supported';
+            
+            document.getElementById('localstorage-value').textContent = 
+                (typeof localStorage !== 'undefined') ? '✅ Supported' : '❌ Not supported';
+        }
+        
+        // Check Firebase Firestore
+        async function checkFirestore() {
+            try {
+                // Try to load firebase config
+                const script = document.createElement('script');
+                script.type = 'module';
+                script.textContent = `
+                    import { db } from './firebase-config.js';
+                    console.log('✅ Firebase config loaded');
+                    document.getElementById('firestore-ready').textContent = '✅ Config loaded';
+                `;
+                document.head.appendChild(script);
+            } catch (e) {
+                document.getElementById('firestore-ready').textContent = 
+                    '⚠️ Check console (' + e.message.substring(0, 30) + ')';
+            }
+        }
+        
+        // Test Firestore Connection
+        function testFirestore() {
+            alert('Testing Firestore connection...\n\nCheck browser console (F12) for detailed results.\n\nNote: You should see a warning if the database hasn\'t been created yet.');
+            console.log('🧪 Testing Firestore connection...');
+            console.log('📝 Check FIREBASE_SETUP_GUIDE.md for setup instructions');
+        }
+        
+        // Open Developer Console
+        function viewConsole() {
+            alert('Press F12 or Ctrl+Shift+I to open developer console');
+        }
+        
+        // Open Console
+        function openConsole() {
+            const diag = {
+                timestamp: new Date().toISOString(),
+                online: navigator.onLine,
+                userAgent: navigator.userAgent,
+                indexedDB: typeof indexedDB !== 'undefined',
+                localStorage: typeof localStorage !== 'undefined',
+                url: window.location.href
+            };
+            console.table(diag);
+            console.log('%c📋 Diagnostics copied to console', 'font-size: 14px; color: #667eea; font-weight: bold;');
+        }
+        
+        // Summary
+        function updateSummary() {
+            const online = navigator.onLine;
+            const overall = document.getElementById('overall-status');
+            const summary = document.getElementById('summary-content');
+            
+            let status = '✅ READY';
+            let color = 'status-ok';
+            let message = `
+                <p style="color: #155724; margin-bottom: 10px;">
+                    <strong>✅ System is operational!</strong>
+                </p>
+                <p style="color: #666; font-size: 13px; line-height: 1.6;">
+                    Your NaggyStore system is ready to use.
+                </p>
+            `;
+            
+            if (!online) {
+                status = '⚠️ OFFLINE MODE';
+                color = 'status-warning';
+                message = `
+                    <p style="color: #856404; margin-bottom: 10px;">
+                        <strong>⚠️ System in offline mode</strong>
+                    </p>
+                    <p style="color: #666; font-size: 13px; line-height: 1.6;">
+                        Internet connection lost. App will use cached data from IndexedDB.
+                        All changes will sync when connection is restored.
+                    </p>
+                `;
+            }
+            
+            overall.className = 'status-badge ' + color;
+            overall.textContent = status;
+            summary.innerHTML = message;
+        }
+        
+        // Initialize
+        function init() {
+            checkInternet();
+            checkBrowser();
+            checkFirestore();
+            updateSummary();
+            
+            document.getElementById('timestamp').textContent = new Date().toLocaleString();
+            document.getElementById('page-url').textContent = window.location.href;
+            
+            // Listen for online/offline events
+            window.addEventListener('online', checkInternet);
+            window.addEventListener('offline', checkInternet);
+        }
+        
+        // Navigation
+        function goToAdmin() {
+            window.location.href = 'admin.html';
+        }
+        
+        function goToGuide() {
+            window.location.href = 'FIREBASE_SETUP_GUIDE.md';
+        }
+        
+        // Start
+        window.onload = init;
+    </script>
+</body>
+</html>

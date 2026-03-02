@@ -659,77 +659,122 @@
             // --- FIRESTORE DATA LAYER ---
             async function loadFromFirestore() {
                 try {
-                    onSnapshot(collection(db, "products"), (snap) => {
-                        storeProducts = [];
-                        snap.forEach(d => {
-                            const data = d.data();
-                            data._docId = d.id;
-                            if (data.id) data.id = String(data.id);
-                            data._origin = 'store';
-                            storeProducts.push(data);
-                        });
-                        console.log("✅ Store products loaded from Firestore:", storeProducts.length);
-                        mergeProducts();
-                        document.getElementById('firebase-status').textContent = '✅ Synced';
-                        document.getElementById('firebase-status').style.color = '#4CAF50';
-                    }, (err) => {
-                        console.error('Products Snapshot error:', err);
-                        document.getElementById('firebase-status').textContent = '❌ Error';
-                        document.getElementById('firebase-status').style.color = '#f44336';
-                    });
-                    
-                    // also listen to client-specific products if not admin
-                    if (currentUserRole !== 'admin' && auth.currentUser) {
-                        const clientCol = query(collection(db, "clientProducts"), where("clientUid", "==", auth.currentUser.uid));
-                        onSnapshot(clientCol, (snap) => {
-                            clientProducts = [];
-                            snap.forEach(d => {
-                                const data = d.data();
-                                data._docId = d.id;
-                                if (data.id) data.id = String(data.id);
-                                data._origin = 'client';
-                                clientProducts.push(data);
+                    // Try to load products with better error handling
+                    const setupProductsListener = () => {
+                        try {
+                            onSnapshot(collection(db, "products"), (snap) => {
+                                storeProducts = [];
+                                snap.forEach(d => {
+                                    const data = d.data();
+                                    data._docId = d.id;
+                                    if (data.id) data.id = String(data.id);
+                                    data._origin = 'store';
+                                    storeProducts.push(data);
+                                });
+                                console.log("✅ Store products loaded from Firestore:", storeProducts.length);
+                                mergeProducts();
+                                const statEl = document.getElementById('firebase-status');
+                                if (statEl && storeProducts.length > 0) {
+                                    statEl.textContent = '✅ Synced';
+                                    statEl.style.color = '#4CAF50';
+                                }
+                            }, (err) => {
+                                console.warn('Products Snapshot error (expected if DB not created):', err.message);
+                                const statEl = document.getElementById('firebase-status');
+                                if (statEl) {
+                                    statEl.textContent = '⚠️ No Cloud DB';
+                                    statEl.style.color = '#ff9800';
+                                }
+                                // Try to render with empty/cached data anyway
+                                mergeProducts();
                             });
-                            console.log("✅ Client products loaded from Firestore:", clientProducts.length);
-                            mergeProducts();
-                        }, (err) => {
-                            console.error('ClientProducts Snapshot error:', err);
-                        });
-                    }
-                    {
-                        // choose query depending on role
-                        let invQuery = collection(db, "invoices");
-                        if (currentUserRole !== 'admin' && auth.currentUser) {
-                            invQuery = query(collection(db, "invoices"), where("clientUid", "==", auth.currentUser.uid));
+                        } catch (e) {
+                            console.error('Error setting up products listener:', e);
                         }
-                        onSnapshot(invQuery, async (snap) => {
-                            invoices = [];
-                            snap.forEach(d => {
-                                const data = d.data();
-                                data._docId = d.id;
-                                invoices.push(data);
-                            });
-                            // fallback by email if client and no results
-                            if (currentUserRole !== 'admin' && invoices.length === 0 && auth.currentUser && auth.currentUser.email) {
-                                console.log("ℹ️ No invoices by clientUid, trying clientEmail fallback...");
-                                const emailQ = query(collection(db, "invoices"), where("clientEmail", "==", auth.currentUser.email.toLowerCase()));
-                                const emailSnap = await getDocs(emailQ);
-                                emailSnap.forEach(d => {
+                    };
+                    
+                    // Setup client products if not admin
+                    const setupClientProducts = () => {
+                        if (currentUserRole !== 'admin' && auth.currentUser) {
+                            try {
+                                const clientCol = query(collection(db, "clientProducts"), where("clientUid", "==", auth.currentUser.uid));
+                                onSnapshot(clientCol, (snap) => {
+                                    clientProducts = [];
+                                    snap.forEach(d => {
+                                        const data = d.data();
+                                        data._docId = d.id;
+                                        if (data.id) data.id = String(data.id);
+                                        data._origin = 'client';
+                                        clientProducts.push(data);
+                                    });
+                                    console.log("✅ Client products loaded from Firestore:", clientProducts.length);
+                                    mergeProducts();
+                                }, (err) => {
+                                    console.warn('ClientProducts Snapshot error:', err.message);
+                                    mergeProducts();
+                                });
+                            } catch (e) {
+                                console.error('Error setting up client products listener:', e);
+                            }
+                        }
+                    };
+                    
+                    // Setup invoices listener
+                    const setupInvoicesListener = () => {
+                        try {
+                            let invQuery = collection(db, "invoices");
+                            if (currentUserRole !== 'admin' && auth.currentUser) {
+                                invQuery = query(collection(db, "invoices"), where("clientUid", "==", auth.currentUser.uid));
+                            }
+                            onSnapshot(invQuery, async (snap) => {
+                                invoices = [];
+                                snap.forEach(d => {
                                     const data = d.data();
                                     data._docId = d.id;
                                     invoices.push(data);
                                 });
-                            }
-                            console.log("✅ Invoices loaded from Firestore:", invoices.length);
+                                // fallback by email if client and no results
+                                if (currentUserRole !== 'admin' && invoices.length === 0 && auth.currentUser && auth.currentUser.email) {
+                                    console.log("ℹ️ No invoices by clientUid, trying clientEmail fallback...");
+                                    try {
+                                        const emailQ = query(collection(db, "invoices"), where("clientEmail", "==", auth.currentUser.email.toLowerCase()));
+                                        const emailSnap = await getDocs(emailQ);
+                                        emailSnap.forEach(d => {
+                                            const data = d.data();
+                                            data._docId = d.id;
+                                            invoices.push(data);
+                                        });
+                                    } catch (e) {
+                                        console.warn("Email fallback failed (expected if offline):", e.message);
+                                    }
+                                }
+                                console.log("✅ Invoices loaded from Firestore:", invoices.length);
+                                renderInvoiceHistory();
+                            }, (err) => {
+                                console.warn('Invoices Snapshot error (expected if DB not created):', err.message);
+                                renderInvoiceHistory();
+                            });
+                        } catch (e) {
+                            console.error('Error setting up invoices listener:', e);
                             renderInvoiceHistory();
-                        }, (err) => {
-                            console.error('Invoices Snapshot error:', err);
-                        });
-                    }
+                        }
+                    };
+                    
+                    // Setup all listeners
+                    setupProductsListener();
+                    setupClientProducts();
+                    setupInvoicesListener();
+                    
                 } catch (e) {
                     console.error('Firestore load error:', e);
-                    document.getElementById('firebase-status').textContent = '❌ Offline';
-                    document.getElementById('firebase-status').style.color = '#f44336';
+                    const statEl = document.getElementById('firebase-status');
+                    if (statEl) {
+                        statEl.textContent = '⚠️ Offline Mode';
+                        statEl.style.color = '#ff9800';
+                    }
+                    // Still render what we have
+                    mergeProducts();
+                    renderInvoiceHistory();
                 }
             }
 
@@ -1375,8 +1420,9 @@
                 if (!editMode && invoices.some(i => i.number === invData.number)) {
                     return alert("An invoice with this number already exists.");
                 }
-                if (currentUserRole !== 'admin' && !invData.clientEmail) {
-                    return alert("Client email is required for your invoices.");
+                // Allow offline invoices without email (they'll sync with email when online)
+                if (currentUserRole !== 'admin' && !invData.clientEmail && navigator.onLine) {
+                    return alert("Client email is required. Please add it to your invoice details.");
                 }
                 // ensure item quantities positive
                 for (const it of invData.items) {
