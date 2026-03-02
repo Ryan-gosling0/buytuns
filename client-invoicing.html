@@ -938,7 +938,7 @@
       <td>${p.category}</td>
       <td>${Number(p.price).toFixed(3)}</td>
       <td>${colors}</td>
-      <td><input type="number" id="stock-${p.id}" value="${p.stock}" style="width:60px;"></td>
+      <td><input type="number" id="stock-${p.id}" value="${p.stock}" style="width:60px;" onchange="saveAllStocks(true)"></td>
       <td>
         <button onclick="addToInvoice('${p.id}')" title="Ajouter à la facture" style="background:#2196F3; padding:4px 8px; margin-right:5px;">+</button>
         <button class="delete-btn" onclick="deleteProduct('${p.id}')">Suppr</button>
@@ -964,7 +964,7 @@
                 }
             }
 
-            async function saveAllStocks() {
+            async function saveAllStocks(silent = false) {
                 if (currentUserRole === 'admin') {
                     storeProducts.forEach(p => {
                         const el = document.getElementById(`stock-${p.id}`);
@@ -978,7 +978,7 @@
                     });
                     await saveClientProducts();
                 }
-                alert("Stocks mis à jour et sauvegardés dans le cloud!");
+                if (!silent) alert("Stocks mis à jour et sauvegardés dans le cloud!");
                 // refresh display in case any stock values changed externally
                 mergeProducts();
             }
