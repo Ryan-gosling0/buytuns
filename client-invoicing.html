@@ -311,11 +311,12 @@
 
 <body>
 
-    <h1 style="padding:10px 15px; background:#fff; border-bottom:1px solid #ddd; margin:0;">Gestion Admin - Stock et
+    <h1 style="padding:10px 15px; background:#fff; border-bottom:1px solid #ddd; margin:0;">Gestion Client - Stock et
         Factures</h1>
     <div id="top-buttons"
         style="padding:15px; background:#fff; border-bottom:1px solid #eee; display:flex; flex-wrap:wrap; align-items:center; gap:6px;">
-        <span id="firebase-status" style="font-size:12px; color:#4CAF50; font-weight:600; margin-right:6px;">🟢 Checking...
+        <span id="firebase-status" style="font-size:12px; color:#4CAF50; font-weight:600; margin-right:6px;">🟢
+            Checking...
         </span>
         <button onclick="saveAllStocks()">Enregistrer les stocks</button>
         <button onclick="exportCSV()">Exporter (CSV)</button>
@@ -572,10 +573,10 @@
                     }
                     const nameEl = document.getElementById('client-name');
                     if (nameEl) {
-                        nameEl.value = auth.currentUser.displayName || (auth.currentUser.email||'').split('@')[0];
+                        nameEl.value = auth.currentUser.displayName || (auth.currentUser.email || '').split('@')[0];
                     }
                 }
-                
+
                 // Library Check
                 const missing = [];
                 if (typeof Papa === 'undefined') missing.push("PapaParse (CSV)");
@@ -624,7 +625,7 @@
                         renderStockTable(document.getElementById("search-bar").value);
                     });
                 }
-                
+
                 const invoiceSearchBar = document.getElementById("invoice-search-bar");
                 if (invoiceSearchBar) {
                     invoiceSearchBar.addEventListener("input", renderInvoiceHistory);
@@ -640,7 +641,7 @@
                 window.addEventListener('online', updateConnectionStatus);
                 window.addEventListener('offline', updateConnectionStatus);
                 updateConnectionStatus();
-                
+
                 console.log("✅ Admin panel ready!");
             }
 
@@ -693,7 +694,7 @@
                             console.error('Error setting up products listener:', e);
                         }
                     };
-                    
+
                     // Setup client products if not admin
                     const setupClientProducts = () => {
                         if (currentUserRole !== 'admin' && auth.currentUser) {
@@ -719,7 +720,7 @@
                             }
                         }
                     };
-                    
+
                     // Setup invoices listener
                     const setupInvoicesListener = () => {
                         try {
@@ -761,12 +762,12 @@
                             renderInvoiceHistory();
                         }
                     };
-                    
+
                     // Setup all listeners
                     setupProductsListener();
                     setupClientProducts();
                     setupInvoicesListener();
-                    
+
                 } catch (e) {
                     console.error('Firestore load error:', e);
                     const statEl = document.getElementById('firebase-status');
@@ -902,7 +903,7 @@
                     toSave.clientUid = auth.currentUser.uid;
                     toSave.clientEmail = (auth.currentUser.email || '').toLowerCase();
                 }
-                
+
                 // Look up client UID by email to enable client-side filtering if still missing
                 if (toSave.clientEmail && !toSave.clientUid) {
                     const clientUid = await findUserByEmail(toSave.clientEmail);
@@ -913,7 +914,7 @@
                         console.warn("⚠️ Could not find user with email:", toSave.clientEmail);
                     }
                 }
-                
+
                 try {
                     await setDoc(doc(db, "invoices", docId), toSave);
                     console.log('setDoc success for invoice', docId);
@@ -1240,7 +1241,7 @@
                 // for clients, prefill their own information automatically
                 if (currentUserRole !== 'admin' && auth.currentUser) {
                     document.getElementById("client-email").value = auth.currentUser.email || "";
-                    document.getElementById("client-name").value = auth.currentUser.displayName || (auth.currentUser.email||'').split('@')[0];
+                    document.getElementById("client-name").value = auth.currentUser.displayName || (auth.currentUser.email || '').split('@')[0];
                 }
                 renderInvoiceEditorTable();
             }
@@ -1491,7 +1492,7 @@
                 // clear search so saved invoice is visible
                 const invSearch = document.getElementById("invoice-search-bar");
                 if (invSearch) invSearch.value = '';
-                switchTab("invoices");
+                // switchTab("invoices");
                 renderInvoiceHistory();
                 alert("Invoice Saved to Cloud Successfully! ☁️");
             }
@@ -1504,7 +1505,7 @@
 
                 invoices.forEach(inv => {
                     // Search filter
-                    const searchStr = (inv.number + (inv.client?.name||"") + inv.date).toLowerCase();
+                    const searchStr = (inv.number + (inv.client?.name || "") + inv.date).toLowerCase();
                     if (term && !searchStr.includes(term)) return;
 
                     const tr = document.createElement("tr");
