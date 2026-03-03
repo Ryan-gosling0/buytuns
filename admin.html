@@ -381,49 +381,7 @@
     </div>
 
     <div class="admin-layout">
-        <!-- DASHBOARD TAB -->
-        <div class="dashboard-panel" id="tab-dashboard" style="display:none;">
-            <h2>Admin Analytics Dashboard</h2>
-            <div class="stats-row">
-                <div class="stat-card" style="border-bottom-color: #4CAF50;">
-                    <div class="value" id="dash-total-sales">0.000</div>
-                    <div class="label">Total Revenue (DNT)</div>
-                </div>
-                <div class="stat-card" style="border-bottom-color: #2196F3;">
-                    <div class="value" id="dash-total-products">0</div>
-                    <div class="label">Total Products</div>
-                </div>
-                <div class="stat-card" style="border-bottom-color: #ff9800;">
-                    <div class="value" id="dash-low-stock">0</div>
-                    <div class="label">Low Stock Alerts</div>
-                </div>
-                <div class="stat-card" style="border-bottom-color: #9c27b0;">
-                    <div class="value" id="dash-total-invoices">0</div>
-                    <div class="label">Total Invoices</div>
-                </div>
-            </div>
 
-            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px;">
-                <div class="field-group">
-                    <h3>Recent Growth</h3>
-                    <p style="color:#666; font-size:13px;">Manage your store effectively by monitoring these real-time
-                        signals.</p>
-                </div>
-                <div class="field-group">
-                    <h3>Quick Links</h3>
-                    <div style="display:flex; gap:10px; flex-wrap:wrap;">
-                        <button onclick="switchTab('stock')" style="background:#eee; color:#333; font-size:12px;">Manage
-                            Stock</button>
-                        <button onclick="switchTab('invoices')"
-                            style="background:#eee; color:#333; font-size:12px;">View Invoices</button>
-                        <button onclick="window.location.href='admin-users.html'"
-                            style="background:#eee; color:#333; font-size:12px;">User List</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- STOCK TAB -->
         <div class="stock-panel" id="tab-stock">
             <h2>Stock Management</h2>
             <div style="overflow:auto; flex:1;">
@@ -616,7 +574,6 @@
                 products = [...storeProducts, ...clientProducts];
                 console.log("✅ Products merged:", products.length);
                 renderStockTable();
-                if (typeof updateDashboard === 'function') updateDashboard();
             }
             let editMode = false;
             let editingInvoiceIndex = -1;
@@ -660,7 +617,7 @@
                 // No auto-prefill for client info, allowing manual entry for all users.
 
                 // Default tab
-                switchTab('dashboard');
+                switchTab('stock');
 
                 // Library Check
                 const missing = [];
@@ -837,7 +794,6 @@
                                 }
                                 console.log("✅ Invoices loaded from Firestore:", invoices.length);
                                 renderInvoiceHistory();
-                                if (typeof updateDashboard === 'function') updateDashboard();
                             }, (err) => {
                                 console.warn('Invoices Snapshot error (expected if DB not created):', err.message);
                                 renderInvoiceHistory();
@@ -1084,19 +1040,36 @@
             }
 
             window.emptyStock = async function () {
-                if (!confirm("Voulez-vous vraiment vider TOUT le stock ? Cette action supprimera tous les produits du cloud.")) return;
-                const confirmRes = prompt("Tapez 'VIDER' pour confirmer :") || "";
+                const checkedBoxes = document.querySelectorAll(".select-item:checked");
+                if (checkedBoxes.length === 0) {
+                    return alert("Veuillez sélectionner au moins un item à supprimer.");
+                }
+
+                if (!confirm(`Voulez-vous vraiment supprimer les ${checkedBoxes.length} items sélectionnés ?`)) return;
+                const confirmRes = prompt("Tapez 'VIDER' pour confirmer la suppression des items sélectionnés :") || "";
                 if (confirmRes.toUpperCase() !== 'VIDER') return;
 
                 try {
                     const batch = writeBatch(db);
-                    const storeSnap = await getDocs(collection(db, "products"));
-                    storeSnap.forEach(d => batch.delete(d.ref));
-                    const clientSnap = await getDocs(collection(db, "clientProducts"));
-                    clientSnap.forEach(d => batch.delete(d.ref));
+                    const idsToDelete = Array.from(checkedBoxes).map(cb => cb.value);
+
+                    for (const id of idsToDelete) {
+                        const p = products.find(x => x.id === id);
+                        if (p) {
+                            const collectionName = p._origin === 'client' ? "clientProducts" : "products";
+                            const docId = p._docId || sanitizeDocId(p.id);
+                            batch.delete(doc(db, collectionName, String(docId)));
+                        }
+                    }
 
                     await batch.commit();
-                    alert("Stock vidé avec succès !");
+
+                    // Update local state
+                    storeProducts = storeProducts.filter(p => !idsToDelete.includes(p.id));
+                    clientProducts = clientProducts.filter(p => !idsToDelete.includes(p.id));
+
+                    alert(`${checkedBoxes.length} items supprimés avec succès !`);
+                    mergeProducts();
                 } catch (e) {
                     alert("Erreur lors de la suppression : " + e.message);
                 }
@@ -1273,13 +1246,7 @@
 
             // --- INVOICE EDITOR LOGIC ---
             function switchTab(tab) {
-                if (tab === "dashboard") {
-                    document.getElementById("tab-dashboard").style.display = "flex";
-                    document.getElementById("tab-stock").style.display = "none";
-                    document.getElementById("tab-invoices").style.display = "none";
-                    document.getElementById("invoice-editor").style.display = "none";
-                    updateDashboard();
-                } else if (tab === "stock") {
+                if (tab === "stock") {
                     document.getElementById("tab-dashboard").style.display = "none";
                     document.getElementById("tab-stock").style.display = "flex";
                     document.getElementById("tab-invoices").style.display = "none";
@@ -1296,22 +1263,6 @@
                 }
             }
 
-            function updateDashboard() {
-                // 1. Total Revenue
-                const revenue = invoices.reduce((sum, inv) => sum + (parseFloat(inv.totalTTC) || 0), 0);
-                document.getElementById('dash-total-sales').textContent = revenue.toFixed(3);
-
-                // 2. Total Invoices
-                document.getElementById('dash-total-invoices').textContent = invoices.length;
-
-                // 3. Products Stats
-                const totalProducts = products.length;
-                document.getElementById('dash-total-products').textContent = totalProducts;
-
-                // 4. Low Stock
-                const lowStockItems = products.filter(p => (parseInt(p.stock) || 0) < 5).length;
-                document.getElementById('dash-low-stock').textContent = lowStockItems;
-            }
 
             function addToInvoice(id) {
                 const p = products.find(prod => prod.id === id);
