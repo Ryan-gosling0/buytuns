@@ -530,6 +530,7 @@
             let editMode = false;
             let editingInvoiceIndex = -1;
             let currentUserRole = null; // 'admin' or 'client' or other
+            let currentUser = null;
 
             // Wait for persistence to initialize
             await persistenceReady;
@@ -537,6 +538,7 @@
             // --- AUTH GUARD ---
             onAuthStateChanged(auth, async (user) => {
                 if (!user) { window.location.href = 'login.html'; return; }
+                currentUser = user;
 
                 try {
                     const userSnap = await getDoc(doc(db, "users", user.uid));
@@ -1223,10 +1225,10 @@
                 if (!document.getElementById("invoice-id").value) {
                     document.getElementById("invoice-id").value = "INV-" + Date.now();
                 }
-                // for clients, prefill their own information automatically
-                if (currentUserRole !== 'admin' && auth.currentUser) {
-                    document.getElementById("client-email").value = auth.currentUser.email || "";
-                    document.getElementById("client-name").value = auth.currentUser.displayName || (auth.currentUser.email || '').split('@')[0];
+                // for clients, prefill COMPANY information automatically
+                if (currentUserRole !== 'admin' && currentUser) {
+                    document.getElementById("company-email").value = currentUser.email || "";
+                    document.getElementById("company-name").value = currentUser.displayName || (currentUser.email || '').split('@')[0];
                 }
                 renderInvoiceEditorTable();
             }

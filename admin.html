@@ -365,7 +365,6 @@
         <button onclick="saveAllStocks()" style="background:#4CAF50;">💾 Enregistrer</button>
         <button onclick="emptyStock()" style="background:#f44336;" title="Tout effacer">🗑️ Vider</button>
         <button onclick="exportCSV()">Exporter (CSV)</button>
-        <button onclick="switchTab('dashboard')" style="background:#673ab7;">📊 Dashboard</button>
         <button onclick="switchTab('stock')">Stock</button>
         <button onclick="switchTab('invoices')">Historique des factures</button>
         <input type="file" id="import-file" accept=".csv,.txt,.tsv,.xlsx,.xls" style="font-size:12px;">
@@ -610,6 +609,7 @@
             // --- CONFIG & STATE ---
             const ADMIN_PASSWORD = "1234";
             let storeProducts = [], clientProducts = [], products = [], invoices = [], currentInvoice = [];
+            let currentUser = null;
 
             function mergeProducts() {
                 // combine arrays; client items may duplicate store items intentionally
@@ -628,6 +628,7 @@
             // --- AUTH GUARD ---
             onAuthStateChanged(auth, async (user) => {
                 if (!user) { window.location.href = 'login.html'; return; }
+                currentUser = user;
 
                 try {
                     const userSnap = await getDoc(doc(db, "users", user.uid));
@@ -1084,8 +1085,8 @@
 
             window.emptyStock = async function () {
                 if (!confirm("Voulez-vous vraiment vider TOUT le stock ? Cette action supprimera tous les produits du cloud.")) return;
-                const confirmRes = prompt("Tapez 'VIDER' pour confirmer :");
-                if (confirmRes !== 'VIDER') return;
+                const confirmRes = prompt("Tapez 'VIDER' pour confirmer :") || "";
+                if (confirmRes.toUpperCase() !== 'VIDER') return;
 
                 try {
                     const batch = writeBatch(db);
@@ -1366,10 +1367,10 @@
                 if (!document.getElementById("invoice-id").value) {
                     document.getElementById("invoice-id").value = "INV-" + Date.now();
                 }
-                // for clients, prefill their own information automatically
-                if (currentUserRole !== 'admin' && auth.currentUser) {
-                    document.getElementById("client-email").value = auth.currentUser.email || "";
-                    document.getElementById("client-name").value = auth.currentUser.displayName || (auth.currentUser.email || '').split('@')[0];
+                // for clients, prefill COMPANY information automatically
+                if (currentUserRole !== 'admin' && currentUser) {
+                    document.getElementById("company-email").value = currentUser.email || "";
+                    document.getElementById("company-name").value = currentUser.displayName || (currentUser.email || '').split('@')[0];
                 }
                 renderInvoiceEditorTable();
             }
